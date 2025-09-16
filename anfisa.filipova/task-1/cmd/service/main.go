@@ -34,7 +34,11 @@ func main() {
 		return
 	}
 	//fmt.Println("Enter operation: ")
-	fmt.Fscan(os.Stdin, &operation)
+	_, err = fmt.Fscan(os.Stdin, &operation)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Reading error: %v\n", err)
+		os.Exit(1)
+	}
 	result, err := pkg.Calculate(num1, num2, operation)
 
 	if err != nil {

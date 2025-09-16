@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/JingolBong/task-1/internal/calculator"
 )
 
@@ -15,6 +16,10 @@ func main() {
 	case "*":
 		fmt.Printf("%d\n", calc.Mul(firstNumber, secondNumber))
 	case "/":
-		fmt.Printf("%d\n", calc.Div(firstNumber, secondNumber))
+		result, ok := calc.Div(firstNumber, secondNumber)
+		if !ok {
+			fmt.Println("Division by zero")
+		}
+			fmt.Printf("%d\n", result)
 	}
 }

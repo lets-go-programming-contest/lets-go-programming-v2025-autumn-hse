@@ -7,8 +7,10 @@ import (
 )
 
 func main() {
-	var a, b calc.Operand
-	var op calc.Operation
+	var (
+		a, b calc.Operand
+		op   calc.Operation
+	)
 
 	if _, err := fmt.Scan(&a); err != nil {
 		fmt.Println("Invalid first operand")

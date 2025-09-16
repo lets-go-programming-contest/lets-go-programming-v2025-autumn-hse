@@ -9,8 +9,10 @@ type Operand int
 type Operation string
 
 func Calculate(a, b Operand, op Operation) (Operand, error) {
-	var result Operand
-	var err error
+	var (
+		result Operand
+		err    error
+	)
 	switch op {
 	case "+":
 		result, err = a+b, nil

@@ -9,12 +9,12 @@ func main() {
 	firstNumber, secondNumber, operator := calc.UserInput()
 	switch operator {
 	case "+":
-		fmt.Printf("Result: %d\n", calc.Add(firstNumber, secondNumber))
+		fmt.Printf("%d\n", calc.Add(firstNumber, secondNumber))
 	case "-":
-		fmt.Printf("Result: %d\n", calc.Subt(firstNumber, secondNumber))
+		fmt.Printf("%d\n", calc.Subt(firstNumber, secondNumber))
 	case "*":
-		fmt.Printf("Result: %d\n", calc.Mul(firstNumber, secondNumber))
+		fmt.Printf("%d\n", calc.Mul(firstNumber, secondNumber))
 	case "/":
-		fmt.Printf("Result: %.2f\n", calc.Div(firstNumber, secondNumber))
+		fmt.Printf("%d\n", calc.Div(firstNumber, secondNumber))
 	}
 }

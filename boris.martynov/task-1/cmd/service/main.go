@@ -19,7 +19,8 @@ func main() {
 		result, ok := calc.Div(firstNumber, secondNumber)
 		if !ok {
 			fmt.Println("Division by zero")
-		}
+		} else {
 			fmt.Printf("%d\n", result)
+		}
 	}
 }

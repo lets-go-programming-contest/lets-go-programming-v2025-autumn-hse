@@ -9,24 +9,31 @@ import (
 
 func main() {
 	var operand1, operand2 string
-	var err error
 	var operation string
 	var num1, num2 int
-	fmt.Println("Enter first operand: ")
-	fmt.Fscan(os.Stdin, &operand1)
+	//fmt.Println("Enter first operand: ")
+	_, err := fmt.Fscan(os.Stdin, &operand1)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Reading error: %v\n", err)
+		os.Exit(1)
+	}
 	num1, err = strconv.Atoi(operand1)
 	if err != nil {
 		fmt.Println("Invalid first operand")
 		return
 	}
-	fmt.Println("Enter second operand: ")
-	fmt.Fscan(os.Stdin, &operand2)
+	//fmt.Println("Enter second operand: ")
+	_, err = fmt.Fscan(os.Stdin, &operand2)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Reading error: %v\n", err)
+		os.Exit(1)
+	}
 	num2, err = strconv.Atoi(operand2)
 	if err != nil {
 		fmt.Println("Invalid second operand")
 		return
 	}
-	fmt.Println("Enter operation: ")
+	//fmt.Println("Enter operation: ")
 	fmt.Fscan(os.Stdin, &operation)
 	result, err := pkg.Calculate(num1, num2, operation)
 
@@ -35,6 +42,6 @@ func main() {
 		return
 	}
 
-	fmt.Println("Result: ")
+	//fmt.Println("Result: ")
 	fmt.Println(result)
 }

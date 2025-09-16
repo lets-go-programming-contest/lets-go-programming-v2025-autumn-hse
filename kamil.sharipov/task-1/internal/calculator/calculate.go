@@ -21,7 +21,7 @@ func Calculate(left_operand, right_operand int32, operator rune) int64 {
 		return int64(left_operand / right_operand)
 	default:
 		fmt.Println("Invalid operation")
-		os.Exit(1)
+		return 0
 	}
 
 	return 0

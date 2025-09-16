@@ -30,21 +30,18 @@ func UserInput() (int64, int64, string) {
  var n int
  var err error
 
- fmt.Print("First number: ")
  n, err = fmt.Scanln(&a)
  if err != nil || n != 1 {
   fmt.Println("Invalid first operand")
   return 0, 0, ""
  }
 
- fmt.Print("Second number: ")
  n, err = fmt.Scanln(&b)
  if err != nil || n != 1 {
   fmt.Println("Invalid second operand")
   return 0, 0, ""
  }
 
- fmt.Print("Operation: ")
  n, err = fmt.Scanln(&operator)
  if err != nil || n != 1 {
   fmt.Println("Invalid operation")

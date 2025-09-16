@@ -1,43 +1,31 @@
 package main
 
 import (
-	calc "calculator/internal/calculator"
 	"fmt"
-	"os"
+	calc "github.com/6ermvh/calculator/internal/calculator"
 )
 
 func main() {
-	var A, B, Res calc.Operand
-	var Op calc.Operation
+	var a, b calc.Operand
+	var op calc.Operation
 
-	if err := A.Read(); err != nil {
-		fmt.Println(fmt.Errorf("Invalid first operand"))
-		os.Exit(0)
+	if _, err := fmt.Scan(&a); err != nil {
+		fmt.Println("Invalid first operand")
+		return
 	}
-	if err := B.Read(); err != nil {
-		fmt.Println(fmt.Errorf("Invalid second operand"))
-		os.Exit(0)
+	if _, err := fmt.Scan(&b); err != nil {
+		fmt.Println("Invalid second operand")
+		return
 	}
-	if err := Op.Read(); err != nil {
+	if _, err := fmt.Scan(&op); err != nil {
+		fmt.Println("Invalid operation")
+		return
+	}
+
+	res, err := calc.Calculate(a, b, op)
+	if err != nil {
 		fmt.Println(err)
-		os.Exit(0)
 	}
 
-	switch Op.Value {
-	case '+':
-		Res, _ = calc.Addition(A, B)
-	case '-':
-		Res, _ = calc.Subtraction(A, B)
-	case '*':
-		Res, _ = calc.Multiplication(A, B)
-	case '/':
-		var err error
-		Res, err = calc.Division(A, B)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(0)
-		}
-	}
-
-	fmt.Println(Res.Value)
+	fmt.Println(res)
 }

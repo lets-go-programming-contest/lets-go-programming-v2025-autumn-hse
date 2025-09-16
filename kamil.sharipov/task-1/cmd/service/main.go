@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/kamilSharipov/task-1/internal/calculator"
 	"fmt"
+
+	"github.com/kamilSharipov/task-1/internal/calculator"
 )
 
 func main() {

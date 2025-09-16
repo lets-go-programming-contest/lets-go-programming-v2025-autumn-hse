@@ -2,7 +2,6 @@ package calculator
 
 import (
 	"fmt"
-	"os"
 )
 
 func Calculate(left_operand, right_operand int32, operator rune) int64 {
@@ -16,7 +15,7 @@ func Calculate(left_operand, right_operand int32, operator rune) int64 {
 	case '/':
 		if right_operand == 0 {
 			fmt.Println("Division by zero")
-			os.Exit(1)
+			return 0
 		}
 		return int64(left_operand / right_operand)
 	default:

@@ -7,7 +7,7 @@ import (
 func Calculate(left_operand, right_operand int32, operator rune) int64 {
 	switch operator {
 	case '+':
-		return int64(left_operand + right_operand)
+		return int64(left_operand) + int64(right_operand)
 	case '-':
 		return int64(left_operand - right_operand)
 	case '*':
@@ -22,6 +22,4 @@ func Calculate(left_operand, right_operand int32, operator rune) int64 {
 		fmt.Println("Invalid operation")
 		return 0
 	}
-
-	return 0
 }

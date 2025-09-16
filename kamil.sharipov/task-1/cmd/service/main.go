@@ -7,16 +7,16 @@ import (
 )
 
 func main() {
-	var left_operand, right_operand int32
+	var leftOperand, rightOperand int32
 	var operator string
 
-	_, err := fmt.Scanln(&left_operand)
+	_, err := fmt.Scanln(&leftOperand)
 	if err != nil {
 		fmt.Println("Invalid first operand")
 		return
 	}
 
-	_, err = fmt.Scanln(&right_operand)
+	_, err = fmt.Scanln(&rightOperand)
 	if err != nil {
 		fmt.Println("Invalid second operand")
 		return
@@ -34,7 +34,7 @@ func main() {
 	}
 
 	result, ok := calculator.Calculate(
-		left_operand, right_operand, rune(operator[0]))
+		leftOperand, rightOperand, rune(operator[0]))
 	if ok {
 		fmt.Printf("%d\n", result)
 	}

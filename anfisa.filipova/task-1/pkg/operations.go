@@ -18,5 +18,4 @@ func Calculate(operand1 int, operand2 int, operation string) (interface{}, error
 	default:
 		return 0, fmt.Errorf("Invalid operation")
 	}
-
 }

@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-
 	var A, B, Res calc.Operand
 	var Op calc.Operation
 
@@ -41,5 +40,4 @@ func main() {
 	}
 
 	fmt.Println(Res.Value)
-
 }

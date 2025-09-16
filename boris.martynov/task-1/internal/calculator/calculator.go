@@ -20,7 +20,7 @@ func Mul(a, b int64) int64 {
 func Div(a, b int64) float64 {
  if b == 0 {
   fmt.Println("Division by zero")
-  os.Exit(1)
+  return
  }
  return float64(a) / float64(b)
 }
@@ -35,26 +35,26 @@ func UserInput() (int64, int64, string) {
  n, err = fmt.Scanln(&a)
  if err != nil || n != 1 {
   fmt.Println("Invalid first operand")
-  os.Exit(1)
+  return
  }
 
  fmt.Print("Second number: ")
  n, err = fmt.Scanln(&b)
  if err != nil || n != 1 {
   fmt.Println("Invalid second operand")
-  os.Exit(1)
+  return
  }
 
  fmt.Print("Operation: ")
  n, err = fmt.Scanln(&operator)
  if err != nil || n != 1 {
   fmt.Println("Invalid operation")
-  os.Exit(1)
+  return
  }
 
  if operator != "+" && operator != "-" && operator != "*" && operator != "/" {
   fmt.Println("Invalid operation")
-  os.Exit(1)
+  return
  }
 
  return a, b, operator

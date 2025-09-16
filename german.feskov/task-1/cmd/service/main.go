@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	calc "github.com/6ermvh/calculator/internal/calculator"
 )
 
@@ -25,6 +26,7 @@ func main() {
 	res, err := calc.Calculate(a, b, op)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
 	fmt.Println(res)

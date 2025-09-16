@@ -8,11 +8,10 @@ import (
 
 func main() {
 	var (
-		firstOperand, secondOperand, result int64
-		operation                           string
-		err                                 error
+		firstOperand, secondOperand int64
+		operation                   string
 	)
-	_, err = fmt.Scan(&firstOperand)
+	_, err := fmt.Scan(&firstOperand)
 	if err != nil {
 		fmt.Println("Invalid first operand")
 		return
@@ -27,7 +26,7 @@ func main() {
 		fmt.Println("Invalid operation")
 		return
 	}
-	result, err = calculator.Calculate(firstOperand, secondOperand, operation)
+	result, err := calculator.Calculate(firstOperand, secondOperand, operation)
 	if err == nil {
 		fmt.Println(result)
 	} else {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Calculator/internal/calculator"
+	"github.com/kamilSharipov/task-1/internal/calculator"
 	"fmt"
 )
 

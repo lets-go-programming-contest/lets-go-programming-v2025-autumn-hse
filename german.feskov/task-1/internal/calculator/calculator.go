@@ -31,14 +31,14 @@ func (o *Operation) Read() error {
 	var str string
 	_, err := fmt.Scan(&str)
 	if err != nil {
-		return fmt.Errorf("Invalid Operation")
+		return fmt.Errorf("Invalid operation")
 	}
 	if len(str) != 1 {
-		return fmt.Errorf("Invalid Operation")
+		return fmt.Errorf("Invalid operation")
 	}
 	o.Value = str[0]
 	if _, ok := operators[o.Value]; !ok {
-		return fmt.Errorf("Invalid Operation")
+		return fmt.Errorf("Invalid operation")
 	}
 	return nil
 }

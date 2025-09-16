@@ -2,7 +2,6 @@ package calc
 
 import (
  "fmt"
- "os"
 )
 
 func Add(a, b int64) int64 {

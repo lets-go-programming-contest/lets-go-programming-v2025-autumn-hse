@@ -3,24 +3,40 @@ package main
 import (
 	"fmt"
 
-	calc "github.com/JingolBong/task-1/internal/calculator"
+	"github.com/JingolBong/task-1/internal/calculator"
 )
 
 func main() {
-	firstNumber, secondNumber, operator := calc.UserInput()
+	firstNumber, err := calculator.ReadNumber("first operand")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	secondNumber, err := calculator.ReadNumber("second operand")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	operator, err := calculator.ReadOperator()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	switch operator {
 	case "+":
-		fmt.Printf("%d\n", calc.Add(firstNumber, secondNumber))
+		fmt.Println(firstNumber + secondNumber)
 	case "-":
-		fmt.Printf("%d\n", calc.Subt(firstNumber, secondNumber))
+		fmt.Println(firstNumber - secondNumber)
 	case "*":
-		fmt.Printf("%d\n", calc.Mul(firstNumber, secondNumber))
+		fmt.Println(firstNumber * secondNumber)
 	case "/":
-		result, ok := calc.Div(firstNumber, secondNumber)
-		if !ok {
-			fmt.Println("Division by zero")
+		result, err := calculator.Div(firstNumber, secondNumber)
+		if err != nil {
+			fmt.Println(err)
 		} else {
-			fmt.Printf("%d\n", result)
+			fmt.Println(result)
 		}
+	default:
+		fmt.Println("Invalid operation")
 	}
 }

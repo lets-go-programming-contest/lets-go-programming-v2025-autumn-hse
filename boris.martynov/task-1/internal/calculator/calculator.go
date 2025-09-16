@@ -16,12 +16,11 @@ func Mul(a, b int64) int64 {
 	return a * b
 }
 
-func Div(a, b int64) int64 {
+func Div(a, b int64) (int64, bool) {
 	if b == 0 {
-		fmt.Println("Division by zero")
-		return 0
+		return 0, false
 	}
-	return a / b
+	return a / b, true
 }
 
 func UserInput() (int64, int64, string) {

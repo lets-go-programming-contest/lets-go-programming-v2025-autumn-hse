@@ -19,7 +19,7 @@ func Mul(a, b int64) int64 {
 func Div(a, b int64) float64 {
  if b == 0 {
   fmt.Println("Division by zero")
-  return 0, 0, ""
+  return 0
  }
  return float64(a) / float64(b)
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/JingolBong/task-1/internal/calculator"
+	calc "github.com/JingolBong/task-1/internal/calculator"
 )
 
 func main() {

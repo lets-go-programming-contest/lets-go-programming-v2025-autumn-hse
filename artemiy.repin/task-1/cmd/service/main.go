@@ -10,15 +10,15 @@ func main() {
 	var op string
 
 	if _, err := fmt.Scanln(&a); err != nil {
-		fmt.Fprintln(os.Stderr, "invalid first operand")
+		fmt.Fprintln(os.Stderr, "Invalid first operand")
 		return
 	}
 	if _, err := fmt.Scanln(&b); err != nil {
-		fmt.Fprintln(os.Stderr, "invalid second operand")
+		fmt.Fprintln(os.Stderr, "Invalid second operand")
 		return
 	}
 	if _, err := fmt.Scanln(&op); err != nil {
-		fmt.Fprintln(os.Stderr, "invalid operation")
+		fmt.Fprintln(os.Stderr, "Invalid operation")
 		return
 	}
 
@@ -31,11 +31,11 @@ func main() {
 		fmt.Println(a * b)
 	case "/":
 		if b == 0 {
-			fmt.Fprintln(os.Stderr, "division by zero")
+			fmt.Fprintln(os.Stderr, "Division by zero")
 			return
 		}
 		fmt.Println(a / b)
 	default:
-		fmt.Fprintln(os.Stderr, "invalid operation")
+		fmt.Fprintln(os.Stderr, "Invalid operation")
 	}
 }

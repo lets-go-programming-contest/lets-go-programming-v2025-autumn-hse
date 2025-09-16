@@ -33,6 +33,9 @@ func main() {
 		return
 	}
 
-	result := calculator.Calculate(left_operand, right_operand, rune(operator[0]))
-	fmt.Printf("%d\n", result)
+	result, ok := calculator.Calculate(
+		left_operand, right_operand, rune(operator[0]))
+	if ok {
+		fmt.Printf("%d\n", result)
+	}
 }

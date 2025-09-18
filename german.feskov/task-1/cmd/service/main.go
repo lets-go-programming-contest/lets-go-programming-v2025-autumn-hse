@@ -8,8 +8,8 @@ import (
 
 func main() {
 	var (
-		a, b calc.Operand
-		op   calc.Operation
+		a, b int
+		op   string
 	)
 
 	if _, err := fmt.Scan(&a); err != nil {

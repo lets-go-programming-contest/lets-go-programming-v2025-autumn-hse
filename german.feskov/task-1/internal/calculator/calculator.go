@@ -1,14 +1,15 @@
 package calculator
 
 import (
-	"fmt"
+	"errors"
 )
 
-type Operand int
+var (
+	errDivisionByZero   = errors.New("Division by zero")
+	errInvalidOperation = errors.New("Invalid operation")
+)
 
-type Operation string
-
-func Calculate(a, b Operand, op Operation) (Operand, error) {
+func Calculate(a, b int, op string) (int, error) {
 	switch op {
 	case "+":
 		return a + b, nil
@@ -18,10 +19,10 @@ func Calculate(a, b Operand, op Operation) (Operand, error) {
 		return a * b, nil
 	case "/":
 		if b == 0 {
-			return 0, fmt.Errorf("Division by zero")
+			return 0, errDivisionByZero
 		}
 		return a / b, nil
 	default:
-		return 0, fmt.Errorf("Invalid operation")
+		return 0, errInvalidOperation
 	}
 }

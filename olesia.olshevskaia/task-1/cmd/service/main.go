@@ -6,23 +6,23 @@ import (
 )
 
 func main() {
-	var first_operand, second_operand int64
+	var firstOperand, secondOperand int64
 	var result int64
 	var operation string
 
-	_, err_first_operand := fmt.Scan(&first_operand)
-	_, err_second_operand := fmt.Scan(&second_operand)
-	_, err_operation := fmt.Scan(&operation)
+	_, errFirstOperand := fmt.Scan(&firstOperand)
+	_, errSecondOperand := fmt.Scan(&secondOperand)
+	_, errOperation := fmt.Scan(&operation)
 
-	if err_first_operand != nil {
+	if errFirstOperand != nil {
 		fmt.Println("Invalid first operand")
 		return
 	}
-	if err_second_operand != nil {
+	if errSecondOperand != nil {
 		fmt.Println("Invalid second operand")
 		return
 	}
-	if err_operation != nil {
+	if errOperation != nil {
 		fmt.Println("Invalid operation")
 		return
 	}
@@ -33,17 +33,17 @@ func main() {
 
 	switch operation {
 	case "+":
-		result = first_operand + second_operand
+		result = firstOperand + secondOperand
 	case "-":
-		result = first_operand - second_operand
+		result = firstOperand - secondOperand
 	case "*":
-		result = first_operand * second_operand
+		result = firstOperand * secondOperand
 	case "/":
-		if second_operand == 0 {
+		if secondOperand == 0 {
 			fmt.Println("Division by zero")
 			return
 		}
-		result = first_operand / second_operand
+		result = firstOperand / secondOperand
 	}
 
 	fmt.Println(result)

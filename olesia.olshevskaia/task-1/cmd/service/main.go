@@ -6,8 +6,7 @@ import (
 )
 
 func main() {
-	var firstOperand, secondOperand int64
-	var result int64
+	var firstOperand, secondOperand, result int64
 	var operation string
 
 	_, errFirstOperand := fmt.Scan(&firstOperand)

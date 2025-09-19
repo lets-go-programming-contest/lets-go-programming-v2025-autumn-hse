@@ -9,6 +9,7 @@ func main() {
 		request     string
 		reqVal      int
 	)
+
 	if _, err := fmt.Scan(&depCount); err != nil {
 		return
 	}
@@ -27,11 +28,12 @@ func main() {
 			if _, err := fmt.Scanf("%s %d", &request, &reqVal); err != nil {
 				return
 			}
-			if request == ">=" && reqVal > minT {
-				minT = reqVal
-			}
-			if request == "<=" && reqVal < maxT {
-				maxT = reqVal
+
+			switch request {
+			case ">=":
+				minT = maxInt(minT, reqVal)
+			case "<=":
+				maxT = minInt(maxT, reqVal)
 			}
 
 			if minT > maxT {
@@ -42,4 +44,20 @@ func main() {
 		}
 		fmt.Println()
 	}
+}
+
+func minInt(a, b int) int {
+	if a < b {
+		return a
+	}
+
+	return b
+}
+
+func maxInt(a, b int) int {
+	if a > b {
+		return a
+	}
+
+	return b
 }

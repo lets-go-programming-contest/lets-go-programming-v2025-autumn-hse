@@ -24,14 +24,15 @@ func main() {
 		fmt.Println("Invalid second operand")
 		return
 	}
-	if operator == "/" && rightOperand == 0 {
-		fmt.Println("Division by zero")
-		return
-	}
 
 	_, err = fmt.Scanln(&operator)
 	if err != nil {
 		fmt.Println("Invalid operation")
+		return
+	}
+
+	if operator == "/" && rightOperand == 0 {
+		fmt.Println("Division by zero")
 		return
 	}
 

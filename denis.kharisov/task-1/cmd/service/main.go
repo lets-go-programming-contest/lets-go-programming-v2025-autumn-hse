@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 )
 
 func main() {
@@ -12,18 +11,18 @@ func main() {
 	)
 	_, err := fmt.Scan(&firstOperand)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Invalid first operand")
-		os.Exit(1)
+		fmt.Println("Invalid first operand")
+		return
 	}
 	_, err = fmt.Scan(&secondOperand)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Invalid second operand")
-		os.Exit(1)
+		fmt.Println("Invalid second operand")
+		return
 	}
 	_, err = fmt.Scan(&sign)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Invalid operand")
-		os.Exit(1)
+		fmt.Println("Invalid operand")
+		return
 	}
 	switch sign {
 	case "+":
@@ -34,12 +33,12 @@ func main() {
 		fmt.Println(firstOperand * secondOperand)
 	case "/":
 		if secondOperand == 0 {
-			fmt.Fprintln(os.Stderr, "Division by zero")
-			os.Exit(1)
+			fmt.Println("Division by zero")
+			return
 		}
 		fmt.Println(firstOperand / secondOperand)
 	default:
-		fmt.Fprintln(os.Stderr, "Invalid operand")
-		os.Exit(1)
+		fmt.Println("Invalid operand")
+		return
 	}
 }

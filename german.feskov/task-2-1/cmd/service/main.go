@@ -19,8 +19,8 @@ func main() {
 		}
 
 		var (
-			minT = 0
-			maxT = 1000
+			minT = 15
+			maxT = 30
 		)
 
 		for range workerCount {

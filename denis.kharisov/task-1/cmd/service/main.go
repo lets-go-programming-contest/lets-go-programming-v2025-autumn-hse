@@ -21,7 +21,7 @@ func main() {
 	}
 	_, err = fmt.Scan(&sign)
 	if err != nil {
-		fmt.Println("Invalid operand")
+		fmt.Println("Invalid operation")
 		return
 	}
 	switch sign {
@@ -38,7 +38,7 @@ func main() {
 		}
 		fmt.Println(firstOperand / secondOperand)
 	default:
-		fmt.Println("Invalid operand")
+		fmt.Println("Invalid operation")
 		return
 	}
 }

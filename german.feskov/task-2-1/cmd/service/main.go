@@ -4,26 +4,26 @@ import "fmt"
 
 func main() {
 	var (
-		n       int
-		k       int
-		request string
-		reqVal  int
+		depCount    int
+		workerCount int
+		request     string
+		reqVal      int
 	)
-	if _, err := fmt.Scan(&n); err != nil {
+	if _, err := fmt.Scan(&depCount); err != nil {
 		return
 	}
 
-	for range n {
-		if _, err := fmt.Scan(&k); err != nil {
+	for range depCount {
+		if _, err := fmt.Scan(&workerCount); err != nil {
 			return
 		}
 
 		var (
-			minT int = 0
-			maxT int = 1000
+			minT = 0
+			maxT = 1000
 		)
 
-		for range k {
+		for range workerCount {
 			if _, err := fmt.Scanf("%s %d", &request, &reqVal); err != nil {
 				return
 			}
@@ -40,6 +40,6 @@ func main() {
 				fmt.Println(minT)
 			}
 		}
+		fmt.Println()
 	}
-
 }

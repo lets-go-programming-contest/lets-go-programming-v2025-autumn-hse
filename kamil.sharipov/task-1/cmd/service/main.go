@@ -7,8 +7,11 @@ import (
 )
 
 func main() {
-	var leftOperand, rightOperand int32
-	var operator string
+	var (
+		leftOperand  int32
+		rightOperand int32
+		operator     string
+	)
 
 	_, err := fmt.Scanln(&leftOperand)
 	if err != nil {
@@ -21,6 +24,9 @@ func main() {
 		fmt.Println("Invalid second operand")
 		return
 	}
+	if rightOperand == 0 {
+		fmt.Println("Division by zero")
+	}
 
 	_, err = fmt.Scanln(&operator)
 	if err != nil {
@@ -28,13 +34,8 @@ func main() {
 		return
 	}
 
-	if operator != "+" && operator != "-" && operator != "*" && operator != "/" {
-		fmt.Println("Invalid operation")
-		return
-	}
-
 	result, ok := calculator.Calculate(
-		leftOperand, rightOperand, rune(operator[0]))
+		leftOperand, rightOperand, operator)
 	if ok {
 		fmt.Printf("%d\n", result)
 	}

@@ -4,19 +4,15 @@ import (
 	"fmt"
 )
 
-func Calculate(leftOperand, rightOperand int32, operator rune) (int64, bool) {
+func Calculate(leftOperand, rightOperand int32, operator string) (int64, bool) {
 	switch operator {
-	case '+':
+	case "+":
 		return int64(leftOperand) + int64(rightOperand), true
-	case '-':
+	case "-":
 		return int64(leftOperand) - int64(rightOperand), true
-	case '*':
+	case "*":
 		return int64(leftOperand) * int64(rightOperand), true
-	case '/':
-		if rightOperand == 0 {
-			fmt.Println("Division by zero")
-			return 0, false
-		}
+	case "/":
 		return int64(leftOperand / rightOperand), true
 	default:
 		fmt.Println("Invalid operation")

@@ -11,11 +11,15 @@ func main() {
 	)
 
 	if _, err := fmt.Scan(&depCount); err != nil {
+		fmt.Println(err)
+
 		return
 	}
 
 	for range depCount {
 		if _, err := fmt.Scan(&workerCount); err != nil {
+			fmt.Println(err)
+
 			return
 		}
 
@@ -26,6 +30,8 @@ func main() {
 
 		for range workerCount {
 			if _, err := fmt.Scanf("%s %d", &request, &reqVal); err != nil {
+				fmt.Println(err)
+
 				return
 			}
 

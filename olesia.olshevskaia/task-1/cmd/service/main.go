@@ -6,25 +6,25 @@ import (
 )
 
 func main() {
-	var firstOperand, secondOperand, result int64
-	var operation string
-
-	_, errFirstOperand := fmt.Scan(&firstOperand)
-	_, errSecondOperand := fmt.Scan(&secondOperand)
-	_, errOperation := fmt.Scan(&operation)
-
-	if errFirstOperand != nil {
+	var (
+		firstOperand, secondOperand int64
+		operation                   string
+	)
+	if _, err := fmt.Scan(&firstOperand); err != nil {
 		fmt.Println("Invalid first operand")
 		return
 	}
-	if errSecondOperand != nil {
+
+	if _, err := fmt.Scan(&secondOperand); err != nil {
 		fmt.Println("Invalid second operand")
 		return
 	}
-	if errOperation != nil {
+
+	if _, err := fmt.Scan(&operation); err != nil {
 		fmt.Println("Invalid operation")
 		return
 	}
+
 	if !strings.Contains("+-*/", operation) {
 		fmt.Println("Invalid operation")
 		return
@@ -32,18 +32,16 @@ func main() {
 
 	switch operation {
 	case "+":
-		result = firstOperand + secondOperand
+		fmt.Println(firstOperand + secondOperand)
 	case "-":
-		result = firstOperand - secondOperand
+		fmt.Println(firstOperand - secondOperand)
 	case "*":
-		result = firstOperand * secondOperand
+		fmt.Println(firstOperand * secondOperand)
 	case "/":
 		if secondOperand == 0 {
 			fmt.Println("Division by zero")
 			return
 		}
-		result = firstOperand / secondOperand
+		fmt.Println(firstOperand / secondOperand)
 	}
-
-	fmt.Println(result)
 }

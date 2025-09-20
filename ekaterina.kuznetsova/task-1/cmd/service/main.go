@@ -9,7 +9,6 @@ func main() {
 		firstNum, secondNum int
 		operation           string
 	)
-
 	_, err1 := fmt.Scanln(&firstNum)
 	if err1 != nil {
 		fmt.Println("Invalid first operand")

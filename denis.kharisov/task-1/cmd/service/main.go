@@ -6,8 +6,8 @@ import (
 
 func main() {
 	var (
-		firstOperand, secondOperand float64
-		sign                        string
+		firstOperand, secondOperand int
+		operation                   string
 	)
 	_, err := fmt.Scan(&firstOperand)
 	if err != nil {
@@ -19,12 +19,12 @@ func main() {
 		fmt.Println("Invalid second operand")
 		return
 	}
-	_, err = fmt.Scan(&sign)
+	_, err = fmt.Scan(&operation)
 	if err != nil {
 		fmt.Println("Invalid operation")
 		return
 	}
-	switch sign {
+	switch operation {
 	case "+":
 		fmt.Println(firstOperand + secondOperand)
 	case "-":
@@ -36,7 +36,7 @@ func main() {
 			fmt.Println("Division by zero")
 			return
 		}
-		fmt.Println(firstOperand / secondOperand)
+		fmt.Println(float64(firstOperand) / float64(secondOperand))
 	default:
 		fmt.Println("Invalid operation")
 		return

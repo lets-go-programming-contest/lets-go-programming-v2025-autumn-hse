@@ -14,6 +14,7 @@ func main() {
 	var (
 		departmentCount, employeeCount, preferredTemperature, currentTemperature int
 		inequalitySign                                                           string
+		lowerBound, upperBound                                                   int
 	)
 
 	_, err := fmt.Scan(&departmentCount)
@@ -26,8 +27,8 @@ func main() {
 			log.Fatal(err)
 		}
 
-		lowerBound := minimumTemperature
-		upperBound := maximumTemperature
+		lowerBound = minimumTemperature
+		upperBound = maximumTemperature
 		currentTemperature = -1
 
 		for range employeeCount {
@@ -60,11 +61,14 @@ func main() {
 					currentTemperature = -1
 				case preferredTemperature < upperBound:
 					upperBound = preferredTemperature
-					currentTemperature = lowerBound
+					currentTemperature = upperBound
 				default:
-					currentTemperature = lowerBound
+					currentTemperature = upperBound
 				}
 			default:
+				currentTemperature = -1
+			}
+			if lowerBound > upperBound {
 				currentTemperature = -1
 			}
 

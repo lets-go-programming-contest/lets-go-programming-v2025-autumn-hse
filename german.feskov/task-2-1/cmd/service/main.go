@@ -42,6 +42,7 @@ func main() {
 				fmt.Println(minT)
 			}
 		}
+
 		fmt.Println()
 	}
 }

@@ -4,7 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 
-	"github.com/6ermvH/task-2-2/internal/heapMax"
+	"github.com/6ermvH/task-2-2/internal/heapmax"
 )
 
 func main() {
@@ -13,7 +13,7 @@ func main() {
 		kInd      int
 	)
 
-	dishes := &heapMax.IntHeap{}
+	dishes := &heapmax.IntHeap{}
 	heap.Init(dishes)
 
 	if _, err := fmt.Scan(&dishCount); err != nil {

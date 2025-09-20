@@ -1,4 +1,4 @@
-package heapMax
+package heapmax
 
 type IntHeap []int
 
@@ -19,7 +19,7 @@ func (h *IntHeap) Pop() any {
 	old := *h
 	n := len(old)
 	x := old[n-1]
-	*h = old[0 : n-1]
+	*h = old[0 : n-1] // slice [0:0] is empty slice!!!
 
 	return x
 }

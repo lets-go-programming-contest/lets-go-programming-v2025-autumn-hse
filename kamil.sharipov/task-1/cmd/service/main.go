@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/kamilSharipov/task-1/internal/calculator"
 )
 
 func main() {
 	var (
-		leftOperand  int32
-		rightOperand int32
-		operator     string
+		leftOperand, rightOperand int32
+		operator                  string
 	)
 
 	_, err := fmt.Scanln(&leftOperand)
@@ -31,14 +31,17 @@ func main() {
 		return
 	}
 
-	if operator == "/" && rightOperand == 0 {
-		fmt.Println("Division by zero")
-		return
-	}
-
-	result, ok := calculator.Calculate(
-		leftOperand, rightOperand, operator)
-	if ok {
-		fmt.Printf("%d\n", result)
+	result, err := calculator.Calculate(leftOperand, rightOperand, operator)
+	if err != nil {
+		switch {
+		case strings.Contains(err.Error(), "division by zero"):
+			fmt.Println("Division by zero")
+		case strings.Contains(err.Error(), "invalid operation"):
+			fmt.Println("Invalid operation")
+		default:
+			return
+		}
+	} else {
+		fmt.Println(result)
 	}
 }

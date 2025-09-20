@@ -4,18 +4,20 @@ import (
 	"fmt"
 )
 
-func Calculate(leftOperand, rightOperand int32, operator string) (int64, bool) {
+func Calculate(leftOperand, rightOperand int32, operator string) (int64, error) {
 	switch operator {
 	case "+":
-		return int64(leftOperand) + int64(rightOperand), true
+		return int64(leftOperand) + int64(rightOperand), nil
 	case "-":
-		return int64(leftOperand) - int64(rightOperand), true
+		return int64(leftOperand) - int64(rightOperand), nil
 	case "*":
-		return int64(leftOperand) * int64(rightOperand), true
+		return int64(leftOperand) * int64(rightOperand), nil
 	case "/":
-		return int64(leftOperand / rightOperand), true
+		if rightOperand == 0 {
+			return 0, fmt.Errorf("division by zero")
+		}
+		return int64(leftOperand / rightOperand), nil
 	default:
-		fmt.Println("Invalid operation")
-		return 0, false
+		return 0, fmt.Errorf("invalid operation")
 	}
 }

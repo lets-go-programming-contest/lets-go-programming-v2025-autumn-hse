@@ -18,9 +18,8 @@ func Calculate(firstOperand, secondOperand int64, operation string) (int64, erro
 	case "/":
 		if secondOperand == 0 {
 			return 0, errDivision
-		} else {
-			return firstOperand / secondOperand, nil
 		}
+		return firstOperand / secondOperand, nil
 	default:
 		return 0, errInvalidOperation
 	}

@@ -27,9 +27,9 @@ func main() {
 		return
 	}
 	result, err := calculator.Calculate(firstOperand, secondOperand, operation)
-	if err == nil {
-		fmt.Println(result)
-	} else {
+	if err != nil {
 		fmt.Println(err)
+		return
 	}
+	fmt.Println(result)
 }

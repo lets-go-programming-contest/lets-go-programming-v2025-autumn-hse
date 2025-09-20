@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 )
 
 func main() {
@@ -10,6 +9,7 @@ func main() {
 		firstOperand, secondOperand int64
 		operation                   string
 	)
+
 	if _, err := fmt.Scan(&firstOperand); err != nil {
 		fmt.Println("Invalid first operand")
 		return
@@ -21,11 +21,6 @@ func main() {
 	}
 
 	if _, err := fmt.Scan(&operation); err != nil {
-		fmt.Println("Invalid operation")
-		return
-	}
-
-	if !strings.Contains("+-*/", operation) {
 		fmt.Println("Invalid operation")
 		return
 	}
@@ -43,5 +38,7 @@ func main() {
 			return
 		}
 		fmt.Println(firstOperand / secondOperand)
+	default:
+		fmt.Println("Invalid operation")
 	}
 }

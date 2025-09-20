@@ -5,41 +5,61 @@ import (
 	"strconv"
 )
 
+const (
+	Min = 15
+	Max = 30
+)
+
 func main() {
 	var (
-		countDepartments, countEmployee, temputer, maxTemputer, minTemputer int
-		sign                                                                string
+		countDepartments, countEmployee, minTemperature, maxTemperature int
+		sign                                                            string
 	)
-	fmt.Scan(&countDepartments)
-	for i := 0; i < countDepartments; i++ {
-		fmt.Scan(&countEmployee)
-		maxTemputer = 30
-		minTemputer = 15
 
-		for j := 0; j < countEmployee; j++ {
+	if _, err := fmt.Scan(&countDepartments); err != nil {
+		return
+	}
+
+	for range make([]struct{}, countDepartments) {
+		if _, err := fmt.Scan(&countEmployee); err != nil {
+			return
+		}
+		minTemperature = Min
+		maxTemperature = Max
+
+		for range make([]struct{}, countEmployee) {
 			var line string
-			fmt.Scan(&line)
+			if _, err := fmt.Scan(&line); err != nil {
+				return
+			}
 			sign = line[:2]
 			tempStr := line[2:]
-			temputer, _ = strconv.Atoi(tempStr)
+			temperature, err := strconv.Atoi(tempStr)
+
+			if err != nil {
+				return
+			}
+
 			switch sign {
 			case ">=":
-				if minTemputer < temputer {
-					minTemputer = temputer
+				if minTemperature < temperature {
+					minTemperature = temperature
 				}
 			case "<=":
-				if maxTemputer > temputer {
-					maxTemputer = temputer
+				if maxTemperature > temperature {
+					maxTemperature = temperature
 				}
 			}
-			if minTemputer > maxTemputer {
+
+			switch {
+			case minTemperature > maxTemperature:
 				fmt.Println(-1)
-			} else if minTemputer > 15 && maxTemputer < 30 {
-				fmt.Println(minTemputer)
-			} else if minTemputer > 15 {
-				fmt.Println(minTemputer)
-			} else {
-				fmt.Println(maxTemputer)
+			case minTemperature > Min && maxTemperature < Max:
+				fmt.Println(minTemperature)
+			case minTemperature > Min:
+				fmt.Println(minTemperature)
+			default:
+				fmt.Println(maxTemperature)
 			}
 		}
 	}

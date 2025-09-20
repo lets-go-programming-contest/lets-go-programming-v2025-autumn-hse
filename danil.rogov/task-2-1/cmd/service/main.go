@@ -68,6 +68,7 @@ func main() {
 			default:
 				currentTemperature = -1
 			}
+
 			if lowerBound > upperBound {
 				currentTemperature = -1
 			}

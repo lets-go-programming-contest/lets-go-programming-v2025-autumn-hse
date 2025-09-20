@@ -77,8 +77,10 @@ func main() {
 			if lowerBound > upperBound {
 				result = errorTemperature
 			}
+
 			fmt.Println(result)
 		}
+
 		fmt.Println()
 	}
 }

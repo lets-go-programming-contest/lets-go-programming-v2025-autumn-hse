@@ -5,20 +5,6 @@ import (
 	"log"
 )
 
-func maxInt(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func minInt(a, b int) int {
-	if a > b {
-		return b
-	}
-	return a
-}
-
 const (
 	minimumTemperature = 15
 	maximumTemperature = 30
@@ -26,25 +12,24 @@ const (
 
 func main() {
 	var (
-		departmentCount, employeeCount, preferredTemperature int
-		inequalitySign                                       string
+		departmentCount, employeeCount, preferredTemperature, currentTemperature int
+		inequalitySign                                                           string
+		lowerBound, upperBound                                                   int
 	)
 
 	_, err := fmt.Scan(&departmentCount)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	for range departmentCount {
 		_, err = fmt.Scan(&employeeCount)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		var (
-			lowerBound = minimumTemperature
-			upperBound = maximumTemperature
-		)
+		lowerBound = minimumTemperature
+		upperBound = maximumTemperature
+		currentTemperature = -1
 
 		for range employeeCount {
 			_, err = fmt.Scan(&inequalitySign, &preferredTemperature)
@@ -53,22 +38,42 @@ func main() {
 			}
 
 			if preferredTemperature < minimumTemperature || preferredTemperature > maximumTemperature {
-				fmt.Println(-1)
+				currentTemperature = -1
+				log.Println(currentTemperature)
 
 				continue
 			}
 
 			switch inequalitySign {
 			case ">=":
-				lowerBound = maxInt(lowerBound, preferredTemperature)
+				switch {
+				case preferredTemperature > upperBound:
+					currentTemperature = -1
+				case preferredTemperature > lowerBound:
+					lowerBound = preferredTemperature
+					currentTemperature = lowerBound
+				default:
+					currentTemperature = lowerBound
+				}
 			case "<=":
-				upperBound = minInt(upperBound, preferredTemperature)
+				switch {
+				case preferredTemperature < lowerBound:
+					currentTemperature = -1
+				case preferredTemperature < upperBound:
+					upperBound = preferredTemperature
+					currentTemperature = upperBound
+				default:
+					currentTemperature = upperBound
+				}
+			default:
+				currentTemperature = -1
 			}
+
 			if lowerBound > upperBound {
-				fmt.Println(-1)
-			} else {
-				fmt.Println(lowerBound)
+				currentTemperature = -1
 			}
+
+			log.Println(currentTemperature)
 		}
 		fmt.Println()
 	}

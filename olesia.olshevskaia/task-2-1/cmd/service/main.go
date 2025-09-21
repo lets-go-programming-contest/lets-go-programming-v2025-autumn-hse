@@ -20,8 +20,8 @@ func printOptimumTemperature(minTemperature, maxTemperature int) {
 
 func main() {
 	var (
-		countDepartments, countEmployee, minTemperature, maxTemperature, temperature int
-		sign                                                                         string
+		countDepartments, countEmployee, temperature int
+		sign                                         string
 	)
 
 	if _, err := fmt.Scanln(&countDepartments); err != nil {
@@ -37,8 +37,8 @@ func main() {
 			return
 		}
 
-		minTemperature = Min
-		maxTemperature = Max
+		minTemperature := Min
+		maxTemperature := Max
 
 		for range make([]struct{}, countEmployee) {
 			if _, err := fmt.Scanln(&sign, &temperature); err != nil {

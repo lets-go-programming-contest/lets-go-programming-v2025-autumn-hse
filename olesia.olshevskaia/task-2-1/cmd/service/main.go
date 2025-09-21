@@ -10,16 +10,12 @@ const (
 )
 
 func printOptimumTemperature(minTemperature, maxTemperature int) {
-	switch {
-	case minTemperature > maxTemperature:
+	if minTemperature > maxTemperature {
 		fmt.Println(-1)
-	case minTemperature > Min && maxTemperature < Max:
-		fmt.Println(minTemperature)
-	case minTemperature > Min:
-		fmt.Println(minTemperature)
-	default:
-		fmt.Println(maxTemperature)
+		return
 	}
+
+	fmt.Println(minTemperature)
 }
 
 func main() {

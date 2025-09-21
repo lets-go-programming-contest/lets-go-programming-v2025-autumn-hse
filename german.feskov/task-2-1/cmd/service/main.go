@@ -2,11 +2,16 @@ package main
 
 import "fmt"
 
+const (
+	minTemperature = 15
+	maxTemperature = 30
+)
+
 func main() {
 	var (
 		depCount    int
 		workerCount int
-		request     string
+		reqOp       string
 		reqVal      int
 	)
 
@@ -24,22 +29,26 @@ func main() {
 		}
 
 		var (
-			minT = 15
-			maxT = 30
+			minT = minTemperature
+			maxT = maxTemperature
 		)
 
 		for range workerCount {
-			if _, err := fmt.Scanf("%s %d", &request, &reqVal); err != nil {
-				fmt.Println(err)
+			for tryAgain := false; !tryAgain; {
+				if _, err := fmt.Scanf("%s %d", &reqOp, &reqVal); err != nil {
+					continue
+				}
 
-				return
-			}
-
-			switch request {
-			case ">=":
-				minT = maxInt(minT, reqVal)
-			case "<=":
-				maxT = minInt(maxT, reqVal)
+				switch reqOp {
+				case ">=":
+					minT = maxInt(minT, reqVal)
+					tryAgain = true
+				case "<=":
+					maxT = minInt(maxT, reqVal)
+					tryAgain = true
+				default:
+					continue
+				}
 			}
 
 			if minT > maxT {

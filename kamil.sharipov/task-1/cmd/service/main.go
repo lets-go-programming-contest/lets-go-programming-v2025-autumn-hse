@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/kamilSharipov/task-1/internal/calculator"
 )
@@ -33,15 +32,9 @@ func main() {
 
 	result, err := calculator.Calculate(leftOperand, rightOperand, operator)
 	if err != nil {
-		switch {
-		case strings.Contains(err.Error(), "division by zero"):
-			fmt.Println("Division by zero")
-		case strings.Contains(err.Error(), "invalid operation"):
-			fmt.Println("Invalid operation")
-		default:
-			return
-		}
-	} else {
-		fmt.Println(result)
+		fmt.Println(err.Error())
+		return
 	}
+
+	fmt.Println(result)
 }

@@ -12,6 +12,7 @@ const (
 func printOptimumTemperature(minTemperature, maxTemperature int) {
 	if minTemperature > maxTemperature {
 		fmt.Println(-1)
+
 		return
 	}
 

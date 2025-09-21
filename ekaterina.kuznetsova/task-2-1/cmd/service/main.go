@@ -29,40 +29,25 @@ func main() {
 
 			switch comparisonSign {
 			case "<=":
-				if temperature <= minTemperature {
-					_, err := fmt.Println("-1")
-					if err != nil {
-						return
-					}
-					break
-				}
 				if temperature <= maxTemperature {
 					maxTemperature = temperature
 				}
-				_, err := fmt.Println(minTemperature)
-				if err != nil {
-					return
-				}
-			case ">=":
-				if maxTemperature <= temperature {
-					_, err := fmt.Println("-1")
-					if err != nil {
-						return
-					}
+				if temperature <= minTemperature {
+					fmt.Println("-1")
 					break
 				}
+				fmt.Println(minTemperature)
+			case ">=":
 				if minTemperature <= temperature {
 					minTemperature = temperature
 				}
-				_, err := fmt.Println(minTemperature)
-				if err != nil {
-					return
+				if maxTemperature <= temperature {
+					fmt.Println("-1")
+					break
 				}
+				fmt.Println(minTemperature)
 			default:
-				_, err := fmt.Println("Error compaison sign")
-				if err != nil {
-					return
-				}
+				fmt.Println("Error compaison sign")
 			}
 		}
 		minTemperature = 15

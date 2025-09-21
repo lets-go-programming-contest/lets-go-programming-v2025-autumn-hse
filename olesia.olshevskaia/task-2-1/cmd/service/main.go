@@ -10,6 +10,19 @@ const (
 	Max = 30
 )
 
+func printOptimumTemperature(minTemperature, maxTemperature int) {
+	switch {
+	case minTemperature > maxTemperature:
+		fmt.Println(-1)
+	case minTemperature > Min && maxTemperature < Max:
+		fmt.Println(minTemperature)
+	case minTemperature > Min:
+		fmt.Println(minTemperature)
+	default:
+		fmt.Println(maxTemperature)
+	}
+}
+
 func main() {
 	var (
 		countDepartments, countEmployee, minTemperature, maxTemperature int
@@ -52,17 +65,7 @@ func main() {
 					maxTemperature = temperature
 				}
 			}
-
-			switch {
-			case minTemperature > maxTemperature:
-				fmt.Println(-1)
-			case minTemperature > Min && maxTemperature < Max:
-				fmt.Println(minTemperature)
-			case minTemperature > Min:
-				fmt.Println(minTemperature)
-			default:
-				fmt.Println(maxTemperature)
-			}
+			printOptimumTemperature(minTemperature, maxTemperature)
 		}
 	}
 }

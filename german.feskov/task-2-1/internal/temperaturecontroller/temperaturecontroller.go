@@ -1,4 +1,4 @@
-package temperature_controller
+package temperaturecontroller
 
 import "errors"
 

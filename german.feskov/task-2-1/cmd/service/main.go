@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	tc "github.com/6ermvH/task-2-1/internal/temperature_controller"
+	tc "github.com/6ermvH/task-2-1/internal/temperaturecontroller"
 )
 
 func main() {

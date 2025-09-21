@@ -11,32 +11,58 @@ func main() {
 		comparisonSign                                   string
 	)
 
-	fmt.Scanln(&numberDepartaments)
-	for i := 0; i < numberDepartaments; i++ {
-		fmt.Scanln(&numberEmployees)
-		for j := 0; j < numberEmployees; j++ {
-			fmt.Scanf("%s %d", &comparisonSign, &temperature)
+	_, err := fmt.Scanln(&numberDepartaments)
+	if err != nil {
+		return
+	}
+	for range numberDepartaments {
+		_, err := fmt.Scanln(&numberEmployees)
+		if err != nil {
+			return
+		}
+
+		for range numberEmployees {
+			_, err := fmt.Scanf("%s %d", &comparisonSign, &temperature)
+			if err != nil {
+				return
+			}
+
 			switch comparisonSign {
 			case "<=":
-				if temperature < minTemperature {
-					fmt.Println("-1")
+				if temperature <= minTemperature {
+					_, err := fmt.Println("-1")
+					if err != nil {
+						return
+					}
 					break
 				}
 				if temperature <= maxTemperature {
 					maxTemperature = temperature
 				}
-				fmt.Println(minTemperature)
+				_, err := fmt.Println(minTemperature)
+				if err != nil {
+					return
+				}
 			case ">=":
-				if maxTemperature < temperature {
-					fmt.Println("-1")
+				if maxTemperature <= temperature {
+					_, err := fmt.Println("-1")
+					if err != nil {
+						return
+					}
 					break
 				}
 				if minTemperature <= temperature {
 					minTemperature = temperature
 				}
-				fmt.Println(minTemperature)
+				_, err := fmt.Println(minTemperature)
+				if err != nil {
+					return
+				}
 			default:
-				fmt.Println("Error compaison sign")
+				_, err := fmt.Println("Error compaison sign")
+				if err != nil {
+					return
+				}
 			}
 		}
 		minTemperature = 15

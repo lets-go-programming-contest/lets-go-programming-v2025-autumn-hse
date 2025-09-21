@@ -19,7 +19,7 @@ func main() {
 		return
 	}
 
-	for i := 0; i < numOfDepartments; i++ {
+	for range numOfDepartments {
 		_, err := fmt.Scanln(&employees)
 		if err != nil {
 			return
@@ -27,7 +27,7 @@ func main() {
 
 		minComfortableTemp = minStartingTemp
 		maxComfortableTemp = maxStartingTemp
-		for j := 0; j < employees; j++ {
+		for range employees {
 			_, err = fmt.Scanln(&operator, &temp)
 			if err != nil {
 				return
@@ -38,6 +38,7 @@ func main() {
 			case ">=":
 				minComfortableTemp = max(minComfortableTemp, temp)
 			}
+
 			if minComfortableTemp > maxComfortableTemp {
 				fmt.Println(-1)
 			} else {

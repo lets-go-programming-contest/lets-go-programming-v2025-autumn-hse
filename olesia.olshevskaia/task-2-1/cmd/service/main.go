@@ -30,12 +30,12 @@ func main() {
 		sign                                                            string
 	)
 
-	if _, err := fmt.Scan(&countDepartments); err != nil {
+	if _, err := fmt.Scanln(&countDepartments); err != nil {
 		return
 	}
 
 	for range make([]struct{}, countDepartments) {
-		if _, err := fmt.Scan(&countEmployee); err != nil {
+		if _, err := fmt.Scanln(&countEmployee); err != nil {
 			return
 		}
 

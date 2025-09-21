@@ -39,6 +39,5 @@ func main() {
 		fmt.Println(float64(firstOperand) / float64(secondOperand))
 	default:
 		fmt.Println("Invalid operation")
-		return
 	}
 }

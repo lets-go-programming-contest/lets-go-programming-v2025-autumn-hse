@@ -65,6 +65,7 @@ func main() {
 					maxTemperature = temperature
 				}
 			}
+
 			printOptimumTemperature(minTemperature, maxTemperature)
 		}
 	}

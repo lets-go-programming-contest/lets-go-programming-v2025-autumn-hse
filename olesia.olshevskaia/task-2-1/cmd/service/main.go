@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -43,12 +44,12 @@ func main() {
 
 		for range make([]struct{}, countEmployee) {
 			var line string
-			if _, err := fmt.Scan(&line); err != nil {
+			if _, err := fmt.Scanln(&line); err != nil {
 				return
 			}
 
 			sign = line[:2]
-			tempStr := line[2:]
+			tempStr := strings.TrimSpace(line[2:])
 
 			temperature, err := strconv.Atoi(tempStr)
 			if err != nil {
@@ -67,7 +68,6 @@ func main() {
 			}
 
 			printOptimumTemperature(minTemperature, maxTemperature)
-			fmt.Println()
 		}
 	}
 }

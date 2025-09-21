@@ -45,6 +45,4 @@ func main() {
 			}
 		}
 	}
-
-	return
 }

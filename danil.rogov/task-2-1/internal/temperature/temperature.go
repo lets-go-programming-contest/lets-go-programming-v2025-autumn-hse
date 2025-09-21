@@ -13,8 +13,11 @@ const (
 )
 
 func SetDepartmentTemperature() {
-	var employeeCount int
-	
+	var (
+		preferredTemperature, employeeCount int
+		inequalitySign                      string
+	)
+
 	_, err := fmt.Scan(&employeeCount)
 	if err != nil {
 		fmt.Println("Error reading employee count:", err)
@@ -26,11 +29,6 @@ func SetDepartmentTemperature() {
 	upperBound := maximumTemperature
 
 	for range employeeCount {
-		var (
-			preferredTemperature int
-			inequalitySign       string
-		)
-
 		_, err = fmt.Scan(&inequalitySign, &preferredTemperature)
 		if err != nil {
 			fmt.Println("Error reading sign or temperature:", err)

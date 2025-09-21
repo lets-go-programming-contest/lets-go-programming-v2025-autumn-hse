@@ -27,12 +27,13 @@ func main() {
 
 		minComfortableTemp = minStartingTemp
 		maxComfortableTemp = maxStartingTemp
+
 		for range employees {
 			_, err = fmt.Scanln(&operator, &temp)
 			if err != nil {
 				return
 			}
-			
+
 			switch operator {
 			case "<=":
 				maxComfortableTemp = min(maxComfortableTemp, temp)

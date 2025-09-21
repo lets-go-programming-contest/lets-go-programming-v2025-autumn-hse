@@ -38,6 +38,7 @@ func main() {
 			fmt.Println("Division by zero")
 			return
 		}
+
 		fmt.Println(num1 / num2)
 	default:
 		fmt.Println("Invalid operation")

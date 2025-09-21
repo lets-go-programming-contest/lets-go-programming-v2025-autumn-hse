@@ -32,6 +32,7 @@ func main() {
 			if err != nil {
 				return
 			}
+			
 			switch operator {
 			case "<=":
 				maxComfortableTemp = min(maxComfortableTemp, temp)

@@ -31,11 +31,13 @@ func main() {
 	)
 
 	if _, err := fmt.Scanln(&countDepartments); err != nil {
+		fmt.Println(err)
 		return
 	}
 
 	for range make([]struct{}, countDepartments) {
 		if _, err := fmt.Scanln(&countEmployee); err != nil {
+			fmt.Println(err)
 			return
 		}
 
@@ -45,6 +47,7 @@ func main() {
 		for range make([]struct{}, countEmployee) {
 			var line string
 			if _, err := fmt.Scanln(&line); err != nil {
+				fmt.Println(err)
 				return
 			}
 

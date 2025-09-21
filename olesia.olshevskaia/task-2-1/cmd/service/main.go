@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 )
 
 const (
@@ -26,8 +24,8 @@ func printOptimumTemperature(minTemperature, maxTemperature int) {
 
 func main() {
 	var (
-		countDepartments, countEmployee, minTemperature, maxTemperature int
-		sign                                                            string
+		countDepartments, countEmployee, minTemperature, maxTemperature, temperature int
+		sign                                                                         string
 	)
 
 	if _, err := fmt.Scanln(&countDepartments); err != nil {
@@ -47,18 +45,7 @@ func main() {
 		maxTemperature = Max
 
 		for range make([]struct{}, countEmployee) {
-			var line string
-			if _, err := fmt.Scanln(&line); err != nil {
-				fmt.Println(err)
-
-				return
-			}
-
-			sign = line[:2]
-			tempStr := strings.TrimSpace(line[2:])
-
-			temperature, err := strconv.Atoi(tempStr)
-			if err != nil {
+			if _, err := fmt.Scanln(&sign, &temperature); err != nil {
 				fmt.Println(err)
 
 				return
@@ -74,8 +61,8 @@ func main() {
 					maxTemperature = temperature
 				}
 			}
-		}
 
-		printOptimumTemperature(minTemperature, maxTemperature)
+			printOptimumTemperature(minTemperature, maxTemperature)
+		}
 	}
 }

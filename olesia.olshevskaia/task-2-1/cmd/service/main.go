@@ -67,6 +67,7 @@ func main() {
 			}
 
 			printOptimumTemperature(minTemperature, maxTemperature)
+			fmt.Println()
 		}
 	}
 }

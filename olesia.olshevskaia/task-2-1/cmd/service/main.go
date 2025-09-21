@@ -24,6 +24,7 @@ func main() {
 		if _, err := fmt.Scan(&countEmployee); err != nil {
 			return
 		}
+
 		minTemperature = Min
 		maxTemperature = Max
 
@@ -32,10 +33,11 @@ func main() {
 			if _, err := fmt.Scan(&line); err != nil {
 				return
 			}
+
 			sign = line[:2]
 			tempStr := line[2:]
-			temperature, err := strconv.Atoi(tempStr)
 
+			temperature, err := strconv.Atoi(tempStr)
 			if err != nil {
 				return
 			}

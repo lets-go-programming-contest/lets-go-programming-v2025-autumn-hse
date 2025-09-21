@@ -1,9 +1,8 @@
 package main
 
 import (
+	"calculator/pkg"
 	"fmt"
-
-	"github.com/Anfisa111/task-1/pkg"
 )
 
 func main() {

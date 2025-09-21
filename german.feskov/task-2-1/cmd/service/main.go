@@ -1,18 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
 
-const (
-	minTemperature = 15
-	maxTemperature = 30
+	tc "github.com/6ermvH/task-2-1/internal/temperature_controller"
 )
 
 func main() {
 	var (
 		depCount    int
 		workerCount int
-		reqOp       string
-		reqVal      int
 	)
 
 	if _, err := fmt.Scan(&depCount); err != nil {
@@ -28,50 +25,29 @@ func main() {
 			return
 		}
 
-		var (
-			minT = minTemperature
-			maxT = maxTemperature
-		)
+		requests := make([]tc.Request, 0)
 
 		for range workerCount {
-			for tryAgain := false; !tryAgain; {
-				if _, err := fmt.Scanf("%s %d", &reqOp, &reqVal); err != nil {
-					continue
-				}
+			var request tc.Request
 
-				switch reqOp {
-				case ">=":
-					minT = maxInt(minT, reqVal)
-					tryAgain = true
-				case "<=":
-					maxT = minInt(maxT, reqVal)
-					tryAgain = true
-				default:
-					continue
-				}
+			if _, err := fmt.Scanf("%s %d", &request.Type, &request.Val); err != nil {
+				fmt.Println(err)
+
+				return
 			}
 
-			if minT > maxT {
-				fmt.Println(-1)
-			} else {
-				fmt.Println(minT)
-			}
+			requests = append(requests, request)
+		}
+
+		optimalTemperatures, err := tc.GetOptimalTemperatures(requests)
+		if err != nil {
+			fmt.Println(err)
+
+			return
+		}
+
+		for _, val := range optimalTemperatures {
+			fmt.Println(val)
 		}
 	}
-}
-
-func minInt(a, b int) int {
-	if a < b {
-		return a
-	}
-
-	return b
-}
-
-func maxInt(a, b int) int {
-	if a > b {
-		return a
-	}
-
-	return b
 }

@@ -14,6 +14,7 @@ const (
 
 func SetDepartmentTemperature() {
 	var employeeCount int
+	
 	_, err := fmt.Scan(&employeeCount)
 	if err != nil {
 		fmt.Println("Error reading employee count:", err)

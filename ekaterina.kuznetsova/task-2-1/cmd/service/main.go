@@ -7,6 +7,7 @@ import (
 func lessOrEqual(maxTemperature, minTemperature *int, temperature int) bool {
 	if temperature < *minTemperature || temperature < 15 {
 		fmt.Println("-1")
+
 		return true
 	}
 
@@ -15,12 +16,14 @@ func lessOrEqual(maxTemperature, minTemperature *int, temperature int) bool {
 	}
 
 	fmt.Println(*minTemperature)
+
 	return false
 }
 
 func moreOrEqual(maxTemperature, minTemperature *int, temperature int) bool {
 	if *maxTemperature < temperature || temperature > 30 {
 		fmt.Println("-1")
+
 		return true
 	}
 
@@ -29,6 +32,7 @@ func moreOrEqual(maxTemperature, minTemperature *int, temperature int) bool {
 	}
 
 	fmt.Println(*minTemperature)
+
 	return false
 }
 

@@ -12,13 +12,12 @@ func lessOrEqual(maxTemperature, minTemperature *int, temperature int) {
 	}
 
 	if temperature < *maxTemperature {
+		if *minTemperature > temperature {
+			fmt.Println("-1")
+
+			return
+		}
 		*maxTemperature = temperature
-	}
-
-	if *minTemperature > *maxTemperature {
-		fmt.Println("-1")
-
-		return
 	}
 
 	fmt.Println(*minTemperature)
@@ -32,13 +31,12 @@ func moreOrEqual(maxTemperature, minTemperature *int, temperature int) {
 	}
 
 	if *minTemperature < temperature {
+		if temperature > *maxTemperature {
+			fmt.Println("-1")
+
+			return
+		}
 		*minTemperature = temperature
-	}
-
-	if *minTemperature > *maxTemperature {
-		fmt.Println("-1")
-
-		return
 	}
 
 	fmt.Println(*minTemperature)

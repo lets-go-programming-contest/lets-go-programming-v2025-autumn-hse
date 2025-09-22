@@ -4,6 +4,28 @@ import (
 	"fmt"
 )
 
+func lessOrEqual(maxTemperature, minTemperature *int, temperature int) {
+	if temperature < *minTemperature {
+		fmt.Println("-1")
+		return
+	}
+	if temperature <= *maxTemperature {
+		*maxTemperature = temperature
+	}
+	fmt.Println(minTemperature)
+}
+
+func moreOrEqual(maxTemperature, minTemperature *int, temperature int) {
+	if *maxTemperature < temperature {
+		fmt.Println("-1")
+		return
+	}
+	if *minTemperature <= temperature {
+		*minTemperature = temperature
+	}
+	fmt.Println(minTemperature)
+}
+
 func main() {
 	var (
 		numberDepartaments, numberEmployees, temperature int
@@ -29,23 +51,9 @@ func main() {
 
 			switch comparisonSign {
 			case "<=":
-				if temperature <= maxTemperature {
-					maxTemperature = temperature
-				}
-				if temperature <= minTemperature {
-					fmt.Println("-1")
-					break
-				}
-				fmt.Println(minTemperature)
+				lessOrEqual(&maxTemperature, &minTemperature, temperature)
 			case ">=":
-				if minTemperature <= temperature {
-					minTemperature = temperature
-				}
-				if maxTemperature <= temperature {
-					fmt.Println("-1")
-					break
-				}
-				fmt.Println(minTemperature)
+				moreOrEqual(&maxTemperature, &minTemperature, temperature)
 			default:
 				fmt.Println("Error compaison sign")
 			}

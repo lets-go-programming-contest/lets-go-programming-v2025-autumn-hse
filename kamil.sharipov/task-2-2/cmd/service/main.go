@@ -7,16 +7,16 @@ import (
 
 type IntHeap []int
 
-func (heap IntHeap) Len() int {
-	return len(heap)
+func (heap *IntHeap) Len() int {
+	return len(*heap)
 }
 
-func (heap IntHeap) Less(i, j int) bool {
-	return heap[i] > heap[j]
+func (heap *IntHeap) Less(i, j int) bool {
+	return (*heap)[i] > (*heap)[j]
 }
 
-func (heap IntHeap) Swap(i, j int) {
-	heap[i], heap[j] = heap[j], heap[i]
+func (heap *IntHeap) Swap(i, j int) {
+	(*heap)[i], (*heap)[j] = (*heap)[j], (*heap)[i]
 }
 
 func (heap *IntHeap) Push(x interface{}) {

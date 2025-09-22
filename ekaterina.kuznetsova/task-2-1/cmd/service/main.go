@@ -4,9 +4,14 @@ import (
 	"fmt"
 )
 
+var flagFail = false
+
 func lessOrEqual(maxTemperature, minTemperature *int, temperature int) {
-	if temperature < *minTemperature || temperature > *maxTemperature || temperature < 15 {
-		fmt.Println("-1")
+	if temperature < *minTemperature || temperature < 15 {
+		if !flagFail {
+			fmt.Println("-1")
+		}
+		flagFail = true
 
 		return
 	}
@@ -19,8 +24,11 @@ func lessOrEqual(maxTemperature, minTemperature *int, temperature int) {
 }
 
 func moreOrEqual(maxTemperature, minTemperature *int, temperature int) {
-	if *maxTemperature < temperature || temperature < *minTemperature || temperature > 30 {
-		fmt.Println("-1")
+	if *maxTemperature < temperature || temperature > 30 {
+		if !flagFail {
+			fmt.Println("-1")
+		}
+		flagFail = true
 
 		return
 	}
@@ -52,6 +60,7 @@ func main() {
 
 		minTemperature = 15
 		maxTemperature = 30
+		flagFail = false
 
 		for range numberEmployees {
 			_, err := fmt.Scanf("%s %d\n", &comparisonSign, &temperature)
@@ -61,9 +70,17 @@ func main() {
 
 			switch comparisonSign {
 			case "<=":
-				lessOrEqual(&maxTemperature, &minTemperature, temperature)
+				if !flagFail {
+					lessOrEqual(&maxTemperature, &minTemperature, temperature)
+				} else {
+					fmt.Println("-1")
+				}
 			case ">=":
-				moreOrEqual(&maxTemperature, &minTemperature, temperature)
+				if !flagFail {
+					moreOrEqual(&maxTemperature, &minTemperature, temperature)
+				} else {
+					fmt.Println("-1")
+				}
 			default:
 				fmt.Println("Error compaison sign")
 			}

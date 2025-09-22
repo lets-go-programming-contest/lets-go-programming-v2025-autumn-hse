@@ -4,16 +4,10 @@ import (
 	"fmt"
 )
 
-var flagFail = false
-
-func lessOrEqual(maxTemperature, minTemperature *int, temperature int) {
+func lessOrEqual(maxTemperature, minTemperature *int, temperature int) bool {
 	if temperature < *minTemperature || temperature < 15 {
-		if !flagFail {
-			fmt.Println("-1")
-		}
-		flagFail = true
-
-		return
+		fmt.Println("-1")
+		return true
 	}
 
 	if temperature < *maxTemperature {
@@ -21,16 +15,13 @@ func lessOrEqual(maxTemperature, minTemperature *int, temperature int) {
 	}
 
 	fmt.Println(*minTemperature)
+	return false
 }
 
-func moreOrEqual(maxTemperature, minTemperature *int, temperature int) {
+func moreOrEqual(maxTemperature, minTemperature *int, temperature int) bool {
 	if *maxTemperature < temperature || temperature > 30 {
-		if !flagFail {
-			fmt.Println("-1")
-		}
-		flagFail = true
-
-		return
+		fmt.Println("-1")
+		return true
 	}
 
 	if *minTemperature < temperature {
@@ -38,6 +29,7 @@ func moreOrEqual(maxTemperature, minTemperature *int, temperature int) {
 	}
 
 	fmt.Println(*minTemperature)
+	return false
 }
 
 func main() {
@@ -45,6 +37,7 @@ func main() {
 		numberDepartaments, numberEmployees, temperature int
 		minTemperature, maxTemperature                   = 15, 30
 		comparisonSign                                   string
+		flagFail                                         bool
 	)
 
 	_, err := fmt.Scanln(&numberDepartaments)
@@ -71,13 +64,13 @@ func main() {
 			switch comparisonSign {
 			case "<=":
 				if !flagFail {
-					lessOrEqual(&maxTemperature, &minTemperature, temperature)
+					flagFail = lessOrEqual(&maxTemperature, &minTemperature, temperature)
 				} else {
 					fmt.Println("-1")
 				}
 			case ">=":
 				if !flagFail {
-					moreOrEqual(&maxTemperature, &minTemperature, temperature)
+					flagFail = moreOrEqual(&maxTemperature, &minTemperature, temperature)
 				} else {
 					fmt.Println("-1")
 				}

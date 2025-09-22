@@ -17,6 +17,7 @@ func lessOrEqual(maxTemperature, minTemperature *int, temperature int) {
 
 	if *minTemperature > *maxTemperature {
 		fmt.Println("-1")
+
 		return
 	}
 
@@ -36,6 +37,7 @@ func moreOrEqual(maxTemperature, minTemperature *int, temperature int) {
 
 	if *minTemperature > *maxTemperature {
 		fmt.Println("-1")
+
 		return
 	}
 
@@ -60,6 +62,9 @@ func main() {
 			return
 		}
 
+		minTemperature = 15
+		maxTemperature = 30
+
 		for range numberEmployees {
 			_, err := fmt.Scanf("%s %d", &comparisonSign, &temperature)
 			if err != nil {
@@ -75,8 +80,5 @@ func main() {
 				fmt.Println("Error compaison sign")
 			}
 		}
-
-		minTemperature = 15
-		maxTemperature = 30
 	}
 }

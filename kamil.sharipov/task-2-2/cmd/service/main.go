@@ -20,35 +20,40 @@ func (heap IntHeap) Swap(i, j int) {
 }
 
 func (heap *IntHeap) Push(x interface{}) {
-	*heap = append(*heap, x.(int))
+	rating, ok := x.(int)
+	if !ok {
+		return
+	}
+
+	*heap = append(*heap, rating)
 }
 
 func (heap *IntHeap) Pop() interface{} {
 	oldHeap := *heap
 	x := oldHeap[len(oldHeap)-1]
 	*heap = oldHeap[0 : len(oldHeap)-1]
+
 	return x
 }
 
 func main() {
-	var (
-		dishCount, dish, rank, ans int
-	)
+	var dishCount, dish, rank, ans int
 
 	_, err := fmt.Scanln(&dishCount)
 	if err != nil {
 		return
 	}
 
-	h := &IntHeap{}
-	heap.Init(h)
+	heapInstance := &IntHeap{}
+	heap.Init(heapInstance)
 
 	for range dishCount {
 		_, err := fmt.Scan(&dish)
 		if err != nil {
 			return
 		}
-		heap.Push(h, dish)
+
+		heap.Push(heapInstance, dish)
 	}
 
 	_, err = fmt.Scanln(&rank)
@@ -57,7 +62,12 @@ func main() {
 	}
 
 	for range rank {
-		ans = heap.Pop(h).(int)
+		result := heap.Pop(heapInstance)
+		if rating, ok := result.(int); ok {
+			ans = rating
+		} else {
+			return
+		}
 	}
 
 	_, err = fmt.Println(ans)

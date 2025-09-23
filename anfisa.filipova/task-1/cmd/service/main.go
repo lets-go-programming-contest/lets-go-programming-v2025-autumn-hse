@@ -1,13 +1,15 @@
 package main
 
 import (
-	"calculator/pkg"
+	"calculator/pkg/mycalc"
 	"fmt"
 )
 
 func main() {
-	var operation string
-	var num1, num2 int
+	var (
+		num1, num2 int
+		operation  string
+	)
 	_, err := fmt.Scan(&num1)
 
 	if err != nil {
@@ -22,7 +24,7 @@ func main() {
 	}
 	_, _ = fmt.Scan(&operation)
 
-	result, err := pkg.Calculate(num1, num2, operation)
+	result, err := mycalc.Calculate(num1, num2, operation)
 
 	if err != nil {
 		fmt.Println(err)

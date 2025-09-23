@@ -8,10 +8,13 @@ import (
 )
 
 func main() {
-	var (
-		dishCount int
-		kInd      int
-	)
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Recovered. Error:\n", r)
+		}
+	}()
+
+	var dishCount int
 
 	dishes := &heapmax.IntHeap{}
 	heap.Init(dishes)
@@ -33,6 +36,7 @@ func main() {
 		heap.Push(dishes, val)
 	}
 
+	var kInd int
 	if _, err := fmt.Scan(&kInd); err != nil {
 		fmt.Println(err)
 

@@ -3,11 +3,11 @@ package heapmax
 import "errors"
 
 var (
-	errPushCast      = errors.New("error: bad cast to int")
-	errPopOutOfRange = errors.New("error: out of range")
+	errPushCast      = errors.New("bad cast to int")
+	errPopOutOfRange = errors.New("out of range")
 )
 
-//nolint:recvcheck
+//nolint:recvcheck // is linked type
 type IntHeap []int
 
 func (h IntHeap) Len() int {

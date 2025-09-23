@@ -14,8 +14,8 @@ func lessOrEqual(maxTemperature, minTemperature *int, temperature int) bool {
 	if temperature < *maxTemperature {
 		*maxTemperature = temperature
 	}
-
 	fmt.Println(*minTemperature)
+
 	return false
 }
 

@@ -1,10 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	tc "github.com/6ermvH/task-2-1/internal/temperaturecontroller"
 )
+
+var errBadScanRequest = errors.New("error: bad request scan")
 
 func main() {
 	var (
@@ -27,11 +30,11 @@ func main() {
 
 		requests := make([]tc.Request, 0)
 
-		for range workerCount {
+		for ind := range workerCount {
 			var request tc.Request
 
 			if _, err := fmt.Scanf("%s %d", &request.Type, &request.Val); err != nil {
-				fmt.Println(err)
+				fmt.Println(fmt.Errorf("%w - %w, for %d worker", errBadScanRequest, err, ind))
 
 				return
 			}

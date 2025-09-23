@@ -1,13 +1,19 @@
 package temperaturecontroller
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
+
+var errBadRequestType = errors.New("error: bad request type")
 
 const (
 	minTemperature = 15
 	maxTemperature = 30
-)
 
-var ErrBadRequest = errors.New("error: bad request")
+	requestTypeLess  = "<="
+	requestTypeGreat = ">="
+)
 
 type Request struct {
 	Type string
@@ -22,14 +28,14 @@ func GetOptimalTemperatures(requests []Request) ([]int, error) {
 		maxT = maxTemperature
 	)
 
-	for _, req := range requests {
+	for ind, req := range requests {
 		switch req.Type {
-		case ">=":
+		case requestTypeGreat:
 			minT = maxInt(minT, req.Val)
-		case "<=":
+		case requestTypeLess:
 			maxT = minInt(maxT, req.Val)
 		default:
-			return result, ErrBadRequest
+			return result, fmt.Errorf("%w: %s, in %d request", errBadRequestType, req.Type, ind)
 		}
 
 		if minT > maxT {
@@ -42,7 +48,7 @@ func GetOptimalTemperatures(requests []Request) ([]int, error) {
 	return result, nil
 }
 
-func minInt(a, b int) int { // можно вынести в отдельный пакет, но это усложнит, решил оставить
+func minInt(a, b int) int {
 	if a < b {
 		return a
 	}

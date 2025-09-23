@@ -9,21 +9,20 @@ func main() {
 		firstNum, secondNum int
 		operation           string
 	)
-
-	_, err1 := fmt.Scanln(&firstNum)
-	if err1 != nil {
+	_, err := fmt.Scanln(&firstNum)
+	if err != nil {
 		fmt.Println("Invalid first operand")
 		return
 	}
 
-	_, err2 := fmt.Scanln(&secondNum)
-	if err2 != nil {
+	_, err = fmt.Scanln(&secondNum)
+	if err != nil {
 		fmt.Println("Invalid second operand")
 		return
 	}
 
-	_, errOp := fmt.Scanln(&operation)
-	if errOp != nil {
+	_, err = fmt.Scanln(&operation)
+	if err != nil {
 		fmt.Println("Invalid operation")
 		return
 	}
@@ -40,7 +39,7 @@ func main() {
 			fmt.Println("Division by zero")
 			return
 		}
-		fmt.Println(float64(firstNum) / float64(secondNum))
+		fmt.Println(firstNum / secondNum)
 	default:
 		fmt.Println("Invalid operation")
 	}

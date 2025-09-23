@@ -31,7 +31,7 @@ func main() {
 		return
 	}
 
-	for range make([]struct{}, countDepartments) {
+	for range countDepartments {
 		if _, err := fmt.Scanln(&countEmployee); err != nil {
 			fmt.Println(err)
 
@@ -41,7 +41,7 @@ func main() {
 		minTemperature := Min
 		maxTemperature := Max
 
-		for range make([]struct{}, countEmployee) {
+		for range countEmployee {
 			if _, err := fmt.Scanln(&sign, &temperature); err != nil {
 				fmt.Println(err)
 

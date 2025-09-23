@@ -7,19 +7,17 @@ var (
 	errPopOutOfRange = errors.New("error: out of range")
 )
 
+//nolint:recvcheck
 type IntHeap []int
 
-//nolint:recvcheck // is linked type
 func (h IntHeap) Len() int {
 	return len(h)
 }
 
-//nolint:recvcheck
 func (h IntHeap) Less(i, j int) bool {
 	return h[i] > h[j]
 }
 
-//nolint:recvcheck
 func (h IntHeap) Swap(i, j int) {
 	h[i], h[j] = h[j], h[i]
 }

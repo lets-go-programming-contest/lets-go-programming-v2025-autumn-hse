@@ -1,8 +1,10 @@
 package heapmax
 
-const (
-	errPushCast      = "error: bad cast to int"
-	errPopOutOfRange = ""
+import "errors"
+
+var (
+	errPushCast      = errors.New("error: bad cast to int")
+	errPopOutOfRange = errors.New("error: out of range")
 )
 
 type IntHeap []int

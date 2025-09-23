@@ -17,7 +17,7 @@ func read_number() (int, error) {
 
 func main() {
     var a, b int
-    var operand string
+    var op string
    
     a, err := read_number()
     if err != nil {
@@ -31,18 +31,18 @@ func main() {
 	return
     }
 
-    fmt.Scan(&operand)
+    fmt.Scan(&op)
 
-    if operand == "+" {
+    if op == "+" {
         s := a + b
         fmt.Println(s)
-    } else if operand == "-" {
+    } else if op == "-" {
         s := a - b
         fmt.Println(s)
-    } else if operand == "*" {
+    } else if op == "*" {
         s := a * b
         fmt.Println(s)
-    } else if operand == "/" {
+    } else if op == "/" {
         if b == 0 {
             fmt.Println("Division by zero")
             return

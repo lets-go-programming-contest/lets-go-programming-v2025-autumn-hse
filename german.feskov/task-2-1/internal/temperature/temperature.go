@@ -3,14 +3,9 @@ package temperature
 import (
 	"errors"
 	"fmt"
-	"io"
 )
 
-var (
-	ErrBadRequestType = errors.New("uncorrect request type")
-	ErrFailRead       = errors.New("fail to read")
-	ErrFailWrite      = errors.New("fail to write")
-)
+var ErrBadRequestType = errors.New("uncorrect request type")
 
 const (
 	minTemperature = 15
@@ -29,28 +24,11 @@ type Request struct {
 	Val  int
 }
 
-func Read(in io.Reader, inRequests chan<- Request, count int) error {
-	defer close(inRequests)
-
-	for range count {
-		var req Request
-		if _, err := fmt.Fscanf(in, "\n%s %d", &req.Type, &req.Val); err != nil {
-			return fmt.Errorf("%w: %w", ErrFailRead, err)
-		}
-
-		inRequests <- req
-	}
-
-	return nil
-}
-
 func Calculate(outRequests <-chan Request, inCalculated chan<- int) error {
-	defer close(inCalculated)
-
 	var (
-		minT       = minTemperature
-		maxT       = maxTemperature
-		err  error = nil
+		minT = minTemperature
+		maxT = maxTemperature
+		err  error
 	)
 
 	for req := range outRequests {
@@ -71,16 +49,6 @@ func Calculate(outRequests <-chan Request, inCalculated chan<- int) error {
 	return err
 }
 
-func Write(out io.Writer, outCalculated <-chan int) error {
-	for res := range outCalculated {
-		if _, err := fmt.Fprintln(out, res); err != nil {
-			return fmt.Errorf("%w: %w", ErrFailWrite, err)
-		}
-	}
-
-	return nil
-}
-
 func calculate(minT, maxT int, req Request) (int, int, error) {
 	switch req.Type {
 	case minRequestType:
@@ -88,7 +56,7 @@ func calculate(minT, maxT int, req Request) (int, int, error) {
 	case maxRequestType:
 		return maxInt(minT, req.Val), maxT, nil
 	default:
-		return minT, maxT, fmt.Errorf("%w %s", ErrBadRequestType, req.Type)
+		return minT, maxT, fmt.Errorf("%w %q", ErrBadRequestType, req.Type)
 	}
 }
 

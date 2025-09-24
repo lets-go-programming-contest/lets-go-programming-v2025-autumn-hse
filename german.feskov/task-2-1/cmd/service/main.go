@@ -1,32 +1,21 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"fmt"
-	"os"
 
-	"github.com/6ermvH/lets-go-programming-v2025-autumn-hse/german.feskov/task-2-1/internal/temperature"
+	"github.com/6ermvH/german.feskov/task-2-1/internal/temperature"
 	"golang.org/x/sync/errgroup"
 )
 
 const (
-	bufChanSize = 128
+	bufChanSize = 1
 )
 
 func main() {
-	stdin := bufio.NewReader(os.Stdin)
-	stdout := bufio.NewWriter(os.Stdout)
-
-	defer func() {
-		if err := stdout.Flush(); err != nil {
-			fmt.Println(err)
-		}
-	}()
-
 	var countDep int
 
-	if _, err := fmt.Fscan(stdin, &countDep); err != nil {
+	if _, err := fmt.Scan(&countDep); err != nil {
 		fmt.Println(err)
 
 		return
@@ -34,26 +23,40 @@ func main() {
 
 	for range countDep {
 		var countWorker int
-		if _, err := fmt.Fscan(stdin, &countWorker); err != nil {
+		if _, err := fmt.Scan(&countWorker); err != nil {
 			fmt.Println(err)
 
 			return
 		}
 
-		var (
-			requests   = make(chan temperature.Request, bufChanSize)
-			calculated = make(chan int, bufChanSize)
-			group, _   = errgroup.WithContext(context.Background())
-		)
+		group, _ := errgroup.WithContext(context.Background())
+
+		requests := func(group *errgroup.Group) chan temperature.Request {
+			requests := make(chan temperature.Request, bufChanSize)
+
+			group.Go(func() error {
+				defer close(requests)
+
+				return read(requests, countWorker)
+			})
+
+			return requests
+		}(group)
+
+		calculated := func(group *errgroup.Group, chOut <-chan temperature.Request) chan int {
+			calculated := make(chan int, bufChanSize)
+
+			group.Go(func() error {
+				defer close(calculated)
+
+				return temperature.Calculate(chOut, calculated)
+			})
+
+			return calculated
+		}(group, requests)
 
 		group.Go(func() error {
-			return temperature.Read(stdin, requests, countWorker)
-		})
-		group.Go(func() error {
-			return temperature.Calculate(requests, calculated)
-		})
-		group.Go(func() error {
-			return temperature.Write(stdout, calculated)
+			return write(calculated)
 		})
 
 		if err := group.Wait(); err != nil {
@@ -62,4 +65,26 @@ func main() {
 			return
 		}
 	}
+}
+
+func read(chIn chan<- temperature.Request, count int) error {
+	var req temperature.Request
+	for range count {
+		if _, err := fmt.Scanf("%s %d", &req.Type, &req.Val); err != nil {
+			return fmt.Errorf("while scan, has %w", err)
+		}
+		chIn <- req
+	}
+
+	return nil
+}
+
+func write(chOut <-chan int) error {
+	for res := range chOut {
+		if _, err := fmt.Println(res); err != nil {
+			return fmt.Errorf("while print, has %w", err)
+		}
+	}
+
+	return nil
 }

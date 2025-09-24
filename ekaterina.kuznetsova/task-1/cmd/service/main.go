@@ -39,7 +39,7 @@ func main() {
 			fmt.Println("Division by zero")
 			return
 		}
-		fmt.Println(float64(firstNum) / float64(secondNum))
+		fmt.Println(firstNum / secondNum)
 	default:
 		fmt.Println("Invalid operation")
 	}

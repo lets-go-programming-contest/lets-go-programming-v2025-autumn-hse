@@ -20,8 +20,8 @@ func (h *intHeap) Swap(i, j int) {
 }
 
 func (h *intHeap) Push(x any) {
-	newX, ok := x.(int)
-	if !ok {
+	newX, isInt := x.(int)
+	if !isInt {
 		fmt.Println("invalid type for Push")
 
 		return
@@ -39,10 +39,7 @@ func (h *intHeap) Pop() any {
 }
 
 func main() {
-	var (
-		numberDishes, desiredDish, dish, count int
-		ok                                     bool
-	)
+	var numberDishes, desiredDish, dish, count int
 
 	myHeap := &intHeap{}
 	heap.Init(myHeap)
@@ -53,7 +50,7 @@ func main() {
 		return
 	}
 
-	for range numberDishes {
+	for i := 0; i < numberDishes; i++ {
 		if _, err := fmt.Scan(&dish); err != nil {
 			fmt.Println(err)
 
@@ -68,7 +65,8 @@ func main() {
 		return
 	}
 
-	for range desiredDish {
+	for i := 0; i < desiredDish; i++ {
+		var ok bool
 		count, ok = heap.Pop(myHeap).(int)
 		if !ok {
 			fmt.Println("invalid type from heap.Pop")

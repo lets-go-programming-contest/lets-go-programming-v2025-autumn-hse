@@ -5,50 +5,34 @@ import (
 	"strconv"
 )
 
-func getOptimalTemperature(departmentCount int) {
+func printOptimalTemperature(departmentCount int) {
 	var (
 		employeeCount int
 		inputBound    string
-		value         int
 	)
 	for range departmentCount {
-		_, err := fmt.Scan(&employeeCount)
-		if err != nil {
-			fmt.Println("Reading error")
-
-			return
-		}
 		upperBound := 30
 		lowerBound := 15
+		fmt.Scan(&employeeCount)
 		for range employeeCount {
-			_, err = fmt.Scan(&inputBound)
-			if err != nil {
-				fmt.Println("Reading error")
-
-				return
-			}
+			fmt.Scan(&inputBound)
 			mathSign := inputBound[:2]
-			if mathSign != "<=" && mathSign != ">=" {
-				fmt.Println("Wrong input format")
-
-				return
-			}
-			value, err = strconv.Atoi(inputBound[2:])
+			value, err := strconv.Atoi(inputBound[2:])
 			if err != nil {
 				fmt.Println("Error converting string to int")
 
 				return
 			}
-			if mathSign == "<=" && value < upperBound {
-				upperBound = value
+			if mathSign == "<=" {
+				upperBound = min(value, upperBound)
 			}
-			if mathSign == ">=" && lowerBound < value {
-				lowerBound = value
-			}
-			if mathSign == ">=" && value > upperBound {
-				fmt.Println(-1)
+			if mathSign == ">=" {
+				if value > upperBound {
+					fmt.Println(-1)
 
-				continue
+					continue
+				}
+				lowerBound = max(value, lowerBound)
 			}
 			if value < lowerBound {
 				fmt.Println(-1)
@@ -67,5 +51,6 @@ func main() {
 
 		return
 	}
-	getOptimalTemperature(departmentCount)
+	printOptimalTemperature(departmentCount)
+
 }

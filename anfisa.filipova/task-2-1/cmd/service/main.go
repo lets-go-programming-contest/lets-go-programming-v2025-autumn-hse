@@ -14,6 +14,7 @@ func printOptimalTemperature(departmentCount int) {
 	for range departmentCount {
 		upperBound := 30
 		lowerBound := 15
+
 		if _, err := fmt.Scan(&employeeCount); err != nil {
 			fmt.Println("Reading error", err)
 
@@ -44,6 +45,7 @@ func printOptimalTemperature(departmentCount int) {
 
 				continue
 			}
+
 			fmt.Println(lowerBound)
 		}
 	}
@@ -52,10 +54,12 @@ func printOptimalTemperature(departmentCount int) {
 func main() {
 	var departmentCount int
 	_, err := fmt.Scan(&departmentCount)
+
 	if err != nil {
 		fmt.Println("Reading error")
 
 		return
 	}
+
 	printOptimalTemperature(departmentCount)
 }

@@ -31,7 +31,7 @@ func main() {
 
 		group, _ := errgroup.WithContext(context.Background())
 
-		requests := func(group *errgroup.Group) chan temperature.Request {
+		requests := func() chan temperature.Request {
 			requests := make(chan temperature.Request, bufChanSize)
 
 			group.Go(func() error {
@@ -41,9 +41,9 @@ func main() {
 			})
 
 			return requests
-		}(group)
+		}()
 
-		calculated := func(group *errgroup.Group, chOut <-chan temperature.Request) chan int {
+		calculated := func(chOut <-chan temperature.Request) chan int {
 			calculated := make(chan int, bufChanSize)
 
 			group.Go(func() error {
@@ -53,7 +53,7 @@ func main() {
 			})
 
 			return calculated
-		}(group, requests)
+		}(requests)
 
 		group.Go(func() error {
 			return write(calculated)

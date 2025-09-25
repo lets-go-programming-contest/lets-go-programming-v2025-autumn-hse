@@ -29,6 +29,7 @@ func getOptimalTemperature(departmentCount int) {
 			value, err = strconv.Atoi(inputBound[2:])
 			if err != nil {
 				fmt.Println("Error converting string to int")
+				return
 			}
 			switch mathSign {
 			case "<=":
@@ -45,9 +46,8 @@ func getOptimalTemperature(departmentCount int) {
 				}
 			default:
 				fmt.Println("Wrong input format")
+				return
 			}
-			//fmt.Println(upperBound)
-			//fmt.Println(lowerBound)
 			if value < lowerBound {
 				fmt.Println(-1)
 			} else {

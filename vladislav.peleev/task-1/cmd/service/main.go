@@ -6,7 +6,7 @@ import (
 
 func main() {
 	var (
-		op string 
+		op   string
 		a, b int
 	)
 

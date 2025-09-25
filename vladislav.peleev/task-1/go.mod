@@ -1,3 +1,3 @@
-module lets-go-programming-v2025-autumn-hse/vladislav.peleev/task-1/cmd/service/main.go
+module github.com/VlasfimosY/task-1
 
 go 1.22.7

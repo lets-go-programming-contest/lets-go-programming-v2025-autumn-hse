@@ -39,12 +39,7 @@ func printOptimalTemperature(departmentCount int) {
 				return
 			}
 
-			if value < lowerBound && mathSign == "<=" {
-				fmt.Println(-1)
-
-				continue
-			}
-			if value > upperBound && mathSign == ">=" {
+			if upperBound < lowerBound {
 				fmt.Println(-1)
 
 				continue

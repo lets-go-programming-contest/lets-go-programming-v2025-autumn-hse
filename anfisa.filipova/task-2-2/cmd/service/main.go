@@ -15,7 +15,9 @@ var (
 
 func getPreferredDish(dishCount int) (int, error) {
 	var priority, choiceIdx int
+
 	heapint := &intheap.IntHeap{}
+
 	heap.Init(heapint)
 
 	for range dishCount {
@@ -39,7 +41,6 @@ func getPreferredDish(dishCount int) (int, error) {
 	} else {
 		return 0, errTypeAssertion
 	}
-
 }
 
 func main() {

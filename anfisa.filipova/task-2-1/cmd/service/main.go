@@ -31,11 +31,6 @@ func printOptimalTemperature(departmentCount int) {
 			case "<=":
 				upperBound = min(value, upperBound)
 			case ">=":
-				if value > upperBound {
-					fmt.Println(-1)
-
-					continue
-				}
 				lowerBound = max(value, lowerBound)
 
 			default:
@@ -45,6 +40,11 @@ func printOptimalTemperature(departmentCount int) {
 			}
 
 			if value < lowerBound && mathSign == "<=" {
+				fmt.Println(-1)
+
+				continue
+			}
+			if value > upperBound && mathSign == ">=" {
 				fmt.Println(-1)
 
 				continue

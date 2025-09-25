@@ -53,8 +53,7 @@ func printOptimalTemperature(departmentCount int) {
 
 func main() {
 	var departmentCount int
-	_, err := fmt.Scan(&departmentCount)
-	if err != nil {
+	if _, err := fmt.Scan(&departmentCount); err != nil {
 		fmt.Println("Reading error")
 
 		return

@@ -2,33 +2,21 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 )
 
-func readNumber() (int, error) {
-	var input string
-	_, err := fmt.Scan(&input)
-	if err != nil {
-		return 0, fmt.Errorf("readNumber() : Scan error")
-	}
-	num, err := strconv.Atoi(input)
-	if err != nil {
-		return 0, fmt.Errorf("readNumber() : Conversion error")
-	}
-	return num, nil
-}
-
 func main() {
-	var a, b int
-	var op string
+	var (
+		op string 
+		a, b int
+	)
 
-	a, err := readNumber()
+	_, err := fmt.Scan(&a)
 	if err != nil {
 		fmt.Println("Invalid first operand")
 		return
 	}
 
-	b, err = readNumber()
+	_, err = fmt.Scan(&b)
 	if err != nil {
 		fmt.Println("Invalid second operand")
 		return
@@ -42,21 +30,17 @@ func main() {
 
 	switch op {
 	case "+":
-		s := a + b
-		fmt.Println(s)
+		fmt.Println(a + b)
 	case "-":
-		s := a - b
-		fmt.Println(s)
+		fmt.Println(a - b)
 	case "*":
-		s := a * b
-		fmt.Println(s)
+		fmt.Println(a * b)
 	case "/":
 		if b == 0 {
 			fmt.Println("Division by zero")
 			return
 		}
-		s := a / b
-		fmt.Println(s)
+		fmt.Println(a / b)
 	default:
 		fmt.Println("Invalid operation")
 		return

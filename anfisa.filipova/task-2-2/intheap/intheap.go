@@ -2,20 +2,22 @@ package intheap
 
 type IntHeap []int
 
-func (h IntHeap) Len() int {
-	return len(h)
+func (h *IntHeap) Len() int {
+	return len(*h)
 }
 
-func (h IntHeap) Less(i, j int) bool {
-	return h[i] > h[j]
+func (h *IntHeap) Less(i, j int) bool {
+	return (*h)[i] > (*h)[j]
 }
 
-func (h IntHeap) Swap(i, j int) {
-	h[i], h[j] = h[j], h[i]
+func (h *IntHeap) Swap(i, j int) {
+	(*h)[i], (*h)[j] = (*h)[j], (*h)[i]
 }
 
 func (h *IntHeap) Push(v any) {
-	*h = append(*h, v.(int))
+	if val, ok := v.(int); ok {
+		*h = append(*h, val)
+	}
 }
 
 func (h *IntHeap) Pop() any {
@@ -23,5 +25,6 @@ func (h *IntHeap) Pop() any {
 	l := len(oldHeap)
 	elem := oldHeap[l-1]
 	*h = oldHeap[0 : l-1]
+
 	return elem
 }

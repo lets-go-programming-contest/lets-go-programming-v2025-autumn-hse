@@ -8,29 +8,38 @@ import (
 	"github.com/Anfisa111/task-2-2/intheap"
 )
 
-var errorReading = errors.New("reading error")
+var (
+	errReading       = errors.New("reading error")
+	errTypeAssertion = errors.New("error type assertion")
+)
 
 func getPreferredDish(dishCount int) (int, error) {
-	var priority, k int
-	h := &intheap.IntHeap{}
-	heap.Init(h)
+	var priority, choiceIdx int
+	heapint := &intheap.IntHeap{}
+	heap.Init(heapint)
 
 	for range dishCount {
 		if _, err := fmt.Scan(&priority); err != nil {
-			return 0, errorReading
+			return 0, errReading
 		}
-		heap.Push(h, priority)
+
+		heap.Push(heapint, priority)
 	}
 
-	if _, err := fmt.Scan(&k); err != nil {
-		return 0, errorReading
+	if _, err := fmt.Scan(&choiceIdx); err != nil {
+		return 0, errReading
 	}
 
-	for range k - 1 {
-		heap.Pop(h)
+	for range choiceIdx - 1 {
+		heap.Pop(heapint)
 	}
 
-	return heap.Pop(h).(int), nil
+	if val, ok := heap.Pop(heapint).(int); ok {
+		return val, nil
+	} else {
+		return 0, errTypeAssertion
+	}
+
 }
 
 func main() {

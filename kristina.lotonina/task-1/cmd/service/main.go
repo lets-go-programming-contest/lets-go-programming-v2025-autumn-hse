@@ -9,7 +9,7 @@ import (
 func main() {
 	var (
 		first, second int
-		operation string
+		operation     string
 	)
 	_, err := fmt.Scan(&first)
 	if (err != nil) {

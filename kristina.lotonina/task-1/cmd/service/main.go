@@ -1,6 +1,9 @@
 package main
 
-import "github.com/kef1rch1k/task-1/internal/calculator"
+import ( 
+	"github.com/kef1rch1k/task-1/internal/calculator"
+	"fmt"
+)
 
 func main() {
 	var (

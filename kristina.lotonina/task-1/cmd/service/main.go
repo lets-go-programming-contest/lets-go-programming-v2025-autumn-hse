@@ -1,8 +1,8 @@
 package main
 
 import ( 
-	"github.com/kef1rch1k/task-1/internal/calculator"
 	"fmt"
+	"github.com/kef1rch1k/task-1/internal/calculator"
 )
 
 func main() {
@@ -25,6 +25,6 @@ func main() {
 		fmt.Print("Invalid operation")
 		return
 	}
-	calculator.calculate(first, second, operation)
+	calculator.Calculate(first, second, operation)
 	return
 }

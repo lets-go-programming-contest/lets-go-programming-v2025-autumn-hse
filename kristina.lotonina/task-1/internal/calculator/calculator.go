@@ -2,7 +2,7 @@ package calculator
 
 import "fmt"
 
-func calculate(a int, b int, op string) {
+func Calculate(a int, b int, op string) {
 	if (op == "+") {
 		fmt.Print(a + b) 
 	} else if (op == "-") {

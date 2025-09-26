@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	MinTemp = -30
+	MinTemp = 0
 	MaxTemp = 99
 )
 
@@ -16,6 +16,7 @@ func TemperatureWantedDepartment() {
 	)
 
 	lowestTemperature := MinTemp
+	lowestTemperatureSet := false
 	highestTemperature := MaxTemp
 
 	if _, err := fmt.Scanln(&departmentCapacity); err != nil {
@@ -29,9 +30,10 @@ func TemperatureWantedDepartment() {
 
 		switch greaterOrLess {
 		case ">=":
-			if temperatureWantedByEmployee >= lowestTemperature {
+			if !lowestTemperatureSet || temperatureWantedByEmployee >= lowestTemperature {
 				lowestTemperature = temperatureWantedByEmployee
 			}
+
 		case "<=":
 			if temperatureWantedByEmployee <= highestTemperature {
 				highestTemperature = temperatureWantedByEmployee

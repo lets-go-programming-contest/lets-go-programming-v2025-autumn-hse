@@ -4,14 +4,25 @@ import (
 	"fmt"
 )
 
+const (
+	MinTemp = -30
+	MaxTemp = 99
+)
+
 func TemperatureWantedDepartment() {
-	var departmentCapacity, temperatureWantedByEmployee int64
-	var greaterOrLess string
-	lowestTemperature := int64(-30)
-	highestTemperature := int64(99)
-	fmt.Scanln(&departmentCapacity)
-	for i := int64(0); i < departmentCapacity; i++ {
-		fmt.Scanln(&greaterOrLess, &temperatureWantedByEmployee)
+	var (
+		departmentCapacity, temperatureWantedByEmployee int
+		greaterOrLess                                   string
+	)
+	lowestTemperature := MinTemp
+	highestTemperature := MaxTemp
+	if _, err := fmt.Scanln(&departmentCapacity); err != nil {
+		return
+	}
+	for i := 0; i < departmentCapacity; i++ {
+		if _, err := fmt.Scanln(&greaterOrLess, &temperatureWantedByEmployee); err != nil {
+			return
+		}
 		switch greaterOrLess {
 		case ">=":
 			if temperatureWantedByEmployee >= lowestTemperature {
@@ -23,10 +34,10 @@ func TemperatureWantedDepartment() {
 			}
 		}
 
-		if lowestTemperature < highestTemperature {
-			fmt.Println(lowestTemperature)
-		} else {
+		if lowestTemperature > highestTemperature {
 			fmt.Println("-1")
+		} else {
+			fmt.Println(lowestTemperature)
 		}
 	}
 }

@@ -7,9 +7,11 @@ import (
 )
 
 func main() {
-	var numberOfDepartments int64
-	fmt.Scanln(&numberOfDepartments)
-	for i := int64(0); i < numberOfDepartments; i++ {
+	var numberOfDepartments int
+	if _, err := fmt.Scanln(&numberOfDepartments); err != nil {
+		return
+	}
+	for i := 0; i < numberOfDepartments; i++ {
 		conditioner.TemperatureWantedDepartment()
 	}
 }

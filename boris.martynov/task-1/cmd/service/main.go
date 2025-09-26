@@ -33,7 +33,7 @@ func main() {
 		fmt.Println(firstNumber * secondNumber)
 	case "/":
 		if secondNumber == 0 {
-			fmt.Println(errors.New("division by zero"))
+			fmt.Println(errors.New("Division by zero"))
 			return
 		}
 		fmt.Println(firstNumber / secondNumber)

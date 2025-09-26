@@ -1,7 +1,8 @@
 package calculator
 
-import "fmt"
-
+import (
+	"fmt"
+)
 func Calculate(a int, b int, op string) {
 	if op == "+" {
 		fmt.Println(a + b) 

@@ -10,12 +10,15 @@ const (
 )
 
 func TemperatureWantedDepartment() {
+
 	var (
 		departmentCapacity, temperatureWantedByEmployee int
 		greaterOrLess                                   string
 	)
+
 	lowestTemperature := MinTemp
 	highestTemperature := MaxTemp
+
 	if _, err := fmt.Scanln(&departmentCapacity); err != nil {
 		return
 	}
@@ -23,6 +26,7 @@ func TemperatureWantedDepartment() {
 		if _, err := fmt.Scanln(&greaterOrLess, &temperatureWantedByEmployee); err != nil {
 			return
 		}
+
 		switch greaterOrLess {
 		case ">=":
 			if temperatureWantedByEmployee >= lowestTemperature {
@@ -39,5 +43,6 @@ func TemperatureWantedDepartment() {
 		} else {
 			fmt.Println(lowestTemperature)
 		}
+
 	}
 }

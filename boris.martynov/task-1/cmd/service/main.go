@@ -5,21 +5,21 @@ import (
 
 	"errors"
 
-	"github.com/JingolBong/task-1/internal/inputReader"
+	"github.com/JingolBong/task-1/internal/inputreader"
 )
 
 func main() {
-	firstNumber, err := inputReader.ReadNumber("first operand")
+	firstNumber, err := inputreader.ReadNumber("first operand")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	secondNumber, err := inputReader.ReadNumber("second operand")
+	secondNumber, err := inputreader.ReadNumber("second operand")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	operator, err := inputReader.ReadOperator()
+	operator, err := inputreader.ReadOperator()
 	if err != nil {
 		fmt.Println(err)
 		return

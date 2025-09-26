@@ -6,7 +6,7 @@ import (
 
 func Calculate(a int, b int, op string) {
 	if op == "+" {
-		fmt.Println(a + b) 
+		fmt.Println(a + b)
 	} else if op == "-" {
 		fmt.Println(a - b)
 	} else if op == "*" {
@@ -15,7 +15,7 @@ func Calculate(a int, b int, op string) {
 		if b != 0 {
 			fmt.Println(a / b)
 			return
-		} 
-		fmt.Println("Division by zero")	
+		}
+		fmt.Println("Division by zero")
 	}
 }

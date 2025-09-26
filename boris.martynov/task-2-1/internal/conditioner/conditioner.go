@@ -10,7 +10,6 @@ const (
 )
 
 func TemperatureWantedDepartment() {
-
 	var (
 		departmentCapacity, temperatureWantedByEmployee int
 		greaterOrLess                                   string
@@ -22,7 +21,7 @@ func TemperatureWantedDepartment() {
 	if _, err := fmt.Scanln(&departmentCapacity); err != nil {
 		return
 	}
-	for i := 0; i < departmentCapacity; i++ {
+	for range departmentCapacity {
 		if _, err := fmt.Scanln(&greaterOrLess, &temperatureWantedByEmployee); err != nil {
 			return
 		}
@@ -43,6 +42,5 @@ func TemperatureWantedDepartment() {
 		} else {
 			fmt.Println(lowestTemperature)
 		}
-
 	}
 }

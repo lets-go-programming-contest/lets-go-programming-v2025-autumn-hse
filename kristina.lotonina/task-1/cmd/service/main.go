@@ -1,6 +1,6 @@
 package main
 
-import ( 
+import (
 	"fmt"
 	"github.com/kef1rch1k/task-1/internal/calculator"
 )

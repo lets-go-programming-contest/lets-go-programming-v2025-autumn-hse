@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/kef1rch1k/task-1/internal/calculator"
 )
 
@@ -26,5 +27,4 @@ func main() {
 		return
 	}
 	calculator.Calculate(first, second, operation)
-	return
 }

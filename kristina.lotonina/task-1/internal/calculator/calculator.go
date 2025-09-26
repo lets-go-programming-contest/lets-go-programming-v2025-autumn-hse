@@ -13,9 +13,9 @@ func Calculate(a int, b int, op string) {
 		if b != 0 {
 			fmt.Println(a / b)
 		} else {
-			fmt.Print("Division by zero\n")	
+			fmt.Println("Division by zero")	
 		}
 	} else {
-		fmt.Print("Invalid operation\n")
+		fmt.Println("Invalid operation")
 	}
 }

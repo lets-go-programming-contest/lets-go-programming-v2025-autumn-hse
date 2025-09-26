@@ -13,17 +13,17 @@ func main() {
 	)
 	_, err := fmt.Scan(&first)
 	if err != nil {
-		fmt.Print("Invalid first operand")
+		fmt.Println("Invalid first operand")
 		return
 	}
 	_, err = fmt.Scan(&second)
 	if err != nil {
-		fmt.Print("Invalid second operand")
+		fmt.Println("Invalid second operand")
 		return
 	}
 	_, err = fmt.Scan(&operation)
 	if err != nil {
-		fmt.Print("Invalid operation")
+		fmt.Println("Invalid operation")
 		return
 	}
 	calculator.Calculate(first, second, operation)

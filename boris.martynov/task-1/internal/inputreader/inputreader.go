@@ -1,4 +1,4 @@
-package inputReader
+package inputreader
 
 import (
 	"errors"
@@ -12,9 +12,8 @@ func ReadNumber(name string) (int64, error) {
 	if err != nil {
 		if name == "first operand" {
 			return 0, errors.New("Invalid first operand")
-		} else {
-			return 0, errors.New("Invalid second operand")
 		}
+		return 0, errors.New("Invalid second operand")
 	}
 	return n, nil
 }

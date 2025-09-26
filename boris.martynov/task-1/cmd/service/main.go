@@ -3,21 +3,21 @@ package main
 import (
 	"fmt"
 
-	"github.com/JingolBong/task-1/internal/calculator"
+	"github.com/JingolBong/task-1/internal/input_reader"
 )
 
 func main() {
-	firstNumber, err := calculator.ReadNumber("first operand")
+	firstNumber, err := input_reader.ReadNumber("first operand")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	secondNumber, err := calculator.ReadNumber("second operand")
+	secondNumber, err := input_reader.ReadNumber("second operand")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	operator, err := calculator.ReadOperator()
+	operator, err := input_reader.ReadOperator()
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -30,13 +30,12 @@ func main() {
 	case "*":
 		fmt.Println(firstNumber * secondNumber)
 	case "/":
-		result, err := calculator.Div(firstNumber, secondNumber)
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			fmt.Println(result)
+		if secondNumber == 0 {
+			fmt.Println(input_reader.ErrDivisionByZero)
+			return
 		}
+		fmt.Println(firstNumber / secondNumber)
 	default:
-		fmt.Println("Invalid operation")
+		fmt.Println(input_reader.ErrInvalidOperation)
 	}
 }

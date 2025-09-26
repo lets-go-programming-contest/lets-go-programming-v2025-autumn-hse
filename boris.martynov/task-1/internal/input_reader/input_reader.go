@@ -8,7 +8,7 @@ import (
 
 var (
 	ErrDivisionByZero   = errors.New("Division by zero")
-	ErrInvalidNumber    = errors.New("Invalid number")
+	ErrInvalidNumber    = errors.New("Invalid ")
 	ErrInvalidOperation = errors.New("Invalid operation")
 )
 

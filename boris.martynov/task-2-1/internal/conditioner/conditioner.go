@@ -31,7 +31,6 @@ func TemperatureWantedDepartment() {
 		case ">=":
 			if temperatureWantedByEmployee >= lowestTemperature {
 				lowestTemperature = temperatureWantedByEmployee
-
 			}
 		case "<=":
 			if temperatureWantedByEmployee <= highestTemperature {

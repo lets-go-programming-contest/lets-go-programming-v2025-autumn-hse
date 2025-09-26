@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 
+	"errors"
+
 	"github.com/JingolBong/task-1/internal/input_reader"
 )
 
@@ -31,11 +33,11 @@ func main() {
 		fmt.Println(firstNumber * secondNumber)
 	case "/":
 		if secondNumber == 0 {
-			fmt.Println(input_reader.ErrDivisionByZero)
+			fmt.Println(errors.New("division by zero"))
 			return
 		}
 		fmt.Println(firstNumber / secondNumber)
 	default:
-		fmt.Println(input_reader.ErrInvalidOperation)
+		fmt.Println(errors.New("Invalid operation"))
 	}
 }

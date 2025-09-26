@@ -18,6 +18,7 @@ func TemperatureWantedDepartment() {
 	lowestTemperature := MinTemp
 	lowestTemperatureSet := false
 	highestTemperature := MaxTemp
+	highestTemperatureSet := false
 
 	if _, err := fmt.Scanln(&departmentCapacity); err != nil {
 		return
@@ -32,16 +33,20 @@ func TemperatureWantedDepartment() {
 		case ">=":
 			if !lowestTemperatureSet || temperatureWantedByEmployee >= lowestTemperature {
 				lowestTemperature = temperatureWantedByEmployee
+				lowestTemperatureSet = true
 			}
 
 		case "<=":
 			if temperatureWantedByEmployee <= highestTemperature {
 				highestTemperature = temperatureWantedByEmployee
+				highestTemperatureSet = true
 			}
 		}
 
 		if lowestTemperatureSet && (lowestTemperature < highestTemperature) {
 			fmt.Println(lowestTemperature)
+		} else if !lowestTemperatureSet && highestTemperatureSet {
+			fmt.Println(highestTemperature)
 		} else {
 			fmt.Println("-1")
 		}

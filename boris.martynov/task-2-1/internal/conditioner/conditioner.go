@@ -21,6 +21,7 @@ func TemperatureWantedDepartment() {
 	if _, err := fmt.Scanln(&departmentCapacity); err != nil {
 		return
 	}
+
 	for range departmentCapacity {
 		if _, err := fmt.Scanln(&greaterOrLess, &temperatureWantedByEmployee); err != nil {
 			return

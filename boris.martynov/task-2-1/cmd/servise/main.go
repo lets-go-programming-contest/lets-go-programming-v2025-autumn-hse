@@ -11,6 +11,7 @@ func main() {
 	if _, err := fmt.Scanln(&numberOfDepartments); err != nil {
 		return
 	}
+
 	for range numberOfDepartments {
 		conditioner.TemperatureWantedDepartment()
 	}

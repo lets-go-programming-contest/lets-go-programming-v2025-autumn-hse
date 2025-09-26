@@ -4,14 +4,14 @@ import "fmt"
 
 func Calculate(a int, b int, op string) {
 	if op == "+" {
-		fmt.Print(a + b) 
+		fmt.Println(a + b) 
 	} else if op == "-" {
-		fmt.Print(a - b)
+		fmt.Println(a - b)
 	} else if op == "*" {
-		fmt.Print(a * b)
+		fmt.Println(a * b)
 	} else if op == "/" {
 		if b != 0 {
-			fmt.Print(a / b)
+			fmt.Println(a / b)
 		} else {
 			fmt.Print("Division by zero\n")	
 		}

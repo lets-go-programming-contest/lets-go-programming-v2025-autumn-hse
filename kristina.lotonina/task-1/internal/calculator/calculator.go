@@ -17,5 +17,7 @@ func Calculate(a int, b int, op string) {
 			return
 		}
 		fmt.Println("Division by zero")
+	} else {
+		fmt.Println("Invalid operation")
 	}
 }

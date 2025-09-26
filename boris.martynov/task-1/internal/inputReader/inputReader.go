@@ -1,4 +1,4 @@
-package input_reader
+package inputReader
 
 import (
 	"errors"

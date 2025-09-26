@@ -39,16 +39,15 @@ func TemperatureWantedDepartment() {
 				highestTemperature = temperatureWantedByEmployee
 			}
 		}
-
-		switch lowestTemperatureSet {
-		case true:
-			if lowestTemperature < highestTemperature {
-				fmt.Println(lowestTemperature)
-			} else {
-				fmt.Println(-1)
-			}
-		case false:
-			fmt.Println(highestTemperature)
+	}
+	switch lowestTemperatureSet {
+	case true:
+		if lowestTemperature < highestTemperature {
+			fmt.Println(lowestTemperature)
+		} else {
+			fmt.Println(-1)
 		}
+	case false:
+		fmt.Println(highestTemperature)
 	}
 }

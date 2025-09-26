@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	MinTemp = 0
-	MaxTemp = 99
+	MinTemp = 15
+	MaxTemp = 30
 )
 
 func TemperatureWantedDepartment() {

@@ -40,7 +40,7 @@ func TemperatureWantedDepartment() {
 			}
 		}
 
-		if lowestTemperature < highestTemperature {
+		if lowestTemperature <= highestTemperature {
 			fmt.Println(lowestTemperature)
 		} else {
 			fmt.Println("-1")

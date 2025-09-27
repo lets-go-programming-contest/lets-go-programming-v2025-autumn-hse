@@ -9,6 +9,20 @@ const (
 	Max = 30
 )
 
+func applyCondition(sign string, temperature, minTemperature, maxTemperature int) (int, int) {
+	switch sign {
+	case ">=":
+		if minTemperature < temperature {
+			minTemperature = temperature
+		}
+	case "<=":
+		if maxTemperature > temperature {
+			maxTemperature = temperature
+		}
+	}
+	return minTemperature, maxTemperature
+}
+
 func printOptimumTemperature(minTemperature, maxTemperature int) {
 	if minTemperature > maxTemperature {
 		fmt.Println(-1)
@@ -48,16 +62,7 @@ func main() {
 				return
 			}
 
-			switch sign {
-			case ">=":
-				if minTemperature < temperature {
-					minTemperature = temperature
-				}
-			case "<=":
-				if maxTemperature > temperature {
-					maxTemperature = temperature
-				}
-			}
+			minTemperature, maxTemperature = applyCondition(sign, temperature, minTemperature, maxTemperature)
 			printOptimumTemperature(minTemperature, maxTemperature)
 		}
 	}

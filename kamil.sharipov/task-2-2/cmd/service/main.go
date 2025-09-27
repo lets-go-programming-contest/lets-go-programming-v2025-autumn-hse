@@ -4,7 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 
-	"github.com/kamilSharipov/task-2-2/internal/intHeap"
+	"github.com/kamilSharipov/task-2-2/internal/intheap"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 		return
 	}
 
-	heapInstance := intHeap.InitIntHeap()
+	heapInstance := intheap.InitIntHeap()
 
 	for range dishCount {
 		_, err := fmt.Scan(&dish)

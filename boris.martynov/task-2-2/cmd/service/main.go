@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-
 	"slices"
 
 	"github.com/JingolBong/task-2-2/internal/dishorder"
@@ -10,6 +9,7 @@ import (
 
 func main() {
 	var numberOfDishes, preferedDishNumb int
+
 	containerOfDishes := &dishorder.PrefOrder{}
 
 	if _, err := fmt.Scan(&numberOfDishes); err != nil {

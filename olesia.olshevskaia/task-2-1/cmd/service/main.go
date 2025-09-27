@@ -20,6 +20,7 @@ func applyCondition(sign string, temperature, minTemperature, maxTemperature int
 			maxTemperature = temperature
 		}
 	}
+
 	return minTemperature, maxTemperature
 }
 

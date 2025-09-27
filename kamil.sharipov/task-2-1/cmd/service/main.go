@@ -48,13 +48,13 @@ func main() {
 				return
 			}
 
-			op, err := temperature.ParseOperator(operator)
+			parsedOp, err := temperature.ParseOperator(operator)
 			if err != nil {
 				fmt.Println(ErrParseOperator, err)
 
 				return
 			} else {
-				comfortTemperature.AddConstraint(op, temp)
+				comfortTemperature.AddConstraint(parsedOp, temp)
 			}
 
 			fmt.Println(comfortTemperature.Result())

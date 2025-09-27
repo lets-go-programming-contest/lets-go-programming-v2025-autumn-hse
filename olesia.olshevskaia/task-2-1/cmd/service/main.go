@@ -38,7 +38,6 @@ func (tr *TemperatureRange) Optimum() int {
 }
 
 func NewTemperatureRange() TemperatureRange {
-
 	return TemperatureRange{min: Min, max: Max}
 }
 

@@ -1,4 +1,4 @@
-package intHeap
+package intheap
 
 import (
 	"container/heap"
@@ -23,6 +23,7 @@ func (h *IntHeap) Push(x interface{}) {
 	if !ok {
 		panic("IntHeap.Push: expected int")
 	}
+
 	*h = append(*h, rating)
 }
 
@@ -30,15 +31,18 @@ func (h *IntHeap) Pop() interface{} {
 	if h.Len() == 0 {
 		panic("IntHeap.Pop: cannot pop from empty heap")
 	}
+
 	old := *h
 	n := len(old)
 	x := old[n-1]
 	*h = old[0 : n-1]
+
 	return x
 }
 
 func InitIntHeap() *IntHeap {
 	h := &IntHeap{}
 	heap.Init(h)
+
 	return h
 }

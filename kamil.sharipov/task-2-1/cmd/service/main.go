@@ -1,51 +1,58 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"os"
 
-const (
-	minStartingTemp = 15
-	maxStartingTemp = 30
+	"github.com/kamilSharipov/task-2-1/internal/temperature"
+)
+
+var (
+	ErrReadingNumOfDepartments = errors.New("Error reading number of departments")
+	ErrReadingNumOfEmployees   = errors.New("Error reading number of employees")
+	ErrReadingOperatorTemp     = errors.New("Error reading operator and temperature")
+	ErrParseOperator           = errors.New("Error parsing operator")
 )
 
 func main() {
-	var (
-		numOfDepartments, employees, temp      int
-		minComfortableTemp, maxComfortableTemp int
-		operator                               string
-	)
-
+	var numOfDepartments int
 	_, err := fmt.Scanln(&numOfDepartments)
 	if err != nil {
+		fmt.Fprintln(os.Stderr, ErrReadingNumOfDepartments, err)
 		return
 	}
 
+	var employees int
 	for range numOfDepartments {
 		_, err := fmt.Scanln(&employees)
 		if err != nil {
+			fmt.Fprintln(os.Stderr, ErrReadingNumOfEmployees, err)
 			return
 		}
 
-		minComfortableTemp = minStartingTemp
-		maxComfortableTemp = maxStartingTemp
+		comfortTemperature := temperature.InitComfortTemperature()
 
+		var (
+			operator string
+			temp     int
+		)
 		for range employees {
 			_, err = fmt.Scanln(&operator, &temp)
 			if err != nil {
+				fmt.Fprintln(os.Stderr, ErrReadingOperatorTemp, err)
 				return
 			}
 
-			switch operator {
-			case "<=":
-				maxComfortableTemp = min(maxComfortableTemp, temp)
-			case ">=":
-				minComfortableTemp = max(minComfortableTemp, temp)
+			op, err := temperature.ParseOperator(operator)
+			if err != nil {
+				fmt.Println(os.Stderr, ErrParseOperator, err)
+				return
+			} else {
+				comfortTemperature.AddConstraint(op, temp)
 			}
 
-			if minComfortableTemp > maxComfortableTemp {
-				fmt.Println(-1)
-			} else {
-				fmt.Println(minComfortableTemp)
-			}
+			fmt.Println(comfortTemperature.Result())
 		}
 	}
 }

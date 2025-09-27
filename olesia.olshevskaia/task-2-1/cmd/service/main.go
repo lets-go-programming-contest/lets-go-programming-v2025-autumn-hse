@@ -31,12 +31,15 @@ func (tr *TemperatureRange) Update(sign string, temperature int) {
 
 func (tr *TemperatureRange) Optimum() int {
 	if tr.min > tr.max {
+
 		return -1
 	}
+
 	return tr.min
 }
 
 func NewTemperatureRange() TemperatureRange {
+
 	return TemperatureRange{min: Min, max: Max}
 }
 
@@ -63,7 +66,7 @@ func main() {
 			return
 		}
 
-		tr := NewTemperatureRange()
+		temperatureRange := NewTemperatureRange()
 
 		for range countEmployee {
 			if n, err := fmt.Scanln(&sign, &temperature); err != nil {
@@ -76,8 +79,8 @@ func main() {
 				return
 			}
 
-			tr.Update(sign, temperature)
-			fmt.Println(tr.Optimum())
+			temperatureRange.Update(sign, temperature)
+			fmt.Println(temperatureRange.Optimum())
 		}
 	}
 }

@@ -44,12 +44,14 @@ func main() {
 			_, err = fmt.Scanln(&operator, &temp)
 			if err != nil {
 				fmt.Println(ErrReadingOperatorTemp, err)
+
 				return
 			}
 
 			op, err := temperature.ParseOperator(operator)
 			if err != nil {
 				fmt.Println(ErrParseOperator, err)
+
 				return
 			} else {
 				comfortTemperature.AddConstraint(op, temp)

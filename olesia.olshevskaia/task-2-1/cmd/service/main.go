@@ -19,21 +19,6 @@ func printOptimumTemperature(minTemperature, maxTemperature int) {
 	fmt.Println(minTemperature)
 }
 
-func applyCondition(sign string, temperature, minTemperature, maxTemperature int) (int, int) {
-	switch sign {
-	case ">=":
-		if minTemperature < temperature {
-			minTemperature = temperature
-		}
-	case "<=":
-		if maxTemperature > temperature {
-			maxTemperature = temperature
-		}
-	}
-
-	return minTemperature, maxTemperature
-}
-
 func main() {
 	var (
 		countDepartments, countEmployee, temperature int
@@ -63,7 +48,16 @@ func main() {
 				return
 			}
 
-			minTemperature, maxTemperature = applyCondition(sign, temperature, minTemperature, maxTemperature)
+			switch sign {
+			case ">=":
+				if minTemperature < temperature {
+					minTemperature = temperature
+				}
+			case "<=":
+				if maxTemperature > temperature {
+					maxTemperature = temperature
+				}
+			}
 			printOptimumTemperature(minTemperature, maxTemperature)
 		}
 	}

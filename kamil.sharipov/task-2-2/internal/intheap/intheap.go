@@ -18,6 +18,7 @@ func (h IntHeap) Swap(i, j int) {
 	h[i], h[j] = h[j], h[i]
 }
 
+//nolint:recvcheck
 func (h *IntHeap) Push(x interface{}) {
 	rating, ok := x.(int)
 	if !ok {
@@ -27,6 +28,7 @@ func (h *IntHeap) Push(x interface{}) {
 	*h = append(*h, rating)
 }
 
+//nolint:recvcheck
 func (h *IntHeap) Pop() interface{} {
 	if h.Len() == 0 {
 		panic("IntHeap.Pop: cannot pop from empty heap")

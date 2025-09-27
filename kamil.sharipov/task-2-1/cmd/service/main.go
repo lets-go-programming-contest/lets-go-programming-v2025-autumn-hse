@@ -17,7 +17,6 @@ var (
 func main() {
 	var numOfDepartments int
 	_, err := fmt.Scanln(&numOfDepartments)
-
 	if err != nil {
 		fmt.Println(ErrReadingNumOfDepartments, err)
 

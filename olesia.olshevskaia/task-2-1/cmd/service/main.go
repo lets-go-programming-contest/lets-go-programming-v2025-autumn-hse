@@ -40,8 +40,12 @@ func main() {
 		sign                                         string
 	)
 
-	if _, err := fmt.Scanln(&countDepartments); err != nil {
-		fmt.Println(err)
+	if n, err := fmt.Scanln(&countDepartments); err != nil {
+		fmt.Printf("Ошибка при чтении количества департаментов: считано %d значений, ошибка: %v\n", n, err)
+
+		return
+	} else if n != 1 {
+		fmt.Printf("Ожидалось 1 значение для countDepartments, считано %d\n", n)
 
 		return
 	}
@@ -57,8 +61,12 @@ func main() {
 		maxTemperature := Max
 
 		for range countEmployee {
-			if _, err := fmt.Scanln(&sign, &temperature); err != nil {
-				fmt.Println(err)
+			if n, err := fmt.Scanln(&sign, &temperature); err != nil {
+				fmt.Printf("Ошибка при чтении данных: считано %d значений, ошибка: %v\n", n, err)
+
+				return
+			} else if n != 2 {
+				fmt.Printf("Ожидалось 2 значения (sign и temperature), считано %d\n", n)
 
 				return
 			}

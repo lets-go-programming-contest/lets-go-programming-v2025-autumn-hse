@@ -2,7 +2,7 @@ package temperature
 
 import "errors"
 
-var ErrInvalidOperator = errors.New("Invalid operator")
+var ErrInvalidOperator = errors.New("invalid operator")
 
 const (
 	minStartingTemp = 15
@@ -58,5 +58,6 @@ func (cr *ComfortTemperature) Result() int {
 	if cr.isValid() {
 		return cr.min
 	}
+
 	return -1
 }

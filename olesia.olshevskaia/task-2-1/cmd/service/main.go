@@ -31,7 +31,6 @@ func (tr *TemperatureRange) Update(sign string, temperature int) {
 
 func (tr *TemperatureRange) Optimum() int {
 	if tr.min > tr.max {
-
 		return -1
 	}
 

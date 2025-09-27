@@ -3,38 +3,9 @@ package main
 import (
 	"container/heap"
 	"fmt"
+
+	"github.com/kamilSharipov/task-2-2/internal/intHeap"
 )
-
-type IntHeap []int
-
-func (heap *IntHeap) Len() int {
-	return len(*heap)
-}
-
-func (heap *IntHeap) Less(i, j int) bool {
-	return (*heap)[i] > (*heap)[j]
-}
-
-func (heap *IntHeap) Swap(i, j int) {
-	(*heap)[i], (*heap)[j] = (*heap)[j], (*heap)[i]
-}
-
-func (heap *IntHeap) Push(x interface{}) {
-	rating, ok := x.(int)
-	if !ok {
-		return
-	}
-
-	*heap = append(*heap, rating)
-}
-
-func (heap *IntHeap) Pop() interface{} {
-	oldHeap := *heap
-	x := oldHeap[len(oldHeap)-1]
-	*heap = oldHeap[0 : len(oldHeap)-1]
-
-	return x
-}
 
 func main() {
 	var dishCount, dish, rank, ans int
@@ -44,8 +15,7 @@ func main() {
 		return
 	}
 
-	heapInstance := &IntHeap{}
-	heap.Init(heapInstance)
+	heapInstance := intHeap.InitIntHeap()
 
 	for range dishCount {
 		_, err := fmt.Scan(&dish)

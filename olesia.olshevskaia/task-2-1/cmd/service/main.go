@@ -5,8 +5,10 @@ import (
 )
 
 const (
-	Min = 15
-	Max = 30
+	Min                      = 15
+	Max                      = 30
+	expectedValuesPerInput   = 2
+	expectedcountDepartments = 1
 )
 
 func applyCondition(sign string, temperature, minTemperature, maxTemperature int) (int, int) {
@@ -44,15 +46,15 @@ func main() {
 		fmt.Printf("Ошибка при чтении количества департаментов: считано %d значений, ошибка: %v\n", n, err)
 
 		return
-	} else if n != 1 {
+	} else if n != expectedcountDepartments {
 		fmt.Printf("Ожидалось 1 значение для countDepartments, считано %d\n", n)
 
 		return
 	}
 
 	for range countDepartments {
-		if _, err := fmt.Scanln(&countEmployee); err != nil {
-			fmt.Println(err)
+		if n, err := fmt.Scanln(&countEmployee); err != nil {
+			fmt.Printf("Ошибка при чтении количества сотрудников в департаменте: считано %d значений, ошибка: %v\n", n, err)
 
 			return
 		}
@@ -65,7 +67,7 @@ func main() {
 				fmt.Printf("Ошибка при чтении данных: считано %d значений, ошибка: %v\n", n, err)
 
 				return
-			} else if n != 2 {
+			} else if n != expectedValuesPerInput {
 				fmt.Printf("Ожидалось 2 значения (sign и temperature), считано %d\n", n)
 
 				return

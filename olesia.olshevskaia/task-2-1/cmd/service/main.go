@@ -11,29 +11,33 @@ const (
 	expectedcountDepartments = 1
 )
 
-func applyCondition(sign string, temperature, minTemperature, maxTemperature int) (int, int) {
-	switch sign {
-	case ">=":
-		if minTemperature < temperature {
-			minTemperature = temperature
-		}
-	case "<=":
-		if maxTemperature > temperature {
-			maxTemperature = temperature
-		}
-	}
-
-	return minTemperature, maxTemperature
+type TemperatureRange struct {
+	min int
+	max int
 }
 
-func printOptimumTemperature(minTemperature, maxTemperature int) {
-	if minTemperature > maxTemperature {
-		fmt.Println(-1)
-
-		return
+func (tr *TemperatureRange) Update(sign string, temperature int) {
+	switch sign {
+	case ">=":
+		if tr.min < temperature {
+			tr.min = temperature
+		}
+	case "<=":
+		if tr.max > temperature {
+			tr.max = temperature
+		}
 	}
+}
 
-	fmt.Println(minTemperature)
+func (tr *TemperatureRange) Optimum() int {
+	if tr.min > tr.max {
+		return -1
+	}
+	return tr.min
+}
+
+func NewTemperatureRange() TemperatureRange {
+	return TemperatureRange{min: Min, max: Max}
 }
 
 func main() {
@@ -59,8 +63,7 @@ func main() {
 			return
 		}
 
-		minTemperature := Min
-		maxTemperature := Max
+		tr := NewTemperatureRange()
 
 		for range countEmployee {
 			if n, err := fmt.Scanln(&sign, &temperature); err != nil {
@@ -73,8 +76,8 @@ func main() {
 				return
 			}
 
-			minTemperature, maxTemperature = applyCondition(sign, temperature, minTemperature, maxTemperature)
-			printOptimumTemperature(minTemperature, maxTemperature)
+			tr.Update(sign, temperature)
+			fmt.Println(tr.Optimum())
 		}
 	}
 }

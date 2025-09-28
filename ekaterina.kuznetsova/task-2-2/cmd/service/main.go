@@ -10,7 +10,7 @@ import (
 func main() {
 	var (
 		numberDishes, sequenceNumber int
-		h                            myheap.IntHeap
+		heapRatings                  myheap.IntHeap
 	)
 
 	_, err := fmt.Scanln(&numberDishes)
@@ -22,8 +22,14 @@ func main() {
 
 	for range numberDishes {
 		var rating int
-		fmt.Scan(&rating)
-		heap.Push(&h, rating)
+		_, err = fmt.Scan(&rating)
+		if err != nil {
+			fmt.Println("Error scan rating:", err)
+
+			return
+		}
+
+		heap.Push(&heapRatings, rating)
 	}
 
 	_, err = fmt.Scanln(&sequenceNumber)
@@ -34,7 +40,8 @@ func main() {
 	}
 
 	for range sequenceNumber - 1 {
-		heap.Pop(&h)
+		heap.Pop(&heapRatings)
 	}
-	fmt.Println(heap.Pop(&h))
+
+	fmt.Println(heap.Pop(&heapRatings))
 }

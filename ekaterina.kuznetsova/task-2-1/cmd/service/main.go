@@ -66,12 +66,13 @@ func main() {
 
 	for range numberDepartaments {
 		_, err := fmt.Scanln(&numberEmployees)
-		var errTemperature error
 		if err != nil {
 			fmt.Println("Error scan number of employees:", err)
 
 			return
 		}
+
+		var errTemperature error
 
 		minTemperature := minTemperatureConst
 		maxTemperature := maxTemperatureConst

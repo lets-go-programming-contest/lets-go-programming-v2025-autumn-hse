@@ -28,7 +28,7 @@ func (h *IntHeap) Push(x any) {
 }
 
 func (h *IntHeap) Pop() any {
-	if len(old) == 0 {
+	if len(*h) == 0 {
 		panic(errors.New("data is empty"))
 	}
 

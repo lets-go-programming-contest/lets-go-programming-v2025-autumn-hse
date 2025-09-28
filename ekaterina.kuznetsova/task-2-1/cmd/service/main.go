@@ -1,85 +1,97 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 )
 
-func lessOrEqual(maxTemperature, minTemperature *int, temperature int) bool {
-	if temperature < *minTemperature || temperature < 15 {
-		fmt.Println("-1")
+const (
+	minTemperatureConst = 15
+	maxTemperatureConst = 30
+)
 
-		return true
+var (
+	ErrTemperatureTooBig   = errors.New("Temperature is too big")
+	ErrTemperatureTooSmall = errors.New("Temperature is too small")
+	ErrTemperatureFail     = errors.New("Temperature is fail")
+	ErrInvalidComparison   = errors.New("Error compaison sign")
+)
+
+func lessOrEqual(maxTemperature, minTemperature *int, temperature int) error {
+	if temperature < *minTemperature || temperature < minTemperatureConst {
+		return ErrTemperatureTooSmall
 	}
 
 	if temperature < *maxTemperature {
 		*maxTemperature = temperature
 	}
-
-	fmt.Println(*minTemperature)
-
-	return false
+	return nil
 }
 
-func moreOrEqual(maxTemperature, minTemperature *int, temperature int) bool {
-	if *maxTemperature < temperature || temperature > 30 {
-		fmt.Println("-1")
-
-		return true
+func moreOrEqual(maxTemperature, minTemperature *int, temperature int) error {
+	if *maxTemperature < temperature || temperature > maxTemperatureConst {
+		return ErrTemperatureTooBig
 	}
 
 	if *minTemperature < temperature {
 		*minTemperature = temperature
 	}
 
-	fmt.Println(*minTemperature)
+	return nil
+}
 
-	return false
+func compareValues(maxTemperature, minTemperature *int, temperature int, comparisonSign string) error {
+
+	switch comparisonSign {
+	case "<=":
+		return lessOrEqual(maxTemperature, minTemperature, temperature)
+	case ">=":
+		return moreOrEqual(maxTemperature, minTemperature, temperature)
+	default:
+		return ErrInvalidComparison
+	}
 }
 
 func main() {
 	var (
 		numberDepartaments, numberEmployees, temperature int
-		minTemperature, maxTemperature                   = 15, 30
 		comparisonSign                                   string
-		flagFail                                         bool
 	)
 
 	_, err := fmt.Scanln(&numberDepartaments)
 	if err != nil {
+		fmt.Println("Error scan number of departaments:", err)
+
 		return
 	}
 
 	for range numberDepartaments {
 		_, err := fmt.Scanln(&numberEmployees)
+		var errTemperature error
 		if err != nil {
+			fmt.Println("Error scan number of employees:", err)
+
 			return
 		}
 
-		minTemperature = 15
-		maxTemperature = 30
-		flagFail = false
+		minTemperature := minTemperatureConst
+		maxTemperature := maxTemperatureConst
 
 		for range numberEmployees {
-			_, err := fmt.Scanf("%s %d\n", &comparisonSign, &temperature)
+			_, err = fmt.Scanf("%s %d\n", &comparisonSign, &temperature)
 			if err != nil {
 				return
 			}
 
-			switch comparisonSign {
-			case "<=":
-				if !flagFail {
-					flagFail = lessOrEqual(&maxTemperature, &minTemperature, temperature)
+			if errTemperature != nil {
+				fmt.Println("-1")
+			} else {
+				errTemperature = compareValues(&maxTemperature, &minTemperature, temperature, comparisonSign)
+				if errTemperature != nil {
+					fmt.Println(-1)
 				} else {
-					fmt.Println("-1")
+					fmt.Println(minTemperature)
 				}
-			case ">=":
-				if !flagFail {
-					flagFail = moreOrEqual(&maxTemperature, &minTemperature, temperature)
-				} else {
-					fmt.Println("-1")
-				}
-			default:
-				fmt.Println("Error compaison sign")
 			}
 		}
 	}

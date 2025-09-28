@@ -11,10 +11,10 @@ const (
 )
 
 var (
-	ErrTemperatureTooBig   = errors.New("Temperature is too big")
-	ErrTemperatureTooSmall = errors.New("Temperature is too small")
-	ErrTemperatureFail     = errors.New("Temperature is fail")
-	ErrInvalidComparison   = errors.New("Error compaison sign")
+	ErrTemperatureTooBig   = errors.New("temperature is too big")
+	ErrTemperatureTooSmall = errors.New("temperature is too small")
+	ErrTemperatureFail     = errors.New("temperature is fail")
+	ErrInvalidComparison   = errors.New("еrror compaison sign")
 )
 
 func lessOrEqual(maxTemperature, minTemperature *int, temperature int) error {
@@ -41,7 +41,6 @@ func moreOrEqual(maxTemperature, minTemperature *int, temperature int) error {
 }
 
 func compareValues(maxTemperature, minTemperature *int, temperature int, comparisonSign string) error {
-
 	switch comparisonSign {
 	case "<=":
 		return lessOrEqual(maxTemperature, minTemperature, temperature)

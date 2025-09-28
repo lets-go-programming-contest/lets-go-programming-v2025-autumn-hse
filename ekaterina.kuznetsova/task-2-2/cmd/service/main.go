@@ -22,6 +22,7 @@ func main() {
 
 	for range numberDishes {
 		var rating int
+
 		_, err = fmt.Scan(&rating)
 		if err != nil {
 			fmt.Println("Error scan rating:", err)

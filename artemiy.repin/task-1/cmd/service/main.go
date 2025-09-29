@@ -2,23 +2,24 @@ package main
 
 import (
 	"fmt"
-	"os"
 )
 
 func main() {
-	var a, b float64
-	var op string
+	var (
+		a, b int
+		op   string
+	)
 
 	if _, err := fmt.Scanln(&a); err != nil {
-		fmt.Fprintln(os.Stderr, "Invalid first operand")
+		fmt.Println("Invalid first operand")
 		return
 	}
 	if _, err := fmt.Scanln(&b); err != nil {
-		fmt.Fprintln(os.Stderr, "Invalid second operand")
+		fmt.Println("Invalid second operand")
 		return
 	}
 	if _, err := fmt.Scanln(&op); err != nil {
-		fmt.Fprintln(os.Stderr, "Invalid operation")
+		fmt.Println("Invalid operation")
 		return
 	}
 
@@ -31,11 +32,11 @@ func main() {
 		fmt.Println(a * b)
 	case "/":
 		if b == 0 {
-			fmt.Fprintln(os.Stderr, "Division by zero")
+			fmt.Println("Division by zero")
 			return
 		}
 		fmt.Println(a / b)
 	default:
-		fmt.Fprintln(os.Stderr, "Invalid operation")
+		fmt.Println("Invalid operation")
 	}
 }

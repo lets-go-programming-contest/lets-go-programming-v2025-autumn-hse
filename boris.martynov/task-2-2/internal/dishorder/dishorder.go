@@ -20,9 +20,10 @@ func (h *PrefOrder) Pop() any {
 	}
 
 	old := *h
-	x := old[len(old)-1]
+	neededIndex := len(old) - 1
+	x := old[neededIndex]
 
-	*h = old[0 : len(old)-1]
+	*h = old[0:neededIndex]
 
 	return x
 }

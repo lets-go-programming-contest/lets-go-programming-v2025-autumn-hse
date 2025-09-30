@@ -11,9 +11,9 @@ import (
 var errFailedToScan = errors.New("invalid input")
 
 func main() {
-	var numberOfDishes int
-
 	containerOfDishes := &dishorder.PrefOrder{}
+
+	var numberOfDishes int
 
 	if _, err := fmt.Scan(&numberOfDishes); err != nil {
 		fmt.Println(errFailedToScan)
@@ -40,6 +40,7 @@ func main() {
 		return
 	}
 
+	dishedChoosed := len(*containerOfDishes) - preferedDishNumb
 	slices.Sort(*containerOfDishes)
-	fmt.Println((*containerOfDishes)[len(*containerOfDishes)-preferedDishNumb])
+	fmt.Println((*containerOfDishes)[dishedChoosed])
 }

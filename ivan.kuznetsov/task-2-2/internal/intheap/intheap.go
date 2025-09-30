@@ -2,37 +2,37 @@ package intheap
 
 type Rating []int
 
-func (r *Rating) Len() int {
-	return len(*r)
+func (rating *Rating) Len() int {
+	return len(*rating)
 }
 
-func (r *Rating) Less(i, j int) bool {
-	return (*r)[i] > (*r)[j]
+func (rating *Rating) Less(i, j int) bool {
+	return (*rating)[i] > (*rating)[j]
 }
 
-func (r *Rating) Swap(i, j int) {
-	(*r)[i], (*r)[j] = (*r)[j], (*r)[i]
+func (rating *Rating) Swap(i, j int) {
+	(*rating)[i], (*rating)[j] = (*rating)[j], (*rating)[i]
 }
 
-func (r *Rating) Push(x interface{}) {
+func (rating *Rating) Push(x interface{}) {
 	value, ok := x.(int)
 	if !ok {
 		panic("type conversion error")
 	}
 
-	*r = append(*r, value)
+	*rating = append(*rating, value)
 }
 
-func (r *Rating) Pop() interface{} {
-	old := *r
-	n := len(old)
+func (rating *Rating) Pop() interface{} {
+	old := *rating
+	lenght := len(old)
 
-	if n == 0 {
+	if lenght == 0 {
 		panic("the heap is empty")
 	}
 
-	x := old[n-1]
-	*r = old[0 : n-1]
+	new := old[lenght-1]
+	*rating = old[0 : lenght-1]
 
-	return x
+	return new
 }

@@ -61,5 +61,5 @@ func main() {
 		return
 	}
 
-	fmt.Println(heap.Pop(dishes))
+	fmt.Println(bestDish)
 }

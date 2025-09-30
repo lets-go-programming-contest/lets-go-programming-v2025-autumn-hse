@@ -12,6 +12,11 @@ func main() {
 		limitSign                                               string
 	)
 
+	const (
+		MinTemperature = 15
+		MaxTemperature = 30
+	)
+
 	_, err := fmt.Scan(&departmentsCount)
 	if err != nil {
 		fmt.Printf("Invalid number of departments: %v\n", err)
@@ -27,7 +32,7 @@ func main() {
 			return
 		}
 
-		temperatureRange := &temperature.TemperatureRange{Min: 15, Max: 30}
+		temperatureRange := &temperature.TemperatureRange{Min: MinTemperature, Max: MaxTemperature}
 
 		for range employeesCount {
 			_, err = fmt.Scan(&limitSign)

@@ -6,12 +6,13 @@ import (
 	"fmt"
 )
 
+var (
+	errInvalidFirstOperand  = errors.New("Invalid first operand")
+	errInvalidSecondOperand = errors.New("Invalid second operand")
+)
+
 func ReadNumber(name string) (int64, error) {
-	var (
-		n                       int64
-		errInvalidFirstOperand  = errors.New("Invalid first operand")
-		errInvalidSecondOperand = errors.New("Invalid second operand")
-	)
+	var n int64
 	_, err := fmt.Scanln(&n)
 	if err != nil {
 		if name == "first operand" {

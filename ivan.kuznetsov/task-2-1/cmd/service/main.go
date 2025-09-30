@@ -14,7 +14,7 @@ func main() {
 
 	_, err := fmt.Scan(&departmentsCount)
 	if err != nil {
-		fmt.Println("Invalid number of departments")
+		fmt.Printf("Invalid number of departments: %v\n", err)
 
 		return
 	}
@@ -22,34 +22,30 @@ func main() {
 	for range departmentsCount {
 		_, err = fmt.Scan(&employeesCount)
 		if err != nil {
-			fmt.Println("Invalid number of employees")
+			fmt.Printf("Invalid number of employees: %v\n", err)
 
 			return
 		}
 
-		values := []int{15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30}
+		temperatureRange := temperature.InitialRange()
 
 		for range employeesCount {
 			_, err = fmt.Scan(&limitSign)
 			if err != nil {
-				fmt.Println("Invalid limit format")
+				fmt.Printf("Invalid limit format: %v\n", err)
 
 				return
 			}
 
 			_, err = fmt.Scan(&temperatureLimitValue)
 			if err != nil {
-				fmt.Println("Invalid temperature value")
+				fmt.Printf("Invalid temperature value: %v\n", err)
 
 				return
 			}
 
-			values = temperature.OptimalTemperature(limitSign, temperatureLimitValue, values)
-			if len(values) > 0 {
-				fmt.Println(values[0])
-			} else {
-				fmt.Println(-1)
-			}
+			temperatureRange = temperature.OptimalTemperature(limitSign, temperatureLimitValue, temperatureRange)
+			fmt.Println(temperature.GetOptimalTemperature(temperatureRange))
 		}
 	}
 }

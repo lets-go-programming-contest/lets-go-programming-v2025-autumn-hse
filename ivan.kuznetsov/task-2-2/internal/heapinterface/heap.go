@@ -15,7 +15,10 @@ func (r Rating) Swap(i, j int) {
 }
 
 func (r *Rating) Push(x interface{}) {
-	*r = append(*r, x.(int))
+	value, ok := x.(int)
+	if ok {
+		*r = append(*r, value)
+	}
 }
 
 func (r *Rating) Pop() interface{} {
@@ -23,5 +26,6 @@ func (r *Rating) Pop() interface{} {
 	n := len(old)
 	x := old[n-1]
 	*r = old[0 : n-1]
+
 	return x
 }

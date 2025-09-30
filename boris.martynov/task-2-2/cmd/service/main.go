@@ -8,7 +8,7 @@ import (
 	"github.com/JingolBong/task-2-2/internal/dishorder"
 )
 
-var errFailedToScan = errors.New("Invalid input")
+var errFailedToScan = errors.New("invalid input")
 
 func main() {
 	var numberOfDishes int

@@ -17,6 +17,7 @@ func main() {
 
 	if _, err := fmt.Scan(&numberOfDishes); err != nil {
 		fmt.Println(errFailedToScan)
+
 		return
 	}
 
@@ -25,6 +26,7 @@ func main() {
 
 		if _, err := fmt.Scan(&dishPrefNumber); err != nil {
 			fmt.Println(errFailedToScan)
+
 			return
 		}
 
@@ -34,6 +36,7 @@ func main() {
 	var preferedDishNumb int
 	if _, err := fmt.Scanln(&preferedDishNumb); err != nil {
 		fmt.Println(errFailedToScan)
+
 		return
 	}
 

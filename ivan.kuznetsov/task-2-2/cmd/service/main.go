@@ -4,7 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 
-	"github.com/kuzid-17/task-2-2/internal/heapinterface"
+	intHeap "github.com/kuzid-17/task-2-2/internal/int-heap"
 )
 
 func main() {
@@ -12,18 +12,18 @@ func main() {
 
 	_, err := fmt.Scan(&dishesCount)
 	if err != nil {
-		fmt.Println("Invalid number of dishes")
+		fmt.Printf("Invalid number of dishes: %v\n", err)
 
 		return
 	}
 
-	ratings := &heapinterface.Rating{}
+	ratings := &intHeap.Rating{}
 	heap.Init(ratings)
 
 	for range dishesCount {
 		_, err = fmt.Scan(&ratingNumber)
 		if err != nil {
-			fmt.Println("Invalid value of rating")
+			fmt.Printf("Invalid value of rating: %v\n", err)
 
 			return
 		}
@@ -33,17 +33,17 @@ func main() {
 
 	_, err = fmt.Scan(&preferenceIndex)
 	if err != nil {
-		fmt.Println("Invalid number of preference")
+		fmt.Printf("Invalid number of preference: %v\n", err)
 
 		return
 	}
 
-	for range preferenceIndex {
-		value, ok := heap.Pop(ratings).(int)
-		if ok {
-			result = value
-		}
+	for range preferenceIndex - 1 {
+		heap.Pop(ratings)
 	}
-
+	result, ok := heap.Pop(ratings).(int)
+	if !ok {
+		panic("type conversion error")
+	}
 	fmt.Println(result)
 }

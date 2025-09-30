@@ -1,4 +1,4 @@
-package heapinterface
+package intHeap
 
 type Rating []int
 
@@ -16,14 +16,18 @@ func (r *Rating) Swap(i, j int) {
 
 func (r *Rating) Push(x interface{}) {
 	value, ok := x.(int)
-	if ok {
-		*r = append(*r, value)
+	if !ok {
+		panic("type conversion error")
 	}
+	*r = append(*r, value)
 }
 
 func (r *Rating) Pop() interface{} {
 	old := *r
 	n := len(old)
+	if n == 0 {
+		panic("the heap is empty")
+	}
 	x := old[n-1]
 	*r = old[0 : n-1]
 

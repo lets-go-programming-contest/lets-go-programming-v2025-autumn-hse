@@ -1,16 +1,16 @@
 package temperature
 
-func OptimalTemperature(limit string, temperatureValue int, numbers []int) []int {
+func OptimalTemperature(sign string, value int, numbers []int) []int {
 	var result []int
 
 	for _, temp := range numbers {
-		switch limit {
+		switch sign {
 		case "<=":
-			if temp <= temperatureValue {
+			if temp <= value {
 				result = append(result, temp)
 			}
 		case ">=":
-			if temp >= temperatureValue {
+			if temp >= value {
 				result = append(result, temp)
 			}
 		}

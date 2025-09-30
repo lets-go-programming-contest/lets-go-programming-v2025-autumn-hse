@@ -54,6 +54,8 @@ func main() {
 	res, err := getPreferredDish(dishCount)
 	if err != nil {
 		fmt.Println("Error: ", err)
+
+		return
 	}
 
 	fmt.Println(res)

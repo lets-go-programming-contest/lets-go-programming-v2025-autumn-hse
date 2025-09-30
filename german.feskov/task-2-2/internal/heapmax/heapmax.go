@@ -2,24 +2,20 @@ package heapmax
 
 import "errors"
 
-var (
-	errPushCast      = errors.New("bad cast to int")
-	errPopOutOfRange = errors.New("out of range")
-)
+var errPushCast = errors.New("bad cast to int")
 
-//nolint:recvcheck // is linked type
 type IntHeap []int
 
-func (h IntHeap) Len() int {
-	return len(h)
+func (h *IntHeap) Len() int {
+	return len((*h))
 }
 
-func (h IntHeap) Less(i, j int) bool {
-	return h[i] > h[j]
+func (h *IntHeap) Less(i, j int) bool {
+	return (*h)[i] > (*h)[j]
 }
 
-func (h IntHeap) Swap(i, j int) {
-	h[i], h[j] = h[j], h[i]
+func (h *IntHeap) Swap(i, j int) {
+	(*h)[i], (*h)[j] = (*h)[j], (*h)[i]
 }
 
 func (h *IntHeap) Push(x any) {
@@ -33,7 +29,7 @@ func (h *IntHeap) Push(x any) {
 
 func (h *IntHeap) Pop() any {
 	if len(*h) == 0 {
-		panic(errPopOutOfRange)
+		return nil
 	}
 
 	old := *h

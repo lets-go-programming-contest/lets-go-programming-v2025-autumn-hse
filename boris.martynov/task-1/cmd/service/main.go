@@ -9,6 +9,10 @@ import (
 )
 
 func main() {
+	var (
+		errDivisionByZero   = errors.New("Division by zero")
+		errInvalidOperation = errors.New("Invalid operation")
+	)
 	firstNumber, err := inputreader.ReadNumber("first operand")
 	if err != nil {
 		fmt.Println(err)
@@ -33,11 +37,11 @@ func main() {
 		fmt.Println(firstNumber * secondNumber)
 	case "/":
 		if secondNumber == 0 {
-			fmt.Println(errors.New("Division by zero"))
+			fmt.Println(errDivisionByZero)
 			return
 		}
 		fmt.Println(firstNumber / secondNumber)
 	default:
-		fmt.Println(errors.New("Invalid operation"))
+		fmt.Println(errInvalidOperation)
 	}
 }

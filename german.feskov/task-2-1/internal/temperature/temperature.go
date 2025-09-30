@@ -56,7 +56,7 @@ func calculate(minT, maxT int, req Request) (int, int, error) {
 	case maxRequestType:
 		return maxInt(minT, req.Val), maxT, nil
 	default:
-		return minT, maxT, fmt.Errorf("%w %q", ErrBadRequestType, req.Type)
+		return minT, maxT, fmt.Errorf("%w: %q", ErrBadRequestType, req.Type)
 	}
 }
 

@@ -71,7 +71,7 @@ func read(chIn chan<- temperature.Request, count int) error {
 	var req temperature.Request
 	for range count {
 		if _, err := fmt.Scanf("%s %d", &req.Type, &req.Val); err != nil {
-			return fmt.Errorf("while scan, has %w", err)
+			return fmt.Errorf("scan temp request: %w", err)
 		}
 		chIn <- req
 	}
@@ -81,9 +81,7 @@ func read(chIn chan<- temperature.Request, count int) error {
 
 func write(chOut <-chan int) error {
 	for res := range chOut {
-		if _, err := fmt.Println(res); err != nil {
-			return fmt.Errorf("while print, has %w", err)
-		}
+		fmt.Println(res)
 	}
 
 	return nil

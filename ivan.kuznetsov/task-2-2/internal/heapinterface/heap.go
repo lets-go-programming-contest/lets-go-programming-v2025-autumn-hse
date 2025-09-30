@@ -2,16 +2,16 @@ package heapinterface
 
 type Rating []int
 
-func (r Rating) Len() int {
-	return len(r)
+func (r *Rating) Len() int {
+	return len(*r)
 }
 
-func (r Rating) Less(i, j int) bool {
-	return r[i] > r[j]
+func (r *Rating) Less(i, j int) bool {
+	return (*r)[i] > (*r)[j]
 }
 
-func (r Rating) Swap(i, j int) {
-	r[i], r[j] = r[j], r[i]
+func (r *Rating) Swap(i, j int) {
+	(*r)[i], (*r)[j] = (*r)[j], (*r)[i]
 }
 
 func (r *Rating) Push(x interface{}) {

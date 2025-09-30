@@ -8,8 +8,8 @@ import (
 
 func main() {
 	var (
-		departmentsCount, employeesCount, temperatureValue int
-		limit                                              string
+		departmentsCount, employeesCount, temperatureLimitValue int
+		limitSign                                               string
 	)
 
 	_, err := fmt.Scan(&departmentsCount)
@@ -28,22 +28,23 @@ func main() {
 		}
 
 		values := []int{15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30}
+
 		for range employeesCount {
-			_, err = fmt.Scan(&limit)
+			_, err = fmt.Scan(&limitSign)
 			if err != nil {
 				fmt.Println("Invalid limit format")
 
 				return
 			}
 
-			_, err = fmt.Scan(&temperatureValue)
+			_, err = fmt.Scan(&temperatureLimitValue)
 			if err != nil {
 				fmt.Println("Invalid temperature value")
 
 				return
 			}
 
-			values = temperature.OptimalTemperature(limit, temperatureValue, values)
+			values = temperature.OptimalTemperature(limitSign, temperatureLimitValue, values)
 			if len(values) > 0 {
 				fmt.Println(values[0])
 			} else {

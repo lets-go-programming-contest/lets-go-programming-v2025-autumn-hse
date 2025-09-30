@@ -27,7 +27,7 @@ func main() {
 			return
 		}
 
-		temperatureRange := temperature.InitialRange()
+		temperatureRange := &temperature.TemperatureRange{Min: 15, Max: 30}
 
 		for range employeesCount {
 			_, err = fmt.Scan(&limitSign)

@@ -24,14 +24,14 @@ func (h *IntHeap) Push(v any) {
 
 func (h *IntHeap) Pop() any {
 	oldHeap := *h
-	l := len(oldHeap)
+	length := len(oldHeap)
 
-	if l == 0 {
+	if length == 0 {
 		return nil
 	}
 
-	elem := oldHeap[l-1]
-	*h = oldHeap[0 : l-1]
+	elem := oldHeap[length-1]
+	*h = oldHeap[0 : length-1]
 
 	return elem
 }

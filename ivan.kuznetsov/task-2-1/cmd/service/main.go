@@ -1,10 +1,22 @@
 package main
 
-import (
-	"fmt"
+import "fmt"
 
-	"github.com/kuzid-17/task-2-1/internal/temperature"
-)
+func OptimalTemperature(limit string, T int, numbers []int) []int {
+	var result []int
+	for _, temp := range numbers {
+		if limit == "<=" {
+			if temp <= T {
+				result = append(result, temp)
+			}
+		} else if limit == ">=" {
+			if temp >= T {
+				result = append(result, temp)
+			}
+		}
+	}
+	return result
+}
 
 func main() {
 	var (
@@ -39,7 +51,7 @@ func main() {
 				return
 			}
 
-			values = temperature.OptimalTemperature(limit, T, values)
+			values = OptimalTemperature(limit, T, values)
 			if len(values) > 0 {
 				fmt.Println(values[0])
 			} else {

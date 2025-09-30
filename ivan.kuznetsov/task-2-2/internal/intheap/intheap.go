@@ -31,8 +31,8 @@ func (rating *Rating) Pop() interface{} {
 		panic("the heap is empty")
 	}
 
-	new := old[length-1]
+	value := old[length-1]
 	*rating = old[0 : length-1]
 
-	return new
+	return value
 }

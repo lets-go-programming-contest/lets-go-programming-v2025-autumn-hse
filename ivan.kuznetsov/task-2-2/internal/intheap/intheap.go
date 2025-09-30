@@ -25,14 +25,14 @@ func (rating *Rating) Push(x interface{}) {
 
 func (rating *Rating) Pop() interface{} {
 	old := *rating
-	lenght := len(old)
+	length := len(old)
 
-	if lenght == 0 {
+	if length == 0 {
 		panic("the heap is empty")
 	}
 
-	new := old[lenght-1]
-	*rating = old[0 : lenght-1]
+	new := old[length-1]
+	*rating = old[0 : length-1]
 
 	return new
 }

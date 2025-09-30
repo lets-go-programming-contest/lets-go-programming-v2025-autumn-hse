@@ -7,27 +7,27 @@ type TemperatureRange struct {
 	Max int
 }
 
-func OptimalTemperature(sign string, value int, tr *TemperatureRange) *TemperatureRange {
+func OptimalTemperature(sign string, value int, temperature *TemperatureRange) *TemperatureRange {
 	switch sign {
 	case "<=":
-		if value < tr.Max {
-			tr.Max = value
+		if value < temperature.Max {
+			temperature.Max = value
 		}
 	case ">=":
-		if value > tr.Min {
-			tr.Min = value
+		if value > temperature.Min {
+			temperature.Min = value
 		}
 	default:
 		fmt.Printf("Invalid comparison sign '%s'\nThe temperature range has not changed\n", sign)
 	}
 
-	return tr
+	return temperature
 }
 
-func GetOptimalTemperature(tr *TemperatureRange) int {
-	if tr.Min > tr.Max {
+func GetOptimalTemperature(temperature *TemperatureRange) int {
+	if temperature.Min > temperature.Max {
 		return -1
 	}
 
-	return tr.Min
+	return temperature.Min
 }

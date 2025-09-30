@@ -17,10 +17,10 @@ type temperature struct {
 	highest int
 }
 
-func newTemperature(min, max int) *temperature {
+func newTemperature(low, high int) *temperature {
 	return &temperature{
-		lowest:  min,
-		highest: max,
+		lowest:  low,
+		highest: high,
 	}
 }
 
@@ -41,6 +41,7 @@ func (tr *temperature) getResult() int {
 	if tr.lowest <= tr.highest {
 		return tr.lowest
 	}
+
 	return -1
 }
 
@@ -53,7 +54,7 @@ func TemperatureWantedDepartment() {
 		return
 	}
 
-	tr := newTemperature(MinTemp, MaxTemp)
+	temperatureRange := newTemperature(MinTemp, MaxTemp)
 
 	for range departmentCapacity {
 		var (
@@ -67,7 +68,7 @@ func TemperatureWantedDepartment() {
 			return
 		}
 
-		tr.update(greaterOrLess, temperatureWantedByEmployee)
-		fmt.Println(tr.getResult())
+		temperatureRange.update(greaterOrLess, temperatureWantedByEmployee)
+		fmt.Println(temperatureRange.getResult())
 	}
 }

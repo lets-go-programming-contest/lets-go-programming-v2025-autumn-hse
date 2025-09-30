@@ -9,6 +9,7 @@ import (
 var (
 	errInvalidFirstOperand  = errors.New("Invalid first operand")
 	errInvalidSecondOperand = errors.New("Invalid second operand")
+	ErrInvalidOperation     = errors.New("Invalid operation")
 )
 
 func ReadNumber(name string) (int64, error) {
@@ -24,13 +25,10 @@ func ReadNumber(name string) (int64, error) {
 }
 
 func ReadOperator() (string, error) {
-	var (
-		op                  string
-		errInvalidOperation = errors.New("Invalid operation")
-	)
+	var op string
 	_, err := fmt.Scanln(&op)
 	if err != nil {
-		return "", errInvalidOperation
+		return "", ErrInvalidOperation
 	}
 	return op, nil
 }

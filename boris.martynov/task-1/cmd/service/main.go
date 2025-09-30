@@ -8,10 +8,7 @@ import (
 	"github.com/JingolBong/task-1/internal/inputreader"
 )
 
-var (
-	errDivisionByZero   = errors.New("Division by zero")
-	errInvalidOperation = errors.New("Invalid operation")
-)
+var errDivisionByZero = errors.New("Division by zero")
 
 func main() {
 	firstNumber, err := inputreader.ReadNumber("first operand")
@@ -43,6 +40,6 @@ func main() {
 		}
 		fmt.Println(firstNumber / secondNumber)
 	default:
-		fmt.Println(errInvalidOperation)
+		fmt.Println(inputreader.ErrInvalidOperation)
 	}
 }

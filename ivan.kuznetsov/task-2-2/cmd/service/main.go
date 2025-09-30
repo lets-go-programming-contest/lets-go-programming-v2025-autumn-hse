@@ -4,7 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 
-	intHeap "github.com/kuzid-17/task-2-2/internal/int-heap"
+	"github.com/kuzid-17/task-2-2/internal/intheap"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 		return
 	}
 
-	ratings := &intHeap.Rating{}
+	ratings := &intheap.Rating{}
 	heap.Init(ratings)
 
 	for range dishesCount {
@@ -41,9 +41,12 @@ func main() {
 	for range preferenceIndex - 1 {
 		heap.Pop(ratings)
 	}
+
 	result, ok := heap.Pop(ratings).(int)
+
 	if !ok {
 		panic("type conversion error")
 	}
+
 	fmt.Println(result)
 }

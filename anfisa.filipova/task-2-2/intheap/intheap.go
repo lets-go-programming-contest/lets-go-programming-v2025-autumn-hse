@@ -17,12 +17,18 @@ func (h *IntHeap) Swap(i, j int) {
 func (h *IntHeap) Push(v any) {
 	if val, ok := v.(int); ok {
 		*h = append(*h, val)
+	} else {
+
+		return
 	}
 }
 
 func (h *IntHeap) Pop() any {
 	oldHeap := *h
 	l := len(oldHeap)
+	if l == 0 {
+		return nil
+	}
 	elem := oldHeap[l-1]
 	*h = oldHeap[0 : l-1]
 

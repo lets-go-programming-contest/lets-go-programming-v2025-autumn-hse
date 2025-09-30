@@ -39,7 +39,10 @@ func main() {
 	}
 
 	for range preferenceIndex {
-		result = heap.Pop(ratings).(int)
+		value, ok := heap.Pop(ratings).(int)
+		if ok {
+			result = value
+		}
 	}
 
 	fmt.Println(result)

@@ -50,7 +50,6 @@ func main() {
 	)
 
 	returnVal, err := fmt.Scanln(&countDepartments)
-
 	if err != nil {
 		fmt.Printf("Error reading department count: %d values read, error: %v\n", returnVal, err)
 

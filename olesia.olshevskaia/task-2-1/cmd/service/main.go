@@ -26,6 +26,8 @@ func (tr *TemperatureRange) Update(sign string, temperature int) {
 		if tr.max > temperature {
 			tr.max = temperature
 		}
+	default:
+		fmt.Printf("Incorrect temperature string input\n")
 	}
 }
 
@@ -47,7 +49,9 @@ func main() {
 		sign                                         string
 	)
 
-	if n, err := fmt.Scanln(&countDepartments); err != nil {
+	n, err := fmt.Scanln(&countDepartments)
+
+	if err != nil {
 		fmt.Printf("Error reading department count: %d values read, error: %v\n", n, err)
 
 		return
@@ -60,7 +64,7 @@ func main() {
 	}
 
 	for range countDepartments {
-		if n, err := fmt.Scanln(&countEmployee); err != nil {
+		if n, err = fmt.Scanln(&countEmployee); err != nil {
 			fmt.Printf("Error reading department employee count: %d values read, error: %v\n", n, err)
 
 			return
@@ -69,7 +73,7 @@ func main() {
 		temperatureRange := NewTemperatureRange()
 
 		for range countEmployee {
-			if n, err := fmt.Scanln(&sign, &temperature); err != nil {
+			if n, err = fmt.Scanln(&sign, &temperature); err != nil {
 				fmt.Printf("Error reading data: %d values read, error: %v\n", n, err)
 
 				return

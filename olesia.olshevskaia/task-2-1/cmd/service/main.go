@@ -48,18 +48,18 @@ func main() {
 	)
 
 	if n, err := fmt.Scanln(&countDepartments); err != nil {
-		fmt.Printf("Ошибка при чтении количества департаментов: считано %d значений, ошибка: %v\n", n, err)
+		fmt.Printf("Error reading department count: %d values read, error: %v\n", n, err)
 
 		return
 	} else if n != expectedcountDepartments {
-		fmt.Printf("Ожидалось 1 значение для countDepartments, считано %d\n", n)
+		fmt.Printf("Expected 1 value for countDepartments, read %d\n", n)
 
 		return
 	}
 
 	for range countDepartments {
 		if n, err := fmt.Scanln(&countEmployee); err != nil {
-			fmt.Printf("Ошибка при чтении количества сотрудников в департаменте: считано %d значений, ошибка: %v\n", n, err)
+			fmt.Printf("Error reading department employee count: %d values read, error: %v\n", n, err)
 
 			return
 		}
@@ -68,11 +68,11 @@ func main() {
 
 		for range countEmployee {
 			if n, err := fmt.Scanln(&sign, &temperature); err != nil {
-				fmt.Printf("Ошибка при чтении данных: считано %d значений, ошибка: %v\n", n, err)
+				fmt.Printf("Error reading data: %d values read, error: %v\n", n, err)
 
 				return
 			} else if n != expectedValuesPerInput {
-				fmt.Printf("Ожидалось 2 значения (sign и temperature), считано %d\n", n)
+				fmt.Printf("Expected 2 values (sign and temperature), read %d\n", n)
 
 				return
 			}

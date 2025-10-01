@@ -19,6 +19,14 @@ func main() {
 
 	for range departmentCount {
 		processor := temperature.NewTemperatureProcessor()
-		processor.ProcessDepartment(os.Stdin)
+		result, err := processor.ProcessDepartment(os.Stdin)
+
+		if err != nil {
+			for i := range result {
+				fmt.Println(result[i])
+			}
+		} else {
+			fmt.Println(err)
+		}
 	}
 }

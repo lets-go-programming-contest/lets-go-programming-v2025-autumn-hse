@@ -19,7 +19,7 @@ func (h *intHeap) Swap(i, j int) {
 	(*h)[i], (*h)[j] = (*h)[j], (*h)[i]
 }
 
-func (h *intHeap) Push(x interface{}) {
+func (h *intHeap) Push(x any) {
 	newX, isInt := x.(int)
 	if !isInt {
 		fmt.Println("invalid type for Push")
@@ -33,6 +33,11 @@ func (h *intHeap) Push(x interface{}) {
 func (h *intHeap) Pop() any {
 	old := *h
 	n := len(*h)
+	if n == 0 {
+		fmt.Println("intHeap is empty")
+
+		return nil
+	}
 	x := old[n-1]
 	*h = old[:n-1]
 

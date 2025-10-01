@@ -51,7 +51,9 @@ func main() {
 		fmt.Printf("Error reading department count: %d values read, error: %v\n", n, err)
 
 		return
-	} else if n != expectedcountDepartments {
+	}
+
+	if n != expectedcountDepartments {
 		fmt.Printf("Expected 1 value for countDepartments, read %d\n", n)
 
 		return

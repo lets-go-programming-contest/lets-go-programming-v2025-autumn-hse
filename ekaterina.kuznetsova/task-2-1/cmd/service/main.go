@@ -79,9 +79,8 @@ func main() {
 		}
 
 		var errTemperature error
-    
 		validator := TemperatureValidator{
-			minTemperature: minTemperatureConst, 
+			minTemperature: minTemperatureConst,
 			maxTemperature: maxTemperatureConst,
 		}
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Tapochek2894/task-2/subtask-1/internal/temperature"
 )
@@ -17,6 +18,7 @@ func main() {
 	}
 
 	for range departmentCount {
-		temperature.SetDepartmentTemperature()
+		processor := temperature.NewTemperatureProcessor()
+		processor.ProcessDepartment(os.Stdin)
 	}
 }

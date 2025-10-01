@@ -45,10 +45,7 @@ func (h *intHeap) Pop() any {
 }
 
 func main() {
-	var (
-		numberDishes, desiredDish, count int
-		typeCastingOk                    bool
-	)
+	var numberDishes, desiredDish, count int
 
 	myHeap := &intHeap{}
 	heap.Init(myHeap)
@@ -76,16 +73,17 @@ func main() {
 		return
 	}
 
-	for range desiredDish {
-		x := heap.Pop(myHeap)
+	for range desiredDish - 1 {
+		heap.Pop(myHeap)
+	}
 
-		count, typeCastingOk = x.(int)
+	x := heap.Pop(myHeap)
+	count, typeCastingOk := x.(int)
 
-		if !typeCastingOk {
-			fmt.Println("invalid type from heap.Pop")
+	if !typeCastingOk {
+		fmt.Println("invalid type from heap.Pop")
 
-			return
-		}
+		return
 	}
 
 	if _, err := fmt.Println(count); err != nil {

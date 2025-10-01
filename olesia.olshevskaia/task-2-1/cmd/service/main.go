@@ -56,7 +56,6 @@ func main() {
 
 		return
 	}
-
 	if returnVal != expectedcountDepartments {
 		fmt.Printf("Expected 1 value for countDepartments, read %d\n", returnVal)
 

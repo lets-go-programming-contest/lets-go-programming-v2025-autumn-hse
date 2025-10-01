@@ -46,8 +46,8 @@ func (h *intHeap) Pop() any {
 
 func main() {
 	var (
-		numberDishes, desiredDish, dish, count int
-		typeCastingOk                          bool
+		numberDishes, desiredDish, count int
+		typeCastingOk                    bool
 	)
 
 	myHeap := &intHeap{}
@@ -59,6 +59,7 @@ func main() {
 		return
 	}
 
+	var dish int
 	for range numberDishes {
 		if _, err := fmt.Scan(&dish); err != nil {
 			fmt.Println(err)

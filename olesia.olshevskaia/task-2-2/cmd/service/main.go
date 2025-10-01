@@ -20,8 +20,8 @@ func (h *intHeap) Swap(i, j int) {
 }
 
 func (h *intHeap) Push(x any) {
-	newX, isInt := x.(int)
-	if !isInt {
+	newX, ok := x.(int)
+	if !ok {
 		panic("intHeap.Push: invalid type, expected int")
 	}
 

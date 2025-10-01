@@ -19,6 +19,7 @@ func (h *Heap) Push(x any) {
 	if !ok {
 		panic("Heap.Push: element is not int")
 	}
+
 	*h = append(*h, castedElem)
 }
 

@@ -3,51 +3,14 @@ package main
 import (
 	"container/heap"
 	"fmt"
+
+	"github.com/olesia.olshevsraia/task-2-2/intheap"
 )
-
-type intHeap []int
-
-func (h *intHeap) Len() int {
-	return len(*h)
-}
-
-func (h *intHeap) Less(i, j int) bool {
-	return (*h)[i] > (*h)[j]
-}
-
-func (h *intHeap) Swap(i, j int) {
-	(*h)[i], (*h)[j] = (*h)[j], (*h)[i]
-}
-
-func (h *intHeap) Push(x any) {
-	newX, ok := x.(int)
-	if !ok {
-		panic("intHeap.Push: invalid type, expected int")
-	}
-
-	*h = append(*h, newX)
-}
-
-func (h *intHeap) Pop() any {
-	old := *h
-	length := len(*h)
-
-	if length == 0 {
-		fmt.Println("intHeap is empty")
-
-		return nil
-	}
-
-	x := old[length-1]
-	*h = old[:length-1]
-
-	return x
-}
 
 func main() {
 	var numberDishes, desiredDish, count int
 
-	myHeap := &intHeap{}
+	myHeap := &intheap.IntHeap{}
 	heap.Init(myHeap)
 
 	if _, err := fmt.Scanln(&numberDishes); err != nil {

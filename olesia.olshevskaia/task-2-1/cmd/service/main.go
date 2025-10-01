@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	Min                      = 15
-	Max                      = 30
+	minTemperatureValue      = 15
+	maxTemperatureValue      = 30
 	expectedValuesPerInput   = 2
 	expectedcountDepartments = 1
 )
@@ -40,7 +40,7 @@ func (tr *TemperatureRange) Optimum() int {
 }
 
 func NewTemperatureRange() TemperatureRange {
-	return TemperatureRange{min: Min, max: Max}
+	return TemperatureRange{min: minTemperatureValue, max: maxTemperatureValue}
 }
 
 func main() {
@@ -49,23 +49,23 @@ func main() {
 		sign                                         string
 	)
 
-	n, err := fmt.Scanln(&countDepartments)
+	returnVal, err := fmt.Scanln(&countDepartments)
 
 	if err != nil {
-		fmt.Printf("Error reading department count: %d values read, error: %v\n", n, err)
+		fmt.Printf("Error reading department count: %d values read, error: %v\n", returnVal, err)
 
 		return
 	}
 
-	if n != expectedcountDepartments {
-		fmt.Printf("Expected 1 value for countDepartments, read %d\n", n)
+	if returnVal != expectedcountDepartments {
+		fmt.Printf("Expected 1 value for countDepartments, read %d\n", returnVal)
 
 		return
 	}
 
 	for range countDepartments {
-		if n, err = fmt.Scanln(&countEmployee); err != nil {
-			fmt.Printf("Error reading department employee count: %d values read, error: %v\n", n, err)
+		if returnVal, err = fmt.Scanln(&countEmployee); err != nil {
+			fmt.Printf("Error reading department employee count: %d values read, error: %v\n", returnVal, err)
 
 			return
 		}
@@ -73,12 +73,12 @@ func main() {
 		temperatureRange := NewTemperatureRange()
 
 		for range countEmployee {
-			if n, err = fmt.Scanln(&sign, &temperature); err != nil {
-				fmt.Printf("Error reading data: %d values read, error: %v\n", n, err)
+			if returnVal, err = fmt.Scanln(&sign, &temperature); err != nil {
+				fmt.Printf("Error reading data: %d values read, error: %v\n", returnVal, err)
 
 				return
-			} else if n != expectedValuesPerInput {
-				fmt.Printf("Expected 2 values (sign and temperature), read %d\n", n)
+			} else if returnVal != expectedValuesPerInput {
+				fmt.Printf("Expected 2 values (sign and temperature), read %d\n", returnVal)
 
 				return
 			}

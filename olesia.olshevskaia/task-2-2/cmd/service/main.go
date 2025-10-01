@@ -51,7 +51,7 @@ func main() {
 	heap.Init(myHeap)
 
 	if _, err := fmt.Scanln(&numberDishes); err != nil {
-		fmt.Println(err)
+		fmt.Println("error reading the number of dishes", err)
 
 		return
 	}
@@ -59,7 +59,7 @@ func main() {
 	var dish int
 	for range numberDishes {
 		if _, err := fmt.Scan(&dish); err != nil {
-			fmt.Println(err)
+			fmt.Println("error reading dishf", err)
 
 			return
 		}
@@ -68,7 +68,7 @@ func main() {
 	}
 
 	if _, err := fmt.Scanln(&desiredDish); err != nil {
-		fmt.Println(err)
+		fmt.Println("error reading priority", err)
 
 		return
 	}
@@ -87,7 +87,7 @@ func main() {
 	}
 
 	if _, err := fmt.Println(count); err != nil {
-		fmt.Println(err)
+		fmt.Println("error while displaying the response", err)
 
 		return
 	}

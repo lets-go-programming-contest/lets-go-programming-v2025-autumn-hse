@@ -61,6 +61,7 @@ func main() {
 	var (
 		numberDepartaments, numberEmployees, temperature int
 		comparisonSign                                   string
+		errTemperature 									 error
 	)
 
 	_, err := fmt.Scanln(&numberDepartaments)
@@ -82,7 +83,6 @@ func main() {
 			minTemperature: minTemperatureConst,
 			maxTemperature: maxTemperatureConst,
 		}
-		var errTemperature error
 
 		for range numberEmployees {
 			_, err = fmt.Scanf("%s %d\n", &comparisonSign, &temperature)

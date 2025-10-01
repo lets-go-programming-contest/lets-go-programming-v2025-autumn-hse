@@ -1,16 +1,10 @@
 package temperature
 
 import (
-	"errors"
 	"fmt"
 	"io"
 
 	"github.com/Tapochek2894/task-2/subtask-1/internal/intmath"
-)
-
-var (
-	errDivision         = errors.New("Division by zero")
-	errInvalidOperation = errors.New("Invalid operation")
 )
 
 const (
@@ -50,17 +44,17 @@ func (tp *TemperatureProcessor) addPreference(sign string, temperature int) int 
 	return tp.lowerBound
 }
 
-func (tp *TemperatureProcessor) ProcessDepartment(reader io.Reader) ([]int, error) {
+func (tp *TemperatureProcessor) ProcessDepartment(reader io.Reader) {
 	var employeeCount int
 
 	_, err := fmt.Fscan(reader, &employeeCount)
 	if err != nil {
-		return nil, fmt.Errorf("error reading employee count: %w", err)
+		fmt.Println("Error reading employee count:", err)
+
+		return
 	}
 
-	resultSlice := make([]int, employeeCount)
-
-	for i := range employeeCount {
+	for range employeeCount {
 		var (
 			sign        string
 			temperature int
@@ -68,11 +62,12 @@ func (tp *TemperatureProcessor) ProcessDepartment(reader io.Reader) ([]int, erro
 
 		_, err := fmt.Fscan(reader, &sign, &temperature)
 		if err != nil {
-			return nil, fmt.Errorf("error reading sign and temperature: %w", err)
+			fmt.Println("Error reading sign and temperature:", err)
+
+			return
 		}
 
-		resultSlice[i] = tp.addPreference(sign, temperature)
+		result := tp.addPreference(sign, temperature)
+		fmt.Println(result)
 	}
-
-	return resultSlice, nil
 }

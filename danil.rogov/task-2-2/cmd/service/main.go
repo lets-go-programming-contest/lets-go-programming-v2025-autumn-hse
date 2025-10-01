@@ -38,13 +38,9 @@ func main() {
 		return
 	}
 
-	heapLength := intHeap.Len()
-	for i := range heapLength {
-		element := heap.Pop(&intHeap)
-		if heapLength-i == preferredDish {
-			fmt.Println(element)
-
-			return
-		}
+	for range intHeap.Len() - preferredDish {
+		heap.Pop(&intHeap)
 	}
+
+	fmt.Println(heap.Pop(&intHeap))
 }

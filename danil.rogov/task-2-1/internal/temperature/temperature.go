@@ -2,6 +2,7 @@ package temperature
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/Tapochek2894/task-2/subtask-1/internal/intmath"
 )
@@ -12,48 +13,61 @@ const (
 	errorTemperature   = -1
 )
 
-func SetDepartmentTemperature() {
-	var (
-		preferredTemperature, employeeCount int
-		inequalitySign                      string
-	)
+type TemperatureProcessor struct {
+	lowerBound int
+	upperBound int
+}
 
-	_, err := fmt.Scan(&employeeCount)
+func NewTemperatureProcessor() *TemperatureProcessor {
+	return &TemperatureProcessor{
+		lowerBound: minimumTemperature,
+		upperBound: maximumTemperature,
+	}
+}
+
+func (tp *TemperatureProcessor) addPreference(sign string, temperature int) int {
+	if temperature < minimumTemperature || temperature > maximumTemperature {
+		return errorTemperature
+	}
+
+	switch sign {
+	case ">=":
+		tp.lowerBound = intmath.LargerInt(tp.lowerBound, temperature)
+	case "<=":
+		tp.upperBound = intmath.SmallerInt(tp.upperBound, temperature)
+	}
+
+	if tp.lowerBound > tp.upperBound {
+		return errorTemperature
+	}
+
+	return tp.lowerBound
+}
+
+func (tp *TemperatureProcessor) ProcessDepartment(reader io.Reader) {
+	var employeeCount int
+
+	_, err := fmt.Fscan(reader, &employeeCount)
 	if err != nil {
 		fmt.Println("Error reading employee count:", err)
 
 		return
 	}
 
-	lowerBound := minimumTemperature
-	upperBound := maximumTemperature
-
 	for range employeeCount {
-		_, err = fmt.Scan(&inequalitySign, &preferredTemperature)
+		var (
+			sign        string
+			temperature int
+		)
+
+		_, err := fmt.Fscan(reader, &sign, &temperature)
 		if err != nil {
-			fmt.Println("Error reading sign or temperature:", err)
+			fmt.Println("Error reading sign and temperature:", err)
 
 			return
 		}
 
-		if preferredTemperature < minimumTemperature || preferredTemperature > maximumTemperature {
-			fmt.Println(errorTemperature)
-
-			continue
-		}
-
-		switch inequalitySign {
-		case ">=":
-			lowerBound = intmath.LargerInt(lowerBound, preferredTemperature)
-		case "<=":
-			upperBound = intmath.SmallerInt(upperBound, preferredTemperature)
-		}
-
-		result := lowerBound
-		if lowerBound > upperBound {
-			result = errorTemperature
-		}
-
+		result := tp.addPreference(sign, temperature)
 		fmt.Println(result)
 	}
 }

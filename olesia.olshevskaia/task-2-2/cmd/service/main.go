@@ -32,14 +32,16 @@ func (h *intHeap) Push(x any) {
 
 func (h *intHeap) Pop() any {
 	old := *h
-	n := len(*h)
-	if n == 0 {
+	length := len(*h)
+
+	if length == 0 {
 		fmt.Println("intHeap is empty")
 
 		return nil
 	}
-	x := old[n-1]
-	*h = old[:n-1]
+
+	x := old[length-1]
+	*h = old[:length-1]
 
 	return x
 }

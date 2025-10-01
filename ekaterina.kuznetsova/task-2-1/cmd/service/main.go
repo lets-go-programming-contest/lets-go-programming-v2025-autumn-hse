@@ -79,7 +79,11 @@ func main() {
 		}
 
 		var errTemperature error
-		validator := TemperatureValidator{minTemperature: minTemperatureConst, maxTemperature: maxTemperatureConst}
+    
+		validator := TemperatureValidator{
+			minTemperature: minTemperatureConst, 
+			maxTemperature: maxTemperatureConst,
+		}
 
 		for range numberEmployees {
 			_, err = fmt.Scanf("%s %d\n", &comparisonSign, &temperature)

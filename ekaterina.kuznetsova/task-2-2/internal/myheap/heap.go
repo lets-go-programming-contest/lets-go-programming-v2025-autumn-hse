@@ -3,10 +3,10 @@ package myheap
 import "errors"
 
 var (
-	errCast      = errors.New("cast error")
-	errEmptyData = errors.New("data is empty")
+	errCast = errors.New("cast error")
 )
 
+//nolint:recvcheck // is linked type
 type IntHeap []int
 
 func (h IntHeap) Len() int {
@@ -32,7 +32,7 @@ func (h *IntHeap) Push(x any) {
 
 func (h *IntHeap) Pop() any {
 	if len(*h) == 0 {
-		panic(errEmptyData)
+		return nil
 	}
 
 	old := *h

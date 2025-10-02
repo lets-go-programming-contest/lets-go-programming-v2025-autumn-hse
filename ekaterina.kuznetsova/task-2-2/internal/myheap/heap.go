@@ -7,7 +7,6 @@ var (
 	errEmptyData = errors.New("data is empty")
 )
 
-//nolint:recvcheck // is linked type
 type IntHeap []int
 
 func (h IntHeap) Len() int {

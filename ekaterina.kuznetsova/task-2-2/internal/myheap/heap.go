@@ -2,9 +2,7 @@ package myheap
 
 import "errors"
 
-var (
-	errCast = errors.New("cast error")
-)
+var errCast = errors.New("cast error")
 
 //nolint:recvcheck // is linked type
 type IntHeap []int

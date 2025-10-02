@@ -13,6 +13,12 @@ func main() {
 		heapRatings                  myheap.IntHeap
 	)
 
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("Recovered from panic in main: %v\n", r)
+		}
+	}()
+
 	_, err := fmt.Scanln(&numberDishes)
 	if err != nil {
 		fmt.Println("Error scan number of dishes:", err)
@@ -41,7 +47,11 @@ func main() {
 	}
 
 	for range sequenceNumber - 1 {
-		heap.Pop(&heapRatings)
+		if nil == heap.Pop(&heapRatings) {
+			fmt.Println("heap is empty")
+
+			return
+		}
 	}
 
 	fmt.Println(heap.Pop(&heapRatings))

@@ -3,27 +3,22 @@ package main
 import "fmt"
 
 type Value struct {
-	higher string
-	lower  string
+	higher      string
+	lower       string
+	temperature string
 }
 
 func TValues() Value {
 	return Value{
-		higher: "30",
-		lower:  "15",
+		higher:      "30",
+		lower:       "15",
+		temperature: "0",
 	}
 }
 
-func main() {
-	var (
-		number, count int
-		input, t      string
-	)
-
-	t = "0"
+func FindTemp(number int, count int) {
 	values := TValues()
-	fmt.Scan(&number, &count)
-
+	var input string
 	for range number {
 		for range count {
 			fmt.Scanln(&input)
@@ -31,13 +26,13 @@ func main() {
 				if string(input[2])+string(input[3]) > values.lower {
 					values.lower = string(input[2]) + string(input[3])
 				}
-				if t < string(input[2])+string(input[3]) {
-					t = string(input[2]) + string(input[3])
-					if t > values.higher {
+				if values.temperature < string(input[2])+string(input[3]) {
+					values.temperature = string(input[2]) + string(input[3])
+					if values.temperature > values.higher {
 						fmt.Print(-1)
 						return
 					}
-					if t < values.lower {
+					if values.temperature < values.lower {
 						fmt.Print(-1)
 						return
 					}
@@ -47,20 +42,28 @@ func main() {
 				if string(input[2])+string(input[3]) < values.higher {
 					values.higher = string(input[2]) + string(input[3])
 				}
-				if string(input[2])+string(input[3]) < t {
+				if string(input[2])+string(input[3]) < values.temperature {
 					fmt.Print(-1)
 					return
 				}
-				if t > values.higher {
+				if values.temperature > values.higher {
 					fmt.Print(-1)
 					return
 				}
-				if t < values.lower {
+				if values.temperature < values.lower {
 					fmt.Print(-1)
 					return
 				}
 			}
-			fmt.Println(t)
+			fmt.Println(values.temperature)
 		}
 	}
+}
+
+func main() {
+	var (
+		number, count int
+	)
+	fmt.Scan(&number, &count)
+	FindTemp(number, count)
 }

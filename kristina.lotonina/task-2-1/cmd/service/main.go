@@ -77,9 +77,9 @@ func FindTemp(count int) {
 
 			return
 		}
-	}
 
-	fmt.Println(values.temperature)
+		fmt.Println(values.temperature)
+	}
 }
 
 func main() {

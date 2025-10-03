@@ -24,7 +24,6 @@ func TValues() Value {
 func (values *Value) UpdateValues(operation string, temp int) {
 	switch operation {
 	case ">=":
-
 		if temp > values.lower {
 			values.lower = temp
 		}
@@ -33,7 +32,6 @@ func (values *Value) UpdateValues(operation string, temp int) {
 			values.temperature = temp
 		}
 	case "<=":
-
 		if temp < values.higher {
 			values.higher = temp
 		}
@@ -44,7 +42,6 @@ func (values *Value) UpdateValues(operation string, temp int) {
 			return
 		}
 	default:
-		
 		fmt.Println("undefined operation")
 
 		return
@@ -60,9 +57,14 @@ func FindTemp(count int) {
 	values := TValues()
 
 	for range count {
-		fmt.Scanln(&operation, &temp)
+		_, err := fmt.Scanln(&operation, &temp)
+		if err != nil {
+			fmt.Print("unable to read")
+
+			return
+		}
 		values.UpdateValues(operation, temp)
-		
+
 		if values.temperature > values.higher {
 			fmt.Print(-1)
 
@@ -85,7 +87,7 @@ func main() {
 	)
 
 	fmt.Scan(&number, &count)
-	
+
 	for range number {
 		FindTemp(count)
 	}

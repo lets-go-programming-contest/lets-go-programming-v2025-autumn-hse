@@ -3,71 +3,63 @@ package main
 import "fmt"
 
 type Value struct {
-	higher      string
-	lower       string
-	temperature string
+	higher      int
+	lower       int
+	temperature int
 }
 
 func TValues() Value {
 	return Value{
-		higher:      "30",
-		lower:       "15",
-		temperature: "0",
+		higher:      30,
+		lower:       15,
+		temperature: 0,
 	}
 }
 
-func FindTemp(number int, count int) {
-	values := TValues()
-	var input string
-	for range number {
-		for range count {
-			fmt.Scanln(&input)
-			operator := string(input[0]) + string(input[1])
-			switch operator {
-			case ">=":
-				if string(input[2])+string(input[3]) > values.lower {
-					values.lower = string(input[2]) + string(input[3])
-				}
-				if values.temperature < string(input[2])+string(input[3]) {
-					values.temperature = string(input[2]) + string(input[3])
-					if values.temperature > values.higher {
-						fmt.Print(-1)
+func (values *Value) UpdateValues(operation string, temp int) {
+	switch operation {
+		case ">=":
+			if temp > values.lower {
+				values.lower = temp
+			}
+			if temp > values.temperature {
+				values.temperature = temp
+			}
+		case "<=":
+			if temp < values.higher {
+				values.higher = temp
+			}
+			if temp < values.temperature {
+				fmt.Print(-1)
 
-						return
-					}
-					if values.temperature < values.lower {
-						fmt.Print(-1)
-
-						return
-					}
-				}
-			case "<=":
-				if string(input[2])+string(input[3]) < values.higher {
-					values.higher = string(input[2]) + string(input[3])
-				}
-				if string(input[2])+string(input[3]) < values.temperature {
-					fmt.Print(-1)
-
-					return
-				}
-				if values.temperature > values.higher {
-					fmt.Print(-1)
-
-					return
-				}
-				if values.temperature < values.lower {
-					fmt.Print(-1)
-
-					return
-				}
-			default:
-				fmt.Println("undefined operation")
-				
 				return
 			}
+		default:
+			fmt.Println("undefined operation")
+
+			return
+		}
+}
+
+func FindTemp(count int) {
+	var operation string
+	var temp 	  int
+	values := TValues()
+	for range count {
+		fmt.Scanln(&operation, &temp)
+		values.UpdateValues(operation, temp)
+		if values.temperature > values.higher {
+			fmt.Print(-1)
+
+			return
+		}
+		if values.temperature < values.lower {
+			fmt.Print(-1)
+
+			return
 		}
 	}
-	fmt.Println(values.temperature)
+	fmt.Println(values.temperature)	
 }
 
 func main() {
@@ -75,5 +67,7 @@ func main() {
 		number, count int
 	)
 	fmt.Scan(&number, &count)
-	FindTemp(number, count)
+	for range number {
+		FindTemp(count)
+	}
 }

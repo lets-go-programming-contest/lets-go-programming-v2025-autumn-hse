@@ -35,12 +35,6 @@ func (values *Value) UpdateValues(operation string, temp int) {
 		if temp < values.higher {
 			values.higher = temp
 		}
-
-		if temp < values.temperature {
-			fmt.Print(-1)
-
-			return
-		}
 	default:
 		fmt.Println("undefined operation")
 

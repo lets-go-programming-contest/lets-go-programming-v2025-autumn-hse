@@ -32,7 +32,7 @@ func main() {
 
 	var preferedDishNumb int
 	if _, err := fmt.Scanln(&preferedDishNumb); err != nil {
-		fmt.Println("when scanning prefered dish number: ", err)
+		fmt.Println("when scanning preferred dish number: ", err)
 
 		return
 	}

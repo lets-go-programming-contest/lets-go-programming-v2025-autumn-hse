@@ -47,9 +47,13 @@ func (values *Value) UpdateValues(operation string, temp int) {
 }
 
 func FindTemp(count int) {
-	var operation string
-	var temp int
+	var (
+		operation string
+		temp      int
+	)
+
 	values := TValues()
+
 	for range count {
 		fmt.Scanln(&operation, &temp)
 		values.UpdateValues(operation, temp)
@@ -71,6 +75,7 @@ func main() {
 	var (
 		number, count int
 	)
+
 	fmt.Scan(&number, &count)
 	for range number {
 		FindTemp(count)

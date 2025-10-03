@@ -24,8 +24,8 @@ func main() {
 	values := TValues()
 	fmt.Scan(&number, &count)
 
-	for i := range number {
-		for j := range count {
+	for range number {
+		for range count {
 			fmt.Scanln(&input)
 			if string(input[0])+string(input[1]) == ">=" {
 				if string(input[2])+string(input[3]) > values.lower {

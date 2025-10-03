@@ -16,19 +16,18 @@ func TValues() Value {
 
 func main() {
 	var (
-		n, k     int
-		input, t string
+		number, count int
+		input, t      string
 	)
 
 	t = "0"
 	values := TValues()
-	fmt.Scan(&n, &k)
+	fmt.Scan(&number, &count)
 
-	for i := 0; i < n; i++ {
-		for j := 0; j < k; j++ {
+	for i := range number {
+		for j := range count {
 			fmt.Scanln(&input)
 			if string(input[0])+string(input[1]) == ">=" {
-
 				if string(input[2])+string(input[3]) > values.lower {
 					values.lower = string(input[2]) + string(input[3])
 				}

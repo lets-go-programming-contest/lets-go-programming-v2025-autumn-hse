@@ -93,13 +93,13 @@ func main() {
 	}
 
 	for range number {
-		_, err := fmt.Scan(&count)
+		_, err = fmt.Scan(&count)
 		if err != nil {
 			fmt.Print("unable to read")
 
 			return
 		}
-		FindTemp(count)
 
+		FindTemp(count)
 	}
 }

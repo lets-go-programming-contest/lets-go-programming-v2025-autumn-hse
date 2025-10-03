@@ -22,7 +22,9 @@ func FindTemp(number int, count int) {
 	for range number {
 		for range count {
 			fmt.Scanln(&input)
-			if string(input[0])+string(input[1]) == ">=" {
+			operator := string(input[0]) + string(input[1])
+			switch operator {
+			case ">=":
 				if string(input[2])+string(input[3]) > values.lower {
 					values.lower = string(input[2]) + string(input[3])
 				}
@@ -37,8 +39,7 @@ func FindTemp(number int, count int) {
 						return
 					}
 				}
-			}
-			if string(input[0])+string(input[1]) == "<=" {
+			case "<=":
 				if string(input[2])+string(input[3]) < values.higher {
 					values.higher = string(input[2]) + string(input[3])
 				}
@@ -54,10 +55,13 @@ func FindTemp(number int, count int) {
 					fmt.Print(-1)
 					return
 				}
+			default:
+				fmt.Println("undefined operation")
+				return
 			}
-			fmt.Println(values.temperature)
 		}
 	}
+	fmt.Println(values.temperature)
 }
 
 func main() {

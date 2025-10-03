@@ -1,11 +1,8 @@
 package conditioner
 
 import (
-	"errors"
 	"fmt"
 )
-
-var errFailedToScan = errors.New("invalid input")
 
 const (
 	MinTemp = 15
@@ -49,7 +46,7 @@ func TemperatureWantedDepartment() {
 	var departmentCapacity int
 
 	if _, err := fmt.Scanln(&departmentCapacity); err != nil {
-		fmt.Println(errFailedToScan)
+		fmt.Println("when scanning capacity of department: ", err)
 
 		return
 	}
@@ -63,7 +60,7 @@ func TemperatureWantedDepartment() {
 		)
 
 		if _, err := fmt.Scanln(&greaterOrLess, &temperatureWantedByEmployee); err != nil {
-			fmt.Println(errFailedToScan)
+			fmt.Println("when scanning temperature wanted by employee: ", err)
 
 			return
 		}

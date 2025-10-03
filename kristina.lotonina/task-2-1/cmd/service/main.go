@@ -32,10 +32,12 @@ func FindTemp(number int, count int) {
 					values.temperature = string(input[2]) + string(input[3])
 					if values.temperature > values.higher {
 						fmt.Print(-1)
+
 						return
 					}
 					if values.temperature < values.lower {
 						fmt.Print(-1)
+
 						return
 					}
 				}
@@ -45,18 +47,22 @@ func FindTemp(number int, count int) {
 				}
 				if string(input[2])+string(input[3]) < values.temperature {
 					fmt.Print(-1)
+
 					return
 				}
 				if values.temperature > values.higher {
 					fmt.Print(-1)
+
 					return
 				}
 				if values.temperature < values.lower {
 					fmt.Print(-1)
+
 					return
 				}
 			default:
 				fmt.Println("undefined operation")
+				
 				return
 			}
 		}

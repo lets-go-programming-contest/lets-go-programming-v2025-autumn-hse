@@ -63,6 +63,7 @@ func FindTemp(count int) {
 
 			return
 		}
+
 		values.UpdateValues(operation, temp)
 
 		if values.temperature > values.higher {
@@ -82,11 +83,14 @@ func FindTemp(count int) {
 }
 
 func main() {
-	var (
-		number, count int
-	)
+	var number, count int
 
-	fmt.Scan(&number, &count)
+	_, err := fmt.Scan(&number, &count)
+	if err != nil {
+		fmt.Print("unable to read")
+
+		return
+	}
 
 	for range number {
 		FindTemp(count)

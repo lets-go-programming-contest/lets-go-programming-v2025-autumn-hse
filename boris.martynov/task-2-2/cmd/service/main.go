@@ -1,14 +1,11 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 
 	"github.com/JingolBong/task-2-2/internal/dishorder"
 )
-
-var errFailedToScan = errors.New("invalid input")
 
 func main() {
 	containerOfDishes := &dishorder.PrefOrder{}
@@ -16,7 +13,7 @@ func main() {
 	var numberOfDishes int
 
 	if _, err := fmt.Scan(&numberOfDishes); err != nil {
-		fmt.Println(errFailedToScan)
+		fmt.Println("when scanning dish count: ", err)
 
 		return
 	}
@@ -25,7 +22,7 @@ func main() {
 		var dishPrefNumber int
 
 		if _, err := fmt.Scan(&dishPrefNumber); err != nil {
-			fmt.Println(errFailedToScan)
+			fmt.Println("when scanning preference order: ", err)
 
 			return
 		}
@@ -35,7 +32,7 @@ func main() {
 
 	var preferedDishNumb int
 	if _, err := fmt.Scanln(&preferedDishNumb); err != nil {
-		fmt.Println(errFailedToScan)
+		fmt.Println("when scanning prefered dish number: ", err)
 
 		return
 	}

@@ -1,13 +1,9 @@
 package heapmax
 
-import "errors"
-
-var errPushCast = errors.New("bad cast to int")
-
 type IntHeap []int
 
 func (h *IntHeap) Len() int {
-	return len((*h))
+	return len(*h)
 }
 
 func (h *IntHeap) Less(i, j int) bool {
@@ -21,7 +17,7 @@ func (h *IntHeap) Swap(i, j int) {
 func (h *IntHeap) Push(x any) {
 	v, ok := x.(int)
 	if !ok {
-		panic(errPushCast)
+		panic("bad cast to int")
 	}
 
 	*h = append(*h, v)

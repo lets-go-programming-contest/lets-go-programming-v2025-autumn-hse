@@ -24,6 +24,6 @@ func main() {
 			return
 		}
 
-		FindTemp(count)
+		temperature.FindTemp(count)
 	}
 }

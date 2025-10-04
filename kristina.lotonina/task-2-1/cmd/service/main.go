@@ -5,7 +5,6 @@ import "fmt"
 type Value struct {
 	higher      int
 	lower       int
-	temperature int
 }
 
 const (
@@ -54,6 +53,7 @@ func FindTemp(count int) {
 		}
 
 		values.UpdateValues(operation, temp)
+
 		if values.lower <= values.higher {
 			fmt.Println(values.lower)
 		}

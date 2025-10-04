@@ -15,9 +15,8 @@ const (
 
 func TValues() Value {
 	return Value{
-		higher:      MaxTemp,
-		lower:       MinTemp,
-		temperature: 0,
+		higher: MaxTemp,
+		lower:  MinTemp,
 	}
 }
 
@@ -26,10 +25,6 @@ func (values *Value) UpdateValues(operation string, temp int) {
 	case ">=":
 		if temp > values.lower {
 			values.lower = temp
-		}
-
-		if temp > values.temperature {
-			values.temperature = temp
 		}
 	case "<=":
 		if temp < values.higher {
@@ -59,20 +54,9 @@ func FindTemp(count int) {
 		}
 
 		values.UpdateValues(operation, temp)
-
-		if values.temperature > values.higher {
-			fmt.Println(-1)
-
-			return
+		if values.lower <= values.higher {
+			fmt.Println(values.lower)
 		}
-
-		if values.temperature < values.lower {
-			fmt.Println(-1)
-
-			return
-		}
-
-		fmt.Println(values.temperature)
 	}
 }
 

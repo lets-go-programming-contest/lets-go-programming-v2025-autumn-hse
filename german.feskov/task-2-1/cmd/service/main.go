@@ -16,7 +16,7 @@ func main() {
 	var countDep int
 
 	if _, err := fmt.Scan(&countDep); err != nil {
-		fmt.Println(err)
+		fmt.Printf("failed to read count of departaments: %v\n", err)
 
 		return
 	}
@@ -24,7 +24,7 @@ func main() {
 	for range countDep {
 		var countWorker int
 		if _, err := fmt.Scan(&countWorker); err != nil {
-			fmt.Println(err)
+			fmt.Printf("failed to read count of workers: %v\n", err)
 
 			return
 		}

@@ -3,8 +3,8 @@ package main
 import "fmt"
 
 type Value struct {
-	higher      int
-	lower       int
+	higher int
+	lower  int
 }
 
 const (

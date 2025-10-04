@@ -56,6 +56,8 @@ func FindTemp(count int) {
 
 		if values.lower <= values.higher {
 			fmt.Println(values.lower)
+		} else {
+			fmt.Println(-1)
 		}
 	}
 }

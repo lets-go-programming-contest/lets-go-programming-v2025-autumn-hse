@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/kef1rch1k/task-2-2/internal/queue"
+	"github.com/kef1rch1k/task-2-2/internal/dishes"
 )
 
 func main() {

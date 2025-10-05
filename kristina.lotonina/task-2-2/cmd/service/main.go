@@ -24,7 +24,6 @@ func main() {
 	for range number {
 		var preferences int
 		_, err = fmt.Scan(&preferences)
-
 		if err != nil {
 			fmt.Print("unable to read preference :", err)
 

@@ -25,12 +25,8 @@ type temperatureRange struct {
 	minTemperature int
 }
 
-func optimalTemperature(
-	tempRange temperatureRange,
-	operationType operation,
-	temperature int,
-) (temperatureRange, error) {
-	switch operationType {
+func optimalTemperature(tempRange temperatureRange, operType operation, temperature int) (temperatureRange, error) {
+	switch operType {
 	case greaterOrEqualOperation:
 		if temperature > tempRange.maxTemperature {
 			return tempRange, errTemperatureExceedMax

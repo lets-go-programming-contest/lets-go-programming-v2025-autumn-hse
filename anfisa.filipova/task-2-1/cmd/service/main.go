@@ -4,16 +4,37 @@ import (
 	"fmt"
 )
 
+type TemperatureBound struct {
+	UpperBound int
+	LowerBound int
+}
+
+func (t *TemperatureBound) setUpperBound(newBound int) {
+	t.UpperBound = newBound
+}
+
+func (t *TemperatureBound) setLowerBound(newBound int) {
+	t.LowerBound = newBound
+}
+
+func (t TemperatureBound) getUpperBound() int {
+	return t.UpperBound
+}
+func (t TemperatureBound) getLowerBound() int {
+	return t.LowerBound
+}
 func printOptimalTemperature(departmentCount int) {
 	var (
 		employeeCount int
-		value         int
 		mathSign      string
+	)
+	const (
+		defaultUpperBound int = 30
+		defaultLowerBound int = 15
 	)
 
 	for range departmentCount {
-		upperBound := 30
-		lowerBound := 15
+		bound := TemperatureBound{defaultUpperBound, defaultLowerBound}
 
 		if _, err := fmt.Scan(&employeeCount); err != nil {
 			fmt.Println("Reading error", err)
@@ -22,6 +43,7 @@ func printOptimalTemperature(departmentCount int) {
 		}
 
 		for range employeeCount {
+			var value int
 			if _, err := fmt.Scan(&mathSign, &value); err != nil {
 				fmt.Println("Reading error", err)
 
@@ -30,9 +52,9 @@ func printOptimalTemperature(departmentCount int) {
 
 			switch mathSign {
 			case "<=":
-				upperBound = min(value, upperBound)
+				bound.setUpperBound(min(value, bound.getUpperBound()))
 			case ">=":
-				lowerBound = max(value, lowerBound)
+				bound.setLowerBound(max(value, bound.getLowerBound()))
 
 			default:
 				fmt.Println("Wrong format")
@@ -40,13 +62,13 @@ func printOptimalTemperature(departmentCount int) {
 				return
 			}
 
-			if upperBound < lowerBound {
+			if bound.getUpperBound() < bound.getLowerBound() {
 				fmt.Println(-1)
 
 				continue
 			}
 
-			fmt.Println(lowerBound)
+			fmt.Println(bound.getLowerBound())
 		}
 	}
 }

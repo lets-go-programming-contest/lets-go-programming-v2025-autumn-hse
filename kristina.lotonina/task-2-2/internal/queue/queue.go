@@ -22,10 +22,6 @@ func (dishes *Heap) Push(x interface{}) {
 
 func (dishes *Heap) Pop() interface{} {
 	old := *dishes
-
-	if len(old) == 0 {
-		return nil
-	}
 	x := old[(len(old))-1]
 	*dishes = old[0 : (len(old))-1]
 

@@ -37,7 +37,6 @@ func main() {
 	var neededPreference int
 
 	_, err = fmt.Scan(&neededPreference)
-	
 	if err != nil {
 		fmt.Print("unable to read needed preference :", err)
 

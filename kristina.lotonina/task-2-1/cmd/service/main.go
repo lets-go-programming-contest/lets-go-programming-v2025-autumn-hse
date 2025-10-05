@@ -11,7 +11,7 @@ func main() {
 
 	_, err := fmt.Scan(&number)
 	if err != nil {
-		fmt.Println("unable to read")
+		fmt.Println("unable to read:", err)
 
 		return
 	}
@@ -19,7 +19,7 @@ func main() {
 	for range number {
 		_, err = fmt.Scan(&count)
 		if err != nil {
-			fmt.Println("unable to read")
+			fmt.Println("unable to read:", err)
 
 			return
 		}

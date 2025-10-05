@@ -47,7 +47,7 @@ func FindTemp(count int) {
 	for range count {
 		_, err := fmt.Scanln(&operation, &temp)
 		if err != nil {
-			fmt.Println("unable to read")
+			fmt.Println("unable to read :", err)
 
 			return
 		}

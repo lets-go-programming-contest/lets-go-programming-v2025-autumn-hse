@@ -15,13 +15,19 @@ func (dishes Heap) Swap(i int, j int) {
 }
 
 func (dishes *Heap) Push(x interface{}) {
-	*dishes = append(*dishes, x.(int))
+	if value, ok := x.(int); ok {
+		*dishes = append(*dishes, value)
+	}
 }
 
 func (dishes *Heap) Pop() interface{} {
 	old := *dishes
 	n := len(old)
+	if (n == 0) {
+		return nil
+	}
 	x := old[n-1]
 	*dishes = old[0 : n-1]
+
 	return x
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"container/heap"
 	"fmt"
+	"slices"
 
 	"github.com/kef1rch1k/task-2-2/internal/queue"
 )
@@ -23,7 +24,6 @@ func main() {
 	for range number {
 		var preferences int
 		_, err = fmt.Scan(&preferences)
-
 		if err != nil {
 			fmt.Print("unable to read preference :", err)
 
@@ -35,17 +35,14 @@ func main() {
 
 	var neededPreference int
 	_, err = fmt.Scan(&neededPreference)
-
 	if err != nil {
 		fmt.Print("unable to read needed preference :", err)
 
 		return
 	}
 
-	var result int
-	for i := neededPreference; i > 0; i-- {
-		result = heap.Pop(dishesContainer).(int)
-	}
+	chosenDish := len(*dishesContainer) - neededPreference
+	slices.Sort(*dishesContainer)
 
-	fmt.Print(result)
+	fmt.Print((*dishesContainer)[chosenDish])
 }

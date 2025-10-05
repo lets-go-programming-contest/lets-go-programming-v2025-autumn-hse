@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"errors"
 )
 
 type operation string
@@ -13,36 +14,42 @@ const (
 	greaterOrEqualOperation operation = ">="
 )
 
+var (
+	errTemperatureExceedMax = errors.New("temperature Exceed Max")
+	errTemperatureBelowMin  = errors.New("temperature Below Min")
+	errInvalidRange         = errors.New("max temperature < min temperature")
+)
+
 type temperatureRange struct {
 	maxTemperature int
 	minTemperature int
 }
 
-func optimalTemperature(tr temperatureRange, op operation, temperature int) (temperatureRange, error) {
-	switch op {
+func optimalTemperature(tr temperatureRange, operationType operation, temperature int) (temperatureRange, error) {
+	switch operationType {
 	case greaterOrEqualOperation:
 		if temperature > tr.maxTemperature {
-			return tr, fmt.Errorf("max temperature > temperature")
+			return tr, errTemperatureExceedMax
 		} else {
 			tr.minTemperature = temperature
 		}
 	case lessOrEqualOperation:
 		if temperature < tr.minTemperature {
-			return tr, fmt.Errorf("temperature < min temperature")
+			return tr, errTemperatureBelowMin
 		} else {
 			tr.maxTemperature = temperature
 		}
 	}
 	if tr.maxTemperature < tr.minTemperature {
-		return tr, fmt.Errorf("max temperature < min temperature")
+		return tr, errInvalidRange
 	}
 	return tr, nil
 }
 
 func main() {
 	var (
-		numberOfDepartments, numberOfEmployees, temperature  int
-		op                  								 operation
+		numberOfDepartments, numberOfEmployees, temperature int
+		operationType                                       operation
 	)
 
 	_, err := fmt.Scanln(&numberOfDepartments)
@@ -57,19 +64,19 @@ func main() {
 		}
 
 		var (
-		errorFlag = false
-		tr = temperatureRange{
-			maxTemperature: defaultMaxTemperature,
-			minTemperature: defaultMinTemperature,
-		}
+			errorFlag = false
+			tempRange = temperatureRange{
+				maxTemperature: defaultMaxTemperature,
+				minTemperature: defaultMinTemperature,
+			}
 		)
 
 		for employee := 1; employee <= numberOfEmployees; employee++ {
-			_, err = fmt.Scanln(&op, &temperature)
+			_, err = fmt.Scanln(&operationType, &temperature)
 			if err != nil {
 				fmt.Println("Invalid operation and temperature")
 			}
-			tr, err := optimalTemperature(tr, op, temperature)
+			tempRange, err := optimalTemperature(tempRange, operationType, temperature)
 			if err != nil {
 				errorFlag = true
 			}
@@ -77,8 +84,7 @@ func main() {
 				fmt.Println("-1")
 				continue
 			}
-			fmt.Println(tr.minTemperature)
+			fmt.Println(tempRange.minTemperature)
 		}
-		errorFlag = false
 	}
 }

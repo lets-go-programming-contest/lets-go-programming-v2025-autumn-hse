@@ -4,7 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 	"slices"
-	"github.com/kef1rch1k/internal/queue"
+	"github.com/kef1rch1k/task-2-2/internal/queue"
 )
 
 func main() {

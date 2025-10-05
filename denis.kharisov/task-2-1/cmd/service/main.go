@@ -29,7 +29,7 @@ func optimalTemperature(
 	tempRange temperatureRange,
 	operationType operation,
 	temperature int,
-	) (temperatureRange, error) {
+) (temperatureRange, error) {
 	switch operationType {
 	case greaterOrEqualOperation:
 		if temperature > tempRange.maxTemperature {
@@ -43,7 +43,6 @@ func optimalTemperature(
 		} else {
 			tempRange.maxTemperature = temperature
 		}
-		
 	}
 
 	if tempRange.maxTemperature < tempRange.minTemperature {
@@ -93,9 +92,9 @@ func main() {
 				fmt.Println("-1")
 
 				continue
+			} else {
+				fmt.Println(tempRange.minTemperature)
 			}
-
-			fmt.Println(tempRange.minTemperature)
 		}
 	}
 }

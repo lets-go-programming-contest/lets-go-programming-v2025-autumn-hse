@@ -17,17 +17,20 @@ func (t *TemperatureBound) setLowerBound(newBound int) {
 	t.LowerBound = newBound
 }
 
-func (t TemperatureBound) getUpperBound() int {
+func (t *TemperatureBound) getUpperBound() int {
 	return t.UpperBound
 }
-func (t TemperatureBound) getLowerBound() int {
+
+func (t *TemperatureBound) getLowerBound() int {
 	return t.LowerBound
 }
+
 func printOptimalTemperature(departmentCount int) {
 	var (
 		employeeCount int
 		mathSign      string
 	)
+
 	const (
 		defaultUpperBound int = 30
 		defaultLowerBound int = 15

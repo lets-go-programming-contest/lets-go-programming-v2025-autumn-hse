@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 )
 
 type operation string
@@ -25,25 +25,27 @@ type temperatureRange struct {
 	minTemperature int
 }
 
-func optimalTemperature(tr temperatureRange, operationType operation, temperature int) (temperatureRange, error) {
+func optimalTemperature(tempRange temperatureRange, operationType operation, temperature int) (temperatureRange, error) {
 	switch operationType {
 	case greaterOrEqualOperation:
-		if temperature > tr.maxTemperature {
-			return tr, errTemperatureExceedMax
+		if temperature > tempRange.maxTemperature {
+			return tempRange, errTemperatureExceedMax
 		} else {
-			tr.minTemperature = temperature
+			tempRange.minTemperature = temperature
 		}
 	case lessOrEqualOperation:
-		if temperature < tr.minTemperature {
-			return tr, errTemperatureBelowMin
+		if temperature < tempRange.minTemperature {
+			return tempRange, errTemperatureBelowMin
 		} else {
-			tr.maxTemperature = temperature
+			tempRange.maxTemperature = temperature
 		}
 	}
-	if tr.maxTemperature < tr.minTemperature {
-		return tr, errInvalidRange
+	
+	if tempRange.maxTemperature < tempRange.minTemperature {
+		return tempRange, errInvalidRange
 	}
-	return tr, nil
+
+	return tempRange, nil
 }
 
 func main() {
@@ -76,12 +78,15 @@ func main() {
 			if err != nil {
 				fmt.Println("Invalid operation and temperature")
 			}
+
 			tempRange, err := optimalTemperature(tempRange, operationType, temperature)
 			if err != nil {
 				errorFlag = true
 			}
+
 			if errorFlag {
 				fmt.Println("-1")
+
 				continue
 			}
 			fmt.Println(tempRange.minTemperature)

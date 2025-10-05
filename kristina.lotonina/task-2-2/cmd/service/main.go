@@ -1,0 +1,51 @@
+package main
+
+import (
+	"container/heap"
+	"fmt"
+
+	"github.com/kef1rch1k/task-2-2/internal/queue"
+)
+
+func main() {
+	var number int
+	_, err := fmt.Scan(&number)
+
+	dishesContainer := &dishes.Heap{}
+	heap.Init(dishesContainer)
+
+	if err != nil {
+		fmt.Print("unable to read number :", err)
+
+		return
+	}
+
+	for range number {
+		var preferences int
+		_, err = fmt.Scan(&preferences)
+
+		if err != nil {
+			fmt.Print("unable to read preference :", err)
+
+			return
+		}
+
+		heap.Push(dishesContainer, preferences)
+	}
+
+	var neededPreference int
+	_, err = fmt.Scan(&neededPreference)
+
+	if err != nil {
+		fmt.Print("unable to read needed preference :", err)
+
+		return
+	}
+
+	var result int
+	for i := neededPreference; i > 0; i-- {
+		result = heap.Pop(dishesContainer).(int)
+	}
+
+	fmt.Print(result)
+}

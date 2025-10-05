@@ -25,7 +25,11 @@ type temperatureRange struct {
 	minTemperature int
 }
 
-func optimalTemperature(tempRange temperatureRange, operationType operation, temperature int) (temperatureRange, error) {
+func optimalTemperature(
+	tempRange temperatureRange,
+	operationType operation,
+	temperature int,
+	) (temperatureRange, error) {
 	switch operationType {
 	case greaterOrEqualOperation:
 		if temperature > tempRange.maxTemperature {
@@ -39,8 +43,9 @@ func optimalTemperature(tempRange temperatureRange, operationType operation, tem
 		} else {
 			tempRange.maxTemperature = temperature
 		}
+		
 	}
-	
+
 	if tempRange.maxTemperature < tempRange.minTemperature {
 		return tempRange, errInvalidRange
 	}
@@ -89,6 +94,7 @@ func main() {
 
 				continue
 			}
+
 			fmt.Println(tempRange.minTemperature)
 		}
 	}

@@ -79,17 +79,15 @@ func main() {
 				fmt.Println("Invalid operation and temperature")
 			}
 
-			tempRange, err := optimalTemperature(tempRange, operationType, temperature)
-			if err != nil {
-				errorFlag = true
-			}
+			if !errorFlag {
+				tempRange, err := optimalTemperature(tempRange, operationType, temperature)
+				if err != nil {
+					errorFlag = true
+				}
 
-			if errorFlag {
-				fmt.Println("-1")
-
-				continue
-			} else {
 				fmt.Println(tempRange.minTemperature)
+			} else {
+				fmt.Println("-1")
 			}
 		}
 	}

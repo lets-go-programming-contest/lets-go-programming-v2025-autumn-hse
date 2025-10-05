@@ -44,5 +44,5 @@ func main() {
 	chosenDish := len(*dishesContainer) - neededPreference
 	slices.Sort(*dishesContainer)
 
-	fmt.Print((*dishesContainer)[chosenDish])
+	fmt.Println((*dishesContainer)[chosenDish])
 }

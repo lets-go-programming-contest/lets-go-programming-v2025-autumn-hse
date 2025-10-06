@@ -20,12 +20,14 @@ type Config struct {
 }
 
 type Valute struct {
-	NumCode  string `xml:"NumCode"`
-	CharCode string `xml:"CharCode"`
-	Value    string `xml:"Value"`
+	XMLName  xml.Name `xml:"Valute"`
+	NumCode  string   `xml:"NumCode"`
+	CharCode string   `xml:"CharCode"`
+	Value    string   `xml:"Value"`
 }
 
 type ValuteCurs struct {
+	XMLName xml.Name `xml:"ValCurs"`
 	Valutes []Valute `xml:"Valute"`
 }
 
@@ -36,7 +38,7 @@ type ValuteJSON struct {
 }
 
 type ValuteCursJSON struct {
-	Valutes []ValuteJSON
+	Valutes []ValuteJSON `json:"Valutes"`
 }
 
 func main() {

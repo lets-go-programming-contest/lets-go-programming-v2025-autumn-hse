@@ -17,7 +17,6 @@ func main() {
 	results := []string{}
 
 	for range departmentsCount {
-
 		scanner.Scan()
 		employeesCount, _ := strconv.Atoi(scanner.Text())
 
@@ -30,10 +29,9 @@ func main() {
 			scanner.Scan()
 			line := scanner.Text()
 			parts := strings.Fields(line)
-
+			
 			if !isValid {
 				departmentResults = append(departmentResults, "-1")
-
 				continue
 			}
 

@@ -46,6 +46,7 @@ func main() {
 
 				return
 			}
+
 			comfortTemperature.AddConstraint(parsedOp, temp)
 
 			fmt.Println(comfortTemperature.Result())

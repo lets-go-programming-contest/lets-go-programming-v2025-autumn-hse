@@ -95,12 +95,16 @@ func main() {
 
 	outputJSON, err := json.MarshalIndent(valutesOutput, "", "    ")
 	if err != nil {
-		panic(fmt.Sprintf("Error marshaling JSON: %v", err))
+		fmt.Printf("Error marshaling JSON: %v", err)
+
+		return
 	}
 
 	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0750)
 	if err != nil {
-		panic(fmt.Sprintf("Error creating directory: %v", err))
+		fmt.Printf("Error creating directory: %v", err)
+
+		return
 	}
 
 	file, err := os.Create(config.OutputFile)
@@ -114,13 +118,6 @@ func main() {
 	_, err = file.Write(outputJSON)
 	if err != nil {
 		fmt.Printf("Error writing to file: %v\n", err)
-
-		return
-	}
-
-	err = file.Sync()
-	if err != nil {
-		fmt.Printf("Error syncing file: %v\n", err)
 
 		return
 	}

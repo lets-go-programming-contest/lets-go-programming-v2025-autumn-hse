@@ -2,6 +2,8 @@ package temperature
 
 import "errors"
 
+type SignType string
+
 var ErrInvalidOperator = errors.New("invalid operator")
 
 const (
@@ -10,11 +12,11 @@ const (
 )
 
 const (
-	opLessEqual    string = "<="
-	opGreaterEqual string = ">="
+	opLessEqual    SignType = "<="
+	opGreaterEqual SignType = ">="
 )
 
-func ParseOperator(s string) (string, error) {
+func ParseOperator(s string) (SignType, error) {
 	switch s {
 	case "<=":
 		return opLessEqual, nil
@@ -30,14 +32,14 @@ type ComfortTemperature struct {
 	min int
 }
 
-func InitComfortTemperature() *ComfortTemperature {
-	return &ComfortTemperature{
+func NewComfortTemperature() ComfortTemperature {
+	return ComfortTemperature{
 		min: minStartingTemp,
 		max: maxStartingTemp,
 	}
 }
 
-func (cr *ComfortTemperature) AddConstraint(op string, temp int) {
+func (cr *ComfortTemperature) AddConstraint(op SignType, temp int) {
 	switch op {
 	case opLessEqual:
 		if temp < cr.max {
@@ -47,6 +49,8 @@ func (cr *ComfortTemperature) AddConstraint(op string, temp int) {
 		if temp > cr.min {
 			cr.min = temp
 		}
+	default:
+		panic("unknown operator: " + op)
 	}
 }
 

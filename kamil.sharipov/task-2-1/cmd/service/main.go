@@ -1,17 +1,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/kamilSharipov/task-2-1/internal/temperature"
-)
-
-var (
-	ErrReadingNumOfDepartments = errors.New("error reading number of departments")
-	ErrReadingNumOfEmployees   = errors.New("error reading number of employees")
-	ErrReadingOperatorTemp     = errors.New("error reading operator and temperature")
-	ErrParseOperator           = errors.New("error parsing operator")
 )
 
 func main() {
@@ -19,7 +11,7 @@ func main() {
 
 	_, err := fmt.Scanln(&numOfDepartments)
 	if err != nil {
-		fmt.Println(ErrReadingNumOfDepartments, err)
+		fmt.Printf("Error reading number of departments: %v\n", err)
 
 		return
 	}
@@ -28,12 +20,12 @@ func main() {
 	for range numOfDepartments {
 		_, err := fmt.Scanln(&employees)
 		if err != nil {
-			fmt.Println(ErrReadingNumOfEmployees, err)
+			fmt.Printf("Error reading number of employees: %v\n", err)
 
 			return
 		}
 
-		comfortTemperature := temperature.InitComfortTemperature()
+		comfortTemperature := temperature.NewComfortTemperature()
 
 		var (
 			operator string
@@ -43,19 +35,18 @@ func main() {
 		for range employees {
 			_, err = fmt.Scanln(&operator, &temp)
 			if err != nil {
-				fmt.Println(ErrReadingOperatorTemp, err)
+				fmt.Printf("Error reading operator and temperature: %v\n", err)
 
 				return
 			}
 
 			parsedOp, err := temperature.ParseOperator(operator)
 			if err != nil {
-				fmt.Println(ErrParseOperator, err)
+				fmt.Printf("Error parsing operator: %v\n", err)
 
 				return
-			} else {
-				comfortTemperature.AddConstraint(parsedOp, temp)
 			}
+			comfortTemperature.AddConstraint(parsedOp, temp)
 
 			fmt.Println(comfortTemperature.Result())
 		}

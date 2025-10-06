@@ -51,9 +51,10 @@ func main() {
 	}
 
 	var config Config
+
 	err = yaml.Unmarshal(dataConfig, &config)
 	if err != nil {
-		fmt.Printf("read yaml: %v\n", err)
+		fmt.Printf("Error parsing yaml: %v\n", err)
 
 		return
 	}
@@ -100,7 +101,7 @@ func main() {
 		panic(fmt.Sprintf("Error creating directory: %v", err))
 	}
 
-	err = os.WriteFile(config.OutputFile, outputJSON, 0644)
+	err = os.WriteFile(config.OutputFile, outputJSON, 0640)
 	if err != nil {
 		panic(fmt.Sprintf("Error writing output file: %v", err))
 	}

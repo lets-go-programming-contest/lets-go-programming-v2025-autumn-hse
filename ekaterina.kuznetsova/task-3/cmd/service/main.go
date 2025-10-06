@@ -69,16 +69,6 @@ func main() {
 		return
 	}
 
-	// sort.Slice(valCurs.Valutes, func(i, j int) bool {
-	// 	value1 := strings.Replace(valCurs.Valutes[i].Value, ",", ".", -1)
-	// 	value2 := strings.Replace(valCurs.Valutes[j].Value, ",", ".", -1)
-
-	// 	float1, _ := strconv.ParseFloat(value1, 64)
-	// 	float2, _ := strconv.ParseFloat(value2, 64)
-
-	// 	return float1 > float2
-	// })
-
 	var valutesOutput []ValuteJSON
 
 	for _, valute := range valCurs.Valutes {

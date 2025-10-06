@@ -16,44 +16,45 @@ func main() {
 
 	results := []string{}
 
-	for departmentIndex := 0; departmentIndex < departmentsCount; departmentIndex++ {
+	for range departmentsCount {
 
 		scanner.Scan()
 		employeesCount, _ := strconv.Atoi(scanner.Text())
 
-		minTemp := 15
-		maxTemp := 30
-		valid := true
+		minTemperature := 15
+		maxTemperature := 30
+		isValid := true
 		departmentResults := []string{}
 
-		for employeeIndex := 0; employeeIndex < employeesCount; employeeIndex++ {
+		for range employeesCount {
 			scanner.Scan()
 			line := scanner.Text()
 			parts := strings.Fields(line)
 
-			if !valid {
+			if !isValid {
 				departmentResults = append(departmentResults, "-1")
+
 				continue
 			}
 
 			operator := parts[0]
-			temp, _ := strconv.Atoi(parts[1])
+			temperature, _ := strconv.Atoi(parts[1])
 
 			if operator == ">=" {
-				if temp > minTemp {
-					minTemp = temp
+				if temperature > minTemperature {
+					minTemperature = temperature
 				}
 			} else if operator == "<=" {
-				if temp < maxTemp {
-					maxTemp = temp
+				if temperature < maxTemperature {
+					maxTemperature = temperature
 				}
 			}
 
-			if minTemp <= maxTemp {
-				departmentResults = append(departmentResults, strconv.Itoa(minTemp))
+			if minTemperature <= maxTemperature {
+				departmentResults = append(departmentResults, strconv.Itoa(minTemperature))
 			} else {
 				departmentResults = append(departmentResults, "-1")
-				valid = false
+				isValid = false
 			}
 		}
 

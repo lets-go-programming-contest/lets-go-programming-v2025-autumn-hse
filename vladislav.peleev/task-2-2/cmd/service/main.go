@@ -12,7 +12,9 @@ func (h IntHeap) Less(i, j int) bool { return h[i] > h[j] }
 func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
 
 func (h *IntHeap) Push(x interface{}) {
-	*h = append(*h, x.(int))
+	if num, ok := x.(int); ok {
+		*h = append(*h, num)
+	}
 }
 
 func (h *IntHeap) Pop() interface{} {
@@ -20,35 +22,41 @@ func (h *IntHeap) Pop() interface{} {
 	n := len(old)
 	x := old[n-1]
 	*h = old[0 : n-1]
+	
 	return x
 }
 
 func main() {
-	var N, k int
-	fmt.Scan(&N)
-	
-	dishes := make([]int, N)
-	for i := 0; i < N; i++ {
-		fmt.Scan(&dishes[i])
+	var dishCount, preferenceOrder int
+	_, _ = fmt.Scan(&dishCount)
+
+	dishes := make([]int, dishCount)
+	for idx := range dishes {
+		_, _ = fmt.Scan(&dishes[idx])
 	}
-	
-	fmt.Scan(&k)
-	
-	result := findKthPreference(dishes, k)
+
+	_, _ = fmt.Scan(&preferenceOrder)
+
+	result := findKthPreference(dishes, preferenceOrder)
 	fmt.Println(result)
 }
 
-func findKthPreference(dishes []int, k int) int {
-	h := &IntHeap{}
-	heap.Init(h)
+func findKthPreference(dishes []int, preferenceOrder int) int {
+	intHeap := &IntHeap{}
+	heap.Init(intHeap)
 
 	for _, dish := range dishes {
-		heap.Push(h, dish)
+		heap.Push(intHeap, dish)
 	}
 
-	for i := 0; i < k-1; i++ {
-		heap.Pop(h)
+	for idx := 0; idx < preferenceOrder-1; idx++ {
+		heap.Pop(intHeap)
 	}
 
-	return heap.Pop(h).(int)
+	poppedValue := heap.Pop(intHeap)
+	if result, typeOk := poppedValue.(int); typeOk {
+		return result
+	}
+	
+	return 0
 }

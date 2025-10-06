@@ -10,7 +10,8 @@ import (
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Printf("Panic occured: %v\n", r)
+			fmt.Printf("Panic occurred: %v\n", r)
+
 			return
 		}
 	}()
@@ -28,6 +29,7 @@ func main() {
 		_, err := fmt.Scan(&dish)
 		if err != nil {
 			fmt.Printf("Error scanning dish: %v\n", err)
+
 			return
 		}
 
@@ -37,6 +39,7 @@ func main() {
 	_, err = fmt.Scanln(&rank)
 	if err != nil {
 		fmt.Printf("Error scanning rank: %v\n", err)
+
 		return
 	}
 

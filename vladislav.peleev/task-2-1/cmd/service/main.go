@@ -29,9 +29,10 @@ func main() {
 			scanner.Scan()
 			line := scanner.Text()
 			parts := strings.Fields(line)
-			
+
 			if !isValid {
 				departmentResults = append(departmentResults, "-1")
+
 				continue
 			}
 

@@ -20,7 +20,7 @@ type ValuteXML struct {
 }
 
 type ValuteJson struct {
-	NumCode  string  `json:"num_code"`
+	NumCode  int     `json:"num_code"`
 	CharCode string  `json:"char_code"`
 	Value    float64 `json:"value"`
 }
@@ -36,8 +36,13 @@ func ConverteXMLtoJSON(valutes []ValuteXML) ([]ValuteJson, error) {
 			return result, fmt.Errorf(errMsgConvertXmlJson, err)
 		}
 
+		numCode, err := strconv.Atoi(val.NumCode)
+		if err != nil {
+			return result, fmt.Errorf(errMsgConvertXmlJson, err)
+		}
+
 		result = append(result, ValuteJson{
-			NumCode:  val.NumCode,
+			NumCode:  numCode,
 			CharCode: val.CharCode,
 			Value:    num,
 		})

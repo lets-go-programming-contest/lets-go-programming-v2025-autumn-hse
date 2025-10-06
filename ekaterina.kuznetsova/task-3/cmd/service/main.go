@@ -103,23 +103,30 @@ func main() {
 		panic(fmt.Sprintf("Error creating directory: %v", err))
 	}
 
-	// file, err := os.Create(config.OutputFile)
-	// if err != nil {
-	// 	fmt.Printf("Error creating file: %v\n", err)
-
-	// 	return
-	// }
-	// defer file.Close()
-
-	// _, err = file.Write(outputJSON)
-	// if err != nil {
-	// 	fmt.Printf("Error writing to file: %v\n", err)
-
-	// 	return
-	// }
-
-	err = os.WriteFile(config.OutputFile, outputJSON, 0655)
+	file, err := os.Create(config.OutputFile)
 	if err != nil {
-		panic(fmt.Sprintf("Error writing output file: %v", err))
+		fmt.Printf("Error creating file: %v\n", err)
+
+		return
 	}
+	defer file.Close()
+
+	_, err = file.Write(outputJSON)
+	if err != nil {
+		fmt.Printf("Error writing to file: %v\n", err)
+
+		return
+	}
+
+	err = file.Sync()
+	if err != nil {
+		fmt.Printf("Error syncing file: %v\n", err)
+
+		return
+	}
+
+	// err = os.WriteFile(config.OutputFile, outputJSON, 0655)
+	// if err != nil {
+	// 	panic(fmt.Sprintf("Error writing output file: %v", err))
+	// }
 }

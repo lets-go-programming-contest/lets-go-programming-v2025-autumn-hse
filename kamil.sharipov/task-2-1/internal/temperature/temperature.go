@@ -39,8 +39,8 @@ func NewComfortTemperature() ComfortTemperature {
 	}
 }
 
-func (cr *ComfortTemperature) AddConstraint(op SignType, temp int) {
-	switch op {
+func (cr *ComfortTemperature) AddConstraint(operator SignType, temp int) {
+	switch operator {
 	case opLessEqual:
 		if temp < cr.max {
 			cr.max = temp
@@ -50,7 +50,7 @@ func (cr *ComfortTemperature) AddConstraint(op SignType, temp int) {
 			cr.min = temp
 		}
 	default:
-		panic("unknown operator: " + op)
+		panic("unknown operator: " + operator)
 	}
 }
 

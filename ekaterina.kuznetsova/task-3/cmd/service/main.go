@@ -101,7 +101,7 @@ func main() {
 		panic(fmt.Sprintf("Error creating directory: %v", err))
 	}
 
-	err = os.WriteFile(config.OutputFile, outputJSON, 0640)
+	err = os.WriteFile(config.OutputFile, outputJSON, 0600)
 	if err != nil {
 		panic(fmt.Sprintf("Error writing output file: %v", err))
 	}

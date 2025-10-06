@@ -30,7 +30,7 @@ func main() {
 		panic(err)
 	}
 
-	slices.SortFunc(outValutes, func(a, b valute.ValuteJson) int {
+	slices.SortFunc(outValutes, func(a, b valute.ValuteJSON) int {
 		return -cmp.Compare(a.Value, b.Value)
 	})
 

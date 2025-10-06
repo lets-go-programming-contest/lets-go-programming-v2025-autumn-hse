@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"os"
@@ -8,9 +10,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
-	"encoding/json"
-	"encoding/xml"
 
 	"gopkg.in/yaml.v3"
 )
@@ -52,7 +51,12 @@ func main() {
 	}
 
 	var config Config
-	yaml.Unmarshal(dataConfig, &config)
+	err = yaml.Unmarshal(dataConfig, &config)
+	if err != nil {
+		fmt.Printf("read yaml: %v\n", err)
+
+		return
+	}
 
 	var valCurs ValuteCurs
 
@@ -66,36 +70,37 @@ func main() {
 	err = xml.Unmarshal(dataXML, &valCurs)
 	if err != nil {
 		fmt.Printf("Error parsing XML: %v\n", err)
+
 		return
 	}
 
-	var valutesOutput []ValuteJSON
+	var valutesOutput ValuteCursJSON
 
 	for _, valute := range valCurs.Valutes {
 		numCode, _ := strconv.Atoi(valute.NumCode)
-		value, _ := strconv.ParseFloat(strings.Replace(valute.Value, ",", ".", -1), 64)
-		valutesOutput = append(valutesOutput, ValuteJSON{
+		value, _ := strconv.ParseFloat(strings.ReplaceAll(valute.Value, ",", "."), 64)
+		valutesOutput.Valutes = append(valutesOutput.Valutes, ValuteJSON{
 			NumCode:  numCode,
 			CharCode: valute.CharCode,
 			Value:    value,
 		})
 	}
 
-	sort.Slice(valutesOutput, func(i, j int) bool {
-		return valutesOutput[i].Value > valutesOutput[j].Value
+	sort.Slice(valutesOutput.Valutes, func(i, j int) bool {
+		return valutesOutput.Valutes[i].Value > valutesOutput.Valutes[j].Value
 	})
 
-	outputJSON, err := json.MarshalIndent(valutesOutput, "", "    ")
+	outputJSON, err := json.MarshalIndent(valutesOutput.Valutes, "", "    ")
 	if err != nil {
 		panic(fmt.Sprintf("Error marshaling JSON: %v", err))
 	}
 
-	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0755)
+	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0750)
 	if err != nil {
 		panic(fmt.Sprintf("Error creating directory: %v", err))
 	}
 
-	err = os.WriteFile(config.OutputFile, outputJSON, 0755)
+	err = os.WriteFile(config.OutputFile, outputJSON, 0644)
 	if err != nil {
 		panic(fmt.Sprintf("Error writing output file: %v", err))
 	}

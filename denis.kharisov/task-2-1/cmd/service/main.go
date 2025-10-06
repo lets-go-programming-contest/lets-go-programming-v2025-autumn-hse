@@ -83,7 +83,7 @@ func main() {
 				newRange, err := optimalTemperature(tempRange, operationType, temperature)
 				if err != nil {
 					errorFlag = true
-					
+
 					fmt.Println("-1")
 				} else {
 					tempRange = newRange

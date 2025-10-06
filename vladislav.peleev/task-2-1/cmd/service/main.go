@@ -12,21 +12,21 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	scanner.Scan()
-	n, _ := strconv.Atoi(scanner.Text())
+	departmentsCount, _ := strconv.Atoi(scanner.Text())
 
 	results := []string{}
 
-	for i := 0; i < n; i++ {
+	for departmentIndex := 0; departmentIndex < departmentsCount; departmentIndex++ {
 
 		scanner.Scan()
-		k, _ := strconv.Atoi(scanner.Text())
+		employeesCount, _ := strconv.Atoi(scanner.Text())
 
 		minTemp := 15
 		maxTemp := 30
 		valid := true
 		departmentResults := []string{}
 
-		for j := 0; j < k; j++ {
+		for employeeIndex := 0; employeeIndex < employeesCount; employeeIndex++ {
 			scanner.Scan()
 			line := scanner.Text()
 			parts := strings.Fields(line)

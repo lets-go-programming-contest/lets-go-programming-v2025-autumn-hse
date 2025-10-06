@@ -93,7 +93,7 @@ func main() {
 		return valutesOutput.Valutes[i].Value > valutesOutput.Valutes[j].Value
 	})
 
-	outputJSON, err := json.MarshalIndent(valutesOutput.Valutes, "", "    ")
+	outputJSON, err := json.MarshalIndent(valutesOutput, "", "    ")
 	if err != nil {
 		panic(fmt.Sprintf("Error marshaling JSON: %v", err))
 	}
@@ -103,8 +103,23 @@ func main() {
 		panic(fmt.Sprintf("Error creating directory: %v", err))
 	}
 
-	err = os.WriteFile(config.OutputFile, outputJSON, 0600)
+	file, err := os.Create(config.OutputFile)
 	if err != nil {
-		panic(fmt.Sprintf("Error writing output file: %v", err))
+		fmt.Printf("Error creating file: %v\n", err)
+
+		return
 	}
+	defer file.Close()
+
+	_, err = file.Write(outputJSON)
+	if err != nil {
+		fmt.Printf("Error writing to file: %v\n", err)
+
+		return
+	}
+
+	// err = os.WriteFile(config.OutputFile, outputJSON, 0600)
+	// if err != nil {
+	// 	panic(fmt.Sprintf("Error writing output file: %v", err))
+	// }
 }

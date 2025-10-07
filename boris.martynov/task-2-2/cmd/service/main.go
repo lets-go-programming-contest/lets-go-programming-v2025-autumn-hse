@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/JingolBong/task-2-2/internal/dishorder"
 )
@@ -38,6 +37,10 @@ func main() {
 	}
 
 	dishedChoosed := len(*containerOfDishes) - preferedDishNumb
-	slices.Sort(*containerOfDishes)
+
+	for range dishedChoosed {
+		containerOfDishes.Pop()
+	}
+
 	fmt.Println((*containerOfDishes)[dishedChoosed])
 }

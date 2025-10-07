@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -11,16 +10,12 @@ import (
 	xml "github.com/kamilSharipov/task-3/internal/xml_parser"
 )
 
-var (
-	errNoConfigPath error = errors.New("no config path")
-)
-
 func main() {
 	configPath := flag.String("config", "", "config file path")
 	flag.Parse()
 
 	if *configPath == "" {
-		fmt.Println(errNoConfigPath)
+		fmt.Println("no config path")
 
 		return
 	}
@@ -34,7 +29,7 @@ func main() {
 
 	xmlData, err := os.ReadFile(config.InputFile)
 	if err != nil {
-		fmt.Println("Error reading file:", err)
+		fmt.Println("Error reading input file:", err)
 
 		return
 	}

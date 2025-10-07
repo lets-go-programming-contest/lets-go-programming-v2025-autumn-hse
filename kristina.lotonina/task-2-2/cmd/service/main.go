@@ -10,7 +10,6 @@ import (
 func main() {
 	var number int
 	_, err := fmt.Scan(&number)
-
 	if err != nil {
 		fmt.Println("unable to read number :", err)
 

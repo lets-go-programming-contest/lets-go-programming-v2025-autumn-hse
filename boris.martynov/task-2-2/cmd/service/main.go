@@ -36,11 +36,9 @@ func main() {
 		return
 	}
 
-	dishedChoosed := len(*containerOfDishes) - preferedDishNumb
-
-	for range dishedChoosed {
+	for range preferedDishNumb {
 		containerOfDishes.Pop()
 	}
 
-	fmt.Println((*containerOfDishes)[dishedChoosed])
+	fmt.Println(containerOfDishes.Pop())
 }

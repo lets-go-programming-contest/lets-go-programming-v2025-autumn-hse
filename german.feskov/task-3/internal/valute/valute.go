@@ -1,54 +1,55 @@
 package valute
 
 import (
+	"encoding/xml"
 	"fmt"
 	"strconv"
 	"strings"
 )
 
-const (
-	errMsgConvertXMLJSON = "while convering XML to JSON: %w"
-)
-
 type ValCursXML struct {
-	Valutes []ValuteXML `xml:"Valute"`
-}
-type ValuteXML struct {
-	NumCode  string `xml:"NumCode"`
-	CharCode string `xml:"CharCode"`
-	Value    string `xml:"Value"`
+	Valutes []Valute `xml:"Valute"`
 }
 
-type ValuteJSON struct {
-	NumCode  int     `json:"num_code"`
-	CharCode string  `json:"char_code"`
-	Value    float64 `json:"value"`
+type Valute struct {
+	NumCode  int     `json:"num_code"  xml:"NumCode"`
+	CharCode string  `json:"char_code" xml:"CharCode"`
+	Value    Decimal `json:"value"     xml:"Value"`
 }
 
-func ConverteXMLtoJSON(valutes []ValuteXML) ([]ValuteJSON, error) {
-	result := make([]ValuteJSON, 0, len(valutes))
+type Decimal float64
 
-	for _, val := range valutes {
-		strFloat := strings.ReplaceAll(val.Value, ",", ".")
-
-		num, err := strconv.ParseFloat(strFloat, 64)
-		if err != nil {
-			return result, fmt.Errorf(errMsgConvertXMLJSON, err)
-		}
-
-		numCode, err := strconv.Atoi(val.NumCode)
-		if val.NumCode == "" {
-			numCode = 0
-		} else if err != nil {
-			return result, fmt.Errorf(errMsgConvertXMLJSON, err)
-		}
-
-		result = append(result, ValuteJSON{
-			NumCode:  numCode,
-			CharCode: val.CharCode,
-			Value:    num,
-		})
+func (d *Decimal) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
+	var str string
+	if err := dec.DecodeElement(&str, &start); err != nil {
+		return fmt.Errorf("decode element Decimal: %w", err)
 	}
 
-	return result, nil
+	if str == "" {
+		*d = Decimal(0)
+
+		return nil
+	}
+
+	str = strings.ReplaceAll(str, ",", ".")
+
+	val, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		return fmt.Errorf("parse xml Decimal %q: %w", str, err)
+	}
+
+	*d = Decimal(val)
+
+	return nil
+}
+
+func (d *Decimal) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
+	str := strconv.FormatFloat(float64(*d), 'f', -1, 64)
+	str = strings.ReplaceAll(str, ".", ",")
+
+	if err := enc.EncodeElement(str, start); err != nil {
+		return fmt.Errorf("encode element Decimal: %w", err)
+	}
+
+	return nil
 }

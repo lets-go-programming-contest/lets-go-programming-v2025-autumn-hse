@@ -57,12 +57,16 @@ func main() {
 	_, err := fmt.Scanln(&numberOfDepartments)
 	if err != nil {
 		fmt.Println("Invalid number of departments")
+
+		return
 	}
 
 	for departmentNumber := 1; departmentNumber <= numberOfDepartments; departmentNumber++ {
 		_, err = fmt.Scanln(&numberOfEmployees)
 		if err != nil {
 			fmt.Println("Invalid number of employees")
+
+			return
 		}
 
 		var (
@@ -77,6 +81,8 @@ func main() {
 			_, err = fmt.Scanln(&operationType, &temperature)
 			if err != nil {
 				fmt.Println("Invalid operation and temperature")
+
+				return
 			}
 
 			if !errorFlag {

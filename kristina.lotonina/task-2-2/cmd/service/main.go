@@ -40,12 +40,10 @@ func main() {
 		return
 	}
 
-	var result int
-	
 	for range neededPreference {
 		value := heap.Pop(dishesContainer)
 		if intValue, ok := value.(int); ok {
-    		result = intValue
+    		result := intValue
 		} else {
     		panic(fmt.Sprintf("expected int, %v :", value))
 		}

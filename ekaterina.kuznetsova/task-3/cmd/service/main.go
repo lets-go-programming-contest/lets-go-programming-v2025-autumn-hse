@@ -100,7 +100,7 @@ func main() {
 		return
 	}
 
-	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0777)
+	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0o755)
 	if err != nil {
 		fmt.Printf("Error creating directory: %v", err)
 
@@ -122,7 +122,7 @@ func main() {
 	// 	return
 	// }
 
-	err = os.WriteFile(config.OutputFile, outputJSON, 0777)
+	err = os.WriteFile(config.OutputFile, outputJSON, 0o755)
 	if err != nil {
 		panic(fmt.Sprintf("Error writing output file: %v", err))
 	}

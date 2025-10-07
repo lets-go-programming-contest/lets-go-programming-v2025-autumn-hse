@@ -28,6 +28,12 @@ func main() {
 		return
 	}
 
+	if _, err := os.Stat(config.InputFile); err != nil {
+		fmt.Println("no such file or directory:", err)
+
+		return
+	}
+
 	xmlData, err := os.ReadFile(config.InputFile)
 	if err != nil {
 		fmt.Println("Error reading input file:", err)

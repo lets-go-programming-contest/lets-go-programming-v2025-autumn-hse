@@ -9,7 +9,7 @@ import (
 func main() {
 	var numberOfDepartments int
 	if _, err := fmt.Scanln(&numberOfDepartments); err != nil {
-		fmt.Println("when scanning number of departments", err)
+		fmt.Println("when scanning number of departments: ", err)
 
 		return
 	}
@@ -31,7 +31,7 @@ func main() {
 			)
 
 			if _, err := fmt.Scanln(&sign, &temp); err != nil {
-				fmt.Println("error scanning worker preference:", err)
+				fmt.Println("error scanning temperature wanted: ", err)
 
 				return
 			}

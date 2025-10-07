@@ -54,5 +54,13 @@ func main() {
 		heap.Pop(&intHeap)
 	}
 
-	fmt.Println(heap.Pop(&intHeap))
+	value := heap.Pop(&intHeap)
+
+	if value == nil {
+		fmt.Println("Something is wrong")
+
+		return
+	}
+
+	fmt.Println(value)
 }

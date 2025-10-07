@@ -1,7 +1,5 @@
 package dishorder
 
-import "fmt"
-
 type PrefOrder []int
 
 func (h *PrefOrder) Len() int {
@@ -17,12 +15,6 @@ func (h *PrefOrder) Swap(i, j int) {
 }
 
 func (h *PrefOrder) Push(value any) {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("panic in Push:", r)
-		}
-	}()
-
 	pushedInt, ok := value.(int)
 
 	if !ok {

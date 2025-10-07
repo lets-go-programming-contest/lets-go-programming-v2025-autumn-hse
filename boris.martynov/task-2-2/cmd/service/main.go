@@ -8,10 +8,18 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("recover from panic: ", r)
+		}
+	}()
+
 	var (
 		containerOfDishes dishorder.PrefOrder
 		numberOfDishes    int
 	)
+
+	heap.Init(&containerOfDishes)
 
 	if _, err := fmt.Scan(&numberOfDishes); err != nil {
 		fmt.Println("when scanning dish count: ", err)

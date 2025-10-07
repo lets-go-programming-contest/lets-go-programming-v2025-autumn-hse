@@ -20,7 +20,7 @@ func (dishes *Heap) Push(x interface{}) {
 	if value, ok := x.(int); ok {
 		*dishes = append(*dishes, value)
 	} else {
-		panic(fmt.Sprintf("expected int :", x))
+		panic(fmt.Sprintf("expected int, %v", x))
 	}
 }
 

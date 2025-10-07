@@ -3,7 +3,6 @@ package main
 import (
 	"container/heap"
 	"fmt"
-	"slices"
 
 	"github.com/kef1rch1k/task-2-2/internal/dishes"
 )
@@ -11,20 +10,20 @@ import (
 func main() {
 	var number int
 	_, err := fmt.Scan(&number)
-
-	dishesContainer := &dishes.Heap{}
-	heap.Init(dishesContainer)
-
+	
 	if err != nil {
-		fmt.Print("unable to read number :", err)
+		fmt.Println("unable to read number :", err)
 
 		return
 	}
 
+	dishesContainer := &dishes.Heap{}
+	heap.Init(dishesContainer)
+
 	for range number {
 		var preferences int
 		if _, err = fmt.Scan(&preferences); err != nil {
-			fmt.Print("unable to read preference :", err)
+			fmt.Println("unable to read preference :", err)
 
 			return
 		}
@@ -36,13 +35,15 @@ func main() {
 
 	_, err = fmt.Scan(&neededPreference)
 	if err != nil {
-		fmt.Print("unable to read needed preference :", err)
+		fmt.Println("unable to read needed preference :", err)
 
 		return
 	}
 
-	chosenDish := len(*dishesContainer) - neededPreference
-	slices.Sort(*dishesContainer)
+	var result int
+	for i := 0; i < neededPreference; i++ {
+		result = heap.Pop(dishesContainer).(int)
+	}
 
-	fmt.Println((*dishesContainer)[chosenDish])
+	fmt.Println(result)
 }

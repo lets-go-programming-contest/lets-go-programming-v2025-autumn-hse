@@ -15,7 +15,6 @@ func main() {
 	}
 
 	for range numberOfDepartments {
-
 		var departmentCapacity int
 		if _, err := fmt.Scanln(&departmentCapacity); err != nil {
 			fmt.Println("when scanning capacity of department: ", err)

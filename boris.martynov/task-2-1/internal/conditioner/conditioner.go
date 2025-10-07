@@ -1,8 +1,6 @@
 package conditioner
 
-import (
-	"fmt"
-)
+import "errors"
 
 type temperature struct {
 	lowest  int
@@ -12,6 +10,10 @@ type temperature struct {
 const (
 	MinTemp = 15
 	MaxTemp = 30
+)
+
+var (
+	ErrInvalidTempSign = errors.New("invalid temp range sign")
 )
 
 func NewTemperature(low, high int) *temperature {
@@ -32,8 +34,9 @@ func (tr *temperature) TempWantedByEmployee(greaterOrLess string, temp int) (int
 			tr.highest = temp
 		}
 	default:
-		return 0, fmt.Errorf("invalid temp range sign")
+		return 0, ErrInvalidTempSign
 	}
+
 	if tr.lowest <= tr.highest {
 		return tr.lowest, nil
 	}

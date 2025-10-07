@@ -36,7 +36,7 @@ func main() {
 		return
 	}
 
-	for range preferedDishNumb {
+	for range preferedDishNumb - 1 {
 		containerOfDishes.Pop()
 	}
 

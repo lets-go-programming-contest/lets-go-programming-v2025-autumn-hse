@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/kamilSharipov/task-3/internal/config"
 	json "github.com/kamilSharipov/task-3/internal/json_formatter"
@@ -44,6 +45,12 @@ func main() {
 	bytes, err := json.FormateJSON(valCurs)
 	if err != nil {
 		fmt.Println(err)
+
+		return
+	}
+
+	if err := os.MkdirAll(filepath.Dir(config.OutputFile), 0755); err != nil {
+		fmt.Println("Error creating output directory:", err)
 
 		return
 	}

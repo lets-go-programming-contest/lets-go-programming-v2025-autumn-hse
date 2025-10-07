@@ -8,8 +8,7 @@ import (
 )
 
 func main() {
-	var dishesCount, ratingNumber, preferenceIndex, result int
-
+	var dishesCount int
 	_, err := fmt.Scan(&dishesCount)
 	if err != nil {
 		fmt.Printf("Invalid number of dishes: %v\n", err)
@@ -20,6 +19,7 @@ func main() {
 	ratings := &intheap.Rating{}
 	heap.Init(ratings)
 
+	var ratingNumber int
 	for range dishesCount {
 		_, err = fmt.Scan(&ratingNumber)
 		if err != nil {
@@ -31,6 +31,7 @@ func main() {
 		heap.Push(ratings, ratingNumber)
 	}
 
+	var preferenceIndex int
 	_, err = fmt.Scan(&preferenceIndex)
 	if err != nil {
 		fmt.Printf("Invalid number of preference: %v\n", err)
@@ -42,11 +43,16 @@ func main() {
 		heap.Pop(ratings)
 	}
 
-	result, ok := heap.Pop(ratings).(int)
+	ratingValue := heap.Pop(ratings)
 
+	if ratingValue == nil {
+		panic("not enought number of dishes")
+	}
+
+	resultValue, ok := ratingValue.(int)
 	if !ok {
 		panic("type conversion error")
 	}
 
-	fmt.Println(result)
+	fmt.Println(resultValue)
 }

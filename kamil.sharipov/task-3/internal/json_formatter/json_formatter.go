@@ -5,14 +5,20 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 
 	xml "github.com/kamilSharipov/task-3/internal/xml_parser"
 )
 
 type ValuteJSON struct {
-	NumCode  int    `json:"num_code"`
-	CharCode string `json:"char_code"`
-	Value    string `json:"value"`
+	NumCode  int     `json:"num_code"`
+	CharCode string  `json:"char_code"`
+	Value    float64 `json:"value"`
+}
+
+func parseValue(s string) (float64, error) {
+	s = strings.Replace(s, ",", ".", 1)
+	return strconv.ParseFloat(s, 64)
 }
 
 func FormateJSON(valCurs *xml.ValCurs) ([]byte, error) {
@@ -21,13 +27,17 @@ func FormateJSON(valCurs *xml.ValCurs) ([]byte, error) {
 	for i, valute := range valCurs.Valutes {
 		numCode, err := strconv.Atoi(valute.NumCode)
 		if err != nil {
-			fmt.Println("invalid NumCode")
-			return nil, err
+			return nil, fmt.Errorf("invalid numCode %q: %w", valute.NumCode, err)
+		}
+
+		value, err := parseValue(valute.Value)
+		if err != nil {
+			return nil, fmt.Errorf("invalid Value %q: %w", valute.Value, err)
 		}
 
 		valutes[i].CharCode = valute.CharCode
 		valutes[i].NumCode = numCode
-		valutes[i].Value = valute.Value
+		valutes[i].Value = value
 	}
 
 	sort.Slice(valutes, func(i, j int) bool {

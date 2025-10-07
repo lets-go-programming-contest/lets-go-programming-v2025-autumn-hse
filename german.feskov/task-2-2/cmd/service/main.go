@@ -2,13 +2,10 @@ package main
 
 import (
 	"container/heap"
-	"errors"
 	"fmt"
 
 	"github.com/6ermvH/task-2-2/internal/heapmax"
 )
-
-var errEmptyHeap = errors.New("heap is empty")
 
 func main() {
 	defer func() {
@@ -23,7 +20,7 @@ func main() {
 	heap.Init(dishes)
 
 	if _, err := fmt.Scan(&dishCount); err != nil {
-		fmt.Printf("while scan dish count: %v\n", err)
+		fmt.Printf("err: while scan dish count: %v\n", err)
 
 		return
 	}
@@ -31,7 +28,7 @@ func main() {
 	for range dishCount {
 		var val int
 		if _, err := fmt.Scan(&val); err != nil {
-			fmt.Printf("while scan dish value: %v\n", err)
+			fmt.Printf("err: while scan dish value: %v\n", err)
 
 			return
 		}
@@ -41,14 +38,14 @@ func main() {
 
 	var kInd int
 	if _, err := fmt.Scan(&kInd); err != nil {
-		fmt.Printf("while scan K num: %v\n", err)
+		fmt.Printf("err: while scan K num: %v\n", err)
 
 		return
 	}
 
 	for range kInd - 1 {
 		if heap.Pop(dishes) == nil {
-			fmt.Printf("while pop in heap: %v\n", errEmptyHeap)
+			fmt.Printf("err: heap is empty")
 
 			return
 		}
@@ -56,7 +53,7 @@ func main() {
 
 	bestDish := heap.Pop(dishes)
 	if bestDish == nil {
-		fmt.Printf("while pop in heap: %v\n", errEmptyHeap)
+		fmt.Printf("err: heap is empty")
 
 		return
 	}

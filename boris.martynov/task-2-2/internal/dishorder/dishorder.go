@@ -16,16 +16,14 @@ func (h *PrefOrder) Swap(i, j int) {
 	(*h)[i], (*h)[j] = (*h)[j], (*h)[i]
 }
 
-func (h *PrefOrder) Push(x any) {
+func (h *PrefOrder) Push(value any) {
 	defer func() {
-
 		if r := recover(); r != nil {
 			fmt.Println("panic in Push:", r)
 		}
-
 	}()
 
-	pushedInt, ok := x.(int)
+	pushedInt, ok := value.(int)
 
 	if !ok {
 		panic("Pushed not int")

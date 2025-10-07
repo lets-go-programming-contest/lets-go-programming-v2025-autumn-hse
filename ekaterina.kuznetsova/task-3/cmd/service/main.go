@@ -100,7 +100,7 @@ func main() {
 		return
 	}
 
-	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0o755)
+	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0o766)
 	if err != nil {
 		fmt.Printf("Error creating directory: %v", err)
 

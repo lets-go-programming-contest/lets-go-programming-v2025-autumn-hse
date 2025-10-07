@@ -48,7 +48,7 @@ func main() {
 	ratingValue := heap.Pop(ratings)
 
 	if ratingValue == nil {
-		panic("not enought number of dishes")
+		fmt.Printf("Preference doesn't exist. Not enought number of dishes: %v\n", err)
 	}
 
 	resultValue, ok := ratingValue.(int)

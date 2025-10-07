@@ -8,6 +8,12 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Recovered from:", r)
+		}
+	}()
+
 	var (
 		dishCount, dishRank, preferredDish int
 		intHeap                            myheap.Heap
@@ -34,6 +40,12 @@ func main() {
 	_, err = fmt.Scan(&preferredDish)
 	if err != nil {
 		fmt.Println("Error reading preferred dish:", err)
+
+		return
+	}
+
+	if preferredDish > intHeap.Len() {
+		fmt.Println("Too big preffered dish")
 
 		return
 	}

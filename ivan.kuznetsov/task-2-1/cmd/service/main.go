@@ -7,15 +7,7 @@ import (
 )
 
 func main() {
-	var (
-		departmentsCount, employeesCount, temperatureLimitValue int
-		limitSign                                               string
-	)
-
-	const (
-		MinTemperature = 15
-		MaxTemperature = 30
-	)
+	var departmentsCount int
 
 	_, err := fmt.Scan(&departmentsCount)
 	if err != nil {
@@ -25,6 +17,8 @@ func main() {
 	}
 
 	for range departmentsCount {
+		var employeesCount int
+
 		_, err = fmt.Scan(&employeesCount)
 		if err != nil {
 			fmt.Printf("Invalid number of employees: %v\n", err)
@@ -32,7 +26,9 @@ func main() {
 			return
 		}
 
-		temperatureRange := &temperature.TemperatureRange{Min: MinTemperature, Max: MaxTemperature}
+		temperatureRange := temperature.TemperatureRangeInit()
+
+		var limitSign string
 
 		for range employeesCount {
 			_, err = fmt.Scan(&limitSign)
@@ -42,6 +38,8 @@ func main() {
 				return
 			}
 
+			var temperatureLimitValue int
+
 			_, err = fmt.Scan(&temperatureLimitValue)
 			if err != nil {
 				fmt.Printf("Invalid temperature value: %v\n", err)
@@ -50,6 +48,11 @@ func main() {
 			}
 
 			temperatureRange = temperature.OptimalTemperature(limitSign, temperatureLimitValue, temperatureRange)
+
+			if temperatureRange == nil {
+				fmt.Printf("Invalid comparison sign '%s'\nThe temperature range has not changed\n", limitSign)
+			}
+
 			fmt.Println(temperature.GetOptimalTemperature(temperatureRange))
 		}
 	}

@@ -1,10 +1,17 @@
 package temperature
 
-import "fmt"
-
 type TemperatureRange struct {
 	Min int
 	Max int
+}
+
+const (
+	MinTemperature = 15
+	MaxTemperature = 30
+)
+
+func TemperatureRangeInit() *TemperatureRange {
+	return &TemperatureRange{Min: MinTemperature, Max: MaxTemperature}
 }
 
 func OptimalTemperature(sign string, value int, temperature *TemperatureRange) *TemperatureRange {
@@ -18,7 +25,7 @@ func OptimalTemperature(sign string, value int, temperature *TemperatureRange) *
 			temperature.Min = value
 		}
 	default:
-		fmt.Printf("Invalid comparison sign '%s'\nThe temperature range has not changed\n", sign)
+		return nil
 	}
 
 	return temperature

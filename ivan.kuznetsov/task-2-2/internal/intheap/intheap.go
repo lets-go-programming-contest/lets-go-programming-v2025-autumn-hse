@@ -20,6 +20,7 @@ func (rating *Rating) Push(x interface{}) {
 	value, ok := x.(int)
 	if !ok {
 		fmt.Printf("type conversion error: the rating must be an integer")
+
 		return
 	}
 

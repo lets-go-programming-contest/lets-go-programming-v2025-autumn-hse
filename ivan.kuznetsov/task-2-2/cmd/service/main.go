@@ -10,6 +10,7 @@ import (
 func main() {
 	var dishesCount int
 	_, err := fmt.Scan(&dishesCount)
+
 	if err != nil {
 		fmt.Printf("Invalid number of dishes: %v\n", err)
 
@@ -33,6 +34,7 @@ func main() {
 
 	var preferenceIndex int
 	_, err = fmt.Scan(&preferenceIndex)
+
 	if err != nil {
 		fmt.Printf("Invalid number of preference: %v\n", err)
 

@@ -60,7 +60,7 @@ func main() {
 		})
 
 		if err := group.Wait(); err != nil {
-			fmt.Println(err)
+			fmt.Printf("temperature calculated: %v\n", err)
 
 			return
 		}

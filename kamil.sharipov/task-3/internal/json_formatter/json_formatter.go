@@ -2,13 +2,15 @@ package json
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
+	"strconv"
 
 	xml "github.com/kamilSharipov/task-3/internal/xml_parser"
 )
 
 type ValuteJSON struct {
-	NumCode  string `json:"num_code"`
+	NumCode  int    `json:"num_code"`
 	CharCode string `json:"char_code"`
 	Value    string `json:"value"`
 }
@@ -17,8 +19,14 @@ func FormateJSON(valCurs *xml.ValCurs) ([]byte, error) {
 
 	valutes := make([]ValuteJSON, len(valCurs.Valutes))
 	for i, valute := range valCurs.Valutes {
+		numCode, err := strconv.Atoi(valute.NumCode)
+		if err != nil {
+			fmt.Println("invalid NumCode")
+			return nil, err
+		}
+
 		valutes[i].CharCode = valute.CharCode
-		valutes[i].NumCode = valute.NumCode
+		valutes[i].NumCode = numCode
 		valutes[i].Value = valute.Value
 	}
 

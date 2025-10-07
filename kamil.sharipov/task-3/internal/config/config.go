@@ -10,10 +10,8 @@ import (
 )
 
 var (
-	errNoInputFile          error = errors.New("no input file")
-	errNoOutputFile         error = errors.New("no output file")
-	errInputFileDoesntExist error = errors.New("input file does not exist")
-	errFailedToCreateDir    error = errors.New("failed to create output directory")
+	errNoInputFile  error = errors.New("no input file")
+	errNoOutputFile error = errors.New("no output file")
 )
 
 type Config struct {
@@ -42,11 +40,11 @@ func LoadConfig(path string) (*Config, error) {
 	}
 
 	if _, err := os.Stat(config.InputFile); err != nil {
-		return nil, errInputFileDoesntExist
+		return nil, fmt.Errorf("input file does not exist: %w", err)
 	}
 
 	if err := os.MkdirAll(filepath.Dir(config.OutputFile), 0755); err != nil {
-		return nil, errFailedToCreateDir
+		return nil, fmt.Errorf("failed to create output directory: %w", err)
 	}
 
 	return &config, nil

@@ -46,7 +46,7 @@ func FormateJSON(valCurs *xml.ValCurs) ([]byte, error) {
 
 	bytes, err := json.Marshal(valutes)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to marshal: %w", err)
 	}
 	return bytes, nil
 }

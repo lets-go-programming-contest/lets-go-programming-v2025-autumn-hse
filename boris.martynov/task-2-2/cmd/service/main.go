@@ -48,5 +48,13 @@ func main() {
 		heap.Pop(&containerOfDishes)
 	}
 
-	fmt.Println(heap.Pop(&containerOfDishes))
+	last := heap.Pop(&containerOfDishes)
+
+	if last == nil {
+		fmt.Println("no dishes left")
+
+		return
+	}
+
+	fmt.Println(last)
 }

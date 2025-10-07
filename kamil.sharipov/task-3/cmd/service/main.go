@@ -21,35 +21,42 @@ func main() {
 
 	if *configPath == "" {
 		fmt.Println(errNoConfigPath)
+
+		return
 	}
 
 	config, err := config.LoadConfig(*configPath)
 	if err != nil {
 		fmt.Println(err)
+
 		return
 	}
 
 	xmlData, err := os.ReadFile(config.InputFile)
 	if err != nil {
 		fmt.Println("Error reading file:", err)
+
 		return
 	}
 
 	valCurs, err := xml.ParseXML(xmlData)
 	if err != nil {
 		fmt.Println(err)
+
 		return
 	}
 
 	bytes, err := json.FormateJSON(valCurs)
 	if err != nil {
 		fmt.Println(err)
+
 		return
 	}
 
-	outputFile, err := os.Create("output.json")
+	outputFile, err := os.Create(config.OutputFile)
 	if err != nil {
 		fmt.Println("Error creating output file:", err)
+
 		return
 	}
 	defer outputFile.Close()
@@ -57,7 +64,7 @@ func main() {
 	_, err = outputFile.Write(bytes)
 	if err != nil {
 		fmt.Println("Error writing to output file:", err)
+
 		return
 	}
-
 }

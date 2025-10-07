@@ -8,9 +8,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var errInvalidFileStruct = errors.New("invalid file struct")
-
-const errMsg = "while load config %q: %w"
+var errInvalidArgs error = errors.New("invalid arguments")
 
 type Config struct {
 	Input  string `yaml:"input-file"`
@@ -22,15 +20,15 @@ func Load(filePath string) (Config, error) {
 
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return cfg, fmt.Errorf(errMsg, filePath, err)
+		return cfg, fmt.Errorf("read file %q: %w", filePath, err)
 	}
 
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return cfg, fmt.Errorf(errMsg, filePath, err)
+		return cfg, fmt.Errorf("unmarshal from %q: %w", filePath, err)
 	}
 
 	if cfg.Input == "" || cfg.Output == "" {
-		return cfg, fmt.Errorf(errMsg, filePath, errInvalidFileStruct)
+		return cfg, fmt.Errorf("unmarshal from %q: %w", filePath, errInvalidArgs)
 	}
 
 	return cfg, nil

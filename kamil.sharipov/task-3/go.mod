@@ -7,4 +7,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require golang.org/x/text v0.29.0 // indirect
+require golang.org/x/text v0.14.0 // indirect

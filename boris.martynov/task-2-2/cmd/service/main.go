@@ -8,9 +8,10 @@ import (
 )
 
 func main() {
-	containerOfDishes := &dishorder.PrefOrder{}
-
-	var numberOfDishes int
+	var (
+		containerOfDishes dishorder.PrefOrder
+		numberOfDishes    int
+	)
 
 	if _, err := fmt.Scan(&numberOfDishes); err != nil {
 		fmt.Println("when scanning dish count: ", err)
@@ -27,7 +28,7 @@ func main() {
 			return
 		}
 
-		containerOfDishes.Push(dishPrefNumber)
+		heap.Push(&containerOfDishes, dishPrefNumber)
 	}
 
 	var preferedDishNumb int
@@ -44,8 +45,8 @@ func main() {
 	}
 
 	for range containerOfDishes.Len() - preferedDishNumb {
-		heap.Pop(containerOfDishes)
+		heap.Pop(&containerOfDishes)
 	}
 
-	fmt.Println(heap.Pop(containerOfDishes))
+	fmt.Println(heap.Pop(&containerOfDishes))
 }

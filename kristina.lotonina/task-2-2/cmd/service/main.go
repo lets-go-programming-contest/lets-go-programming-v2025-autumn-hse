@@ -9,8 +9,7 @@ import (
 
 func main() {
 	var number int
-	_, err := fmt.Scan(&number)
-	if err != nil {
+	if _, err := fmt.Scan(&number); err != nil {
 		fmt.Println("unable to read number :", err)
 
 		return
@@ -21,7 +20,7 @@ func main() {
 
 	for range number {
 		var preferences int
-		if _, err = fmt.Scan(&preferences); err != nil {
+		if _, err := fmt.Scan(&preferences); err != nil {
 			fmt.Println("unable to read preference :", err)
 
 			return
@@ -32,7 +31,7 @@ func main() {
 
 	var neededPreference int
 
-	_, err = fmt.Scan(&neededPreference)
+	_, err := fmt.Scan(&neededPreference)
 	if err != nil {
 		fmt.Println("unable to read needed preference :", err)
 

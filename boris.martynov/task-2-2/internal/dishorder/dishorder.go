@@ -7,7 +7,7 @@ func (h *PrefOrder) Len() int {
 }
 
 func (h *PrefOrder) Less(i, j int) bool {
-	return (*h)[i] > (*h)[j]
+	return (*h)[i] < (*h)[j]
 }
 
 func (h *PrefOrder) Swap(i, j int) {

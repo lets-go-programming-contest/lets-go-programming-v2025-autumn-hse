@@ -38,6 +38,7 @@ func main() {
 
 	if containerOfDishes.Len() < preferedDishNumb {
 		fmt.Println("too big dish number")
+
 		return
 	}
 

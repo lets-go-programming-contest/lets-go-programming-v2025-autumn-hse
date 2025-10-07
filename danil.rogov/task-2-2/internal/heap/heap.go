@@ -17,7 +17,7 @@ func (h *Heap) Swap(i, j int) {
 func (h *Heap) Push(x any) {
 	castedElem, ok := x.(int)
 	if !ok {
-		panic("Heap.Push: element is not int")
+		panic("element is not int")
 	}
 
 	*h = append(*h, castedElem)
@@ -25,7 +25,7 @@ func (h *Heap) Push(x any) {
 
 func (h *Heap) Pop() any {
 	if h.Len() == 0 || h == nil {
-		panic("Heap.Pop: heap is empty or nil")
+		return nil
 	}
 
 	oldHeap := *h

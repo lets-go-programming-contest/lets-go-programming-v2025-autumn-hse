@@ -1,7 +1,5 @@
 package intheap
 
-import "fmt"
-
 type Rating []int
 
 func (rating *Rating) Len() int {
@@ -19,9 +17,7 @@ func (rating *Rating) Swap(i, j int) {
 func (rating *Rating) Push(x interface{}) {
 	value, ok := x.(int)
 	if !ok {
-		fmt.Printf("type conversion error: the rating must be an integer")
-
-		return
+		panic("type conversion error")
 	}
 
 	*rating = append(*rating, value)

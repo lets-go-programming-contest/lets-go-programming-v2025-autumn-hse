@@ -1,5 +1,7 @@
 package dishes
 
+import "fmt"
+
 type Heap []int
 
 func (dishes *Heap) Len() int {
@@ -17,11 +19,16 @@ func (dishes *Heap) Swap(i int, j int) {
 func (dishes *Heap) Push(x interface{}) {
 	if value, ok := x.(int); ok {
 		*dishes = append(*dishes, value)
+	} else {
+		panic(fmt.Sprintf("expected int :", x))
 	}
 }
 
 func (dishes *Heap) Pop() interface{} {
 	old := *dishes
+	if (len(old) == 0) {
+		return nil
+	}
 	x := old[(len(old))-1]
 	*dishes = old[0 : (len(old))-1]
 

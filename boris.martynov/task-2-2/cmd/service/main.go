@@ -36,7 +36,12 @@ func main() {
 		return
 	}
 
-	for range preferedDishNumb - 1 {
+	if containerOfDishes.Len() < preferedDishNumb {
+		fmt.Println("too big dish number")
+		return
+	}
+
+	for range containerOfDishes.Len() - preferedDishNumb {
 		containerOfDishes.Pop()
 	}
 

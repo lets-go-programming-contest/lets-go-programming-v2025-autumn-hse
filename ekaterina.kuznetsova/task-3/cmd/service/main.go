@@ -27,8 +27,7 @@ type Valute struct {
 }
 
 type ValuteCurs struct {
-	XMLName xml.Name `xml:"ValCurs"`
-	Valutes []Valute `xml:"Valute"`
+	Valutes []Valute `xml:"Valutes"`
 }
 
 type ValuteJSON struct {
@@ -100,30 +99,17 @@ func main() {
 		return
 	}
 
-	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0o766)
+	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0766)
 	if err != nil {
 		fmt.Printf("Error creating directory: %v", err)
 
 		return
 	}
 
-	// file, err := os.Create(config.OutputFile)
-	// if err != nil {
-	// 	fmt.Printf("Error creating file: %v\n", err)
-
-	// 	return
-	// }
-	// defer file.Close()
-
-	// _, err = file.Write(outputJSON)
-	// if err != nil {
-	// 	fmt.Printf("Error writing to file: %v\n", err)
-
-	// 	return
-	// }
-
-	err = os.WriteFile(config.OutputFile, outputJSON, 0o755)
+	err = os.WriteFile(config.OutputFile, outputJSON, 0644)
 	if err != nil {
-		panic(fmt.Sprintf("Error writing output file: %v", err))
+		fmt.Printf("Error writing output file: %v", err)
+
+		return
 	}
 }

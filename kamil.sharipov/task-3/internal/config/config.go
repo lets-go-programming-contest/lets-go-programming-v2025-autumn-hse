@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 )
@@ -37,14 +36,6 @@ func LoadConfig(path string) (*Config, error) {
 	}
 	if config.OutputFile == "" {
 		return nil, errNoOutputFile
-	}
-
-	if _, err := os.Stat(config.InputFile); err != nil {
-		return nil, fmt.Errorf("input file %q does not exist: %w", config.InputFile, err)
-	}
-
-	if err := os.MkdirAll(filepath.Dir(config.OutputFile), 0755); err != nil {
-		return nil, fmt.Errorf("failed to create output directory: %w", err)
 	}
 
 	return &config, nil

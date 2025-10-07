@@ -34,14 +34,14 @@ func main() {
 	heap.Init(heapOfDishes)
 
 	for _, dish := range dishes {
-		heapOfDishes.Push(dish)
+		heap.Push(heapOfDishes, dish)
 	}
 
 	var result int
 
 	for range preferredDishNumber {
-		result = heapOfDishes.Pop().(int)
+		result = heap.Pop(heapOfDishes).(int)
 	}
 
-	fmt.Println(&result)
+	fmt.Println(result)
 }

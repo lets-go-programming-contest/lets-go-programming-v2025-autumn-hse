@@ -12,9 +12,7 @@ const (
 	MaxTemp = 30
 )
 
-var (
-	ErrInvalidTempSign = errors.New("invalid temp range sign")
-)
+var ErrInvalidTempSign = errors.New("invalid temp range sign")
 
 func NewTemperature(low, high int) *temperature {
 	return &temperature{

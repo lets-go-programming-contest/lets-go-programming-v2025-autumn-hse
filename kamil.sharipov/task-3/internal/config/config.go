@@ -40,7 +40,7 @@ func LoadConfig(path string) (*Config, error) {
 	}
 
 	if _, err := os.Stat(config.InputFile); err != nil {
-		return nil, fmt.Errorf("input file does not exist: %w", err)
+		return nil, fmt.Errorf("input file %q does not exist: %w", config.InputFile, err)
 	}
 
 	if err := os.MkdirAll(filepath.Dir(config.OutputFile), 0755); err != nil {

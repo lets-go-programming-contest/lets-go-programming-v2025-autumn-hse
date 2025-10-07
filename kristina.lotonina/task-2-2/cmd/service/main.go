@@ -10,7 +10,7 @@ import (
 func main() {
 	var number int
 	_, err := fmt.Scan(&number)
-	
+
 	if err != nil {
 		fmt.Println("unable to read number :", err)
 
@@ -41,9 +41,14 @@ func main() {
 	}
 
 	var result int
-	for i := 0; i < neededPreference; i++ {
-		result = heap.Pop(dishesContainer).(int)
+	for range neededPreference {
+		value := heap.Pop(dishesContainer)
+		if intValue, ok := value.(int); ok {
+    		result = intValue
+		} else {
+    		panic(fmt.Sprintf("expected int :", value))
+		}
 	}
-
+	
 	fmt.Println(result)
 }

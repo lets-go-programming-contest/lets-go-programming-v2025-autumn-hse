@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -9,8 +10,6 @@ import (
 )
 
 var (
-	errFailedToOpenFile     error = errors.New("failed to open file")
-	errFailedToDecodeConfig error = errors.New("failed to decode config")
 	errNoInputFile          error = errors.New("no input file")
 	errNoOutputFile         error = errors.New("no output file")
 	errInputFileDoesntExist error = errors.New("input file does not exist")
@@ -25,14 +24,14 @@ type Config struct {
 func LoadConfig(path string) (*Config, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, errFailedToOpenFile
+		return nil, fmt.Errorf("failed to open config file %q: %w", path, err)
 	}
 	defer file.Close()
 
 	var config Config
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(&config); err != nil {
-		return nil, errFailedToDecodeConfig
+		return nil, fmt.Errorf("failed to decode config: %w", err)
 	}
 
 	if config.InputFile == "" {

@@ -41,13 +41,13 @@ func main() {
 	}
 
 	var result int
+	
 	for range neededPreference {
 		value := heap.Pop(dishesContainer)
-		
 		if intValue, ok := value.(int); ok {
     		result = intValue
 		} else {
-    		panic(fmt.Sprintf("expected int :", value))
+    		panic(fmt.Sprintf("expected int, %v :", value))
 		}
 	}
 	

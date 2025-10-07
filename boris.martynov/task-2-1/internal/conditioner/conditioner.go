@@ -4,24 +4,24 @@ import (
 	"fmt"
 )
 
-const (
-	MinTemp = 15
-	MaxTemp = 30
-)
-
 type temperature struct {
 	lowest  int
 	highest int
 }
 
-func newTemperature(low, high int) *temperature {
+const (
+	MinTemp = 15
+	MaxTemp = 30
+)
+
+func NewTemperature(low, high int) *temperature {
 	return &temperature{
 		lowest:  low,
 		highest: high,
 	}
 }
 
-func (tr *temperature) update(greaterOrLess string, temp int) {
+func (tr *temperature) TempWantedByEmployee(greaterOrLess string, temp int) (int, error) {
 	switch greaterOrLess {
 	case ">=":
 		if temp > tr.lowest {
@@ -31,41 +31,12 @@ func (tr *temperature) update(greaterOrLess string, temp int) {
 		if temp < tr.highest {
 			tr.highest = temp
 		}
+	default:
+		return 0, fmt.Errorf("invalid temp range sign")
 	}
-}
-
-func (tr *temperature) getResult() int {
 	if tr.lowest <= tr.highest {
-		return tr.lowest
+		return tr.lowest, nil
 	}
 
-	return -1
-}
-
-func TemperatureWantedDepartment() {
-	var departmentCapacity int
-
-	if _, err := fmt.Scanln(&departmentCapacity); err != nil {
-		fmt.Println("when scanning capacity of department: ", err)
-
-		return
-	}
-
-	temperatureRange := newTemperature(MinTemp, MaxTemp)
-
-	for range departmentCapacity {
-		var (
-			temperatureWantedByEmployee int
-			greaterOrLess               string
-		)
-
-		if _, err := fmt.Scanln(&greaterOrLess, &temperatureWantedByEmployee); err != nil {
-			fmt.Println("when scanning temperature wanted by employee: ", err)
-
-			return
-		}
-
-		temperatureRange.update(greaterOrLess, temperatureWantedByEmployee)
-		fmt.Println(temperatureRange.getResult())
-	}
+	return -1, nil
 }

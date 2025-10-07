@@ -8,17 +8,15 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-const errMsg = "while read XML %q: %w"
-
-func Read(path string, val any) (err error) {
+func Read(path string, val any) error {
 	file, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf(errMsg, path, err)
+		return fmt.Errorf("open %q: %w", path, err)
 	}
 
 	defer func() {
-		if ferr := file.Close(); ferr != nil && err == nil {
-			err = fmt.Errorf(errMsg, path, ferr)
+		if ferr := file.Close(); ferr != nil {
+			panic(fmt.Errorf("close file %q: %w", path, err))
 		}
 	}()
 
@@ -26,7 +24,7 @@ func Read(path string, val any) (err error) {
 	dec.CharsetReader = charset.NewReaderLabel
 
 	if err := dec.Decode(val); err != nil {
-		return fmt.Errorf(errMsg, path, err)
+		return fmt.Errorf("decode to %q: %w", path, err)
 	}
 
 	return nil

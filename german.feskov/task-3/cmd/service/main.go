@@ -25,16 +25,11 @@ func main() {
 		panic(err)
 	}
 
-	outValutes, err := valute.ConverteXMLtoJSON(valCurs.Valutes)
-	if err != nil {
-		panic(err)
-	}
-
-	slices.SortFunc(outValutes, func(a, b valute.ValuteJSON) int {
+	slices.SortFunc(valCurs.Valutes, func(a, b valute.Valute) int {
 		return -cmp.Compare(a.Value, b.Value)
 	})
 
-	if err := jsonout.Write(cfg.Output, outValutes); err != nil {
+	if err := jsonout.Write(cfg.Output, valCurs.Valutes); err != nil {
 		panic(err)
 	}
 }

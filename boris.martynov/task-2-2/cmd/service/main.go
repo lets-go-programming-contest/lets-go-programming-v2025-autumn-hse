@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/heap"
 	"fmt"
 
 	"github.com/JingolBong/task-2-2/internal/dishorder"
@@ -43,8 +44,8 @@ func main() {
 	}
 
 	for range containerOfDishes.Len() - preferedDishNumb {
-		containerOfDishes.Pop()
+		heap.Pop(containerOfDishes)
 	}
 
-	fmt.Println(containerOfDishes.Pop())
+	fmt.Println(heap.Pop(containerOfDishes))
 }

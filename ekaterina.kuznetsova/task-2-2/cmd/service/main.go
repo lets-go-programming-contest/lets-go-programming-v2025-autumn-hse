@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("Recovered from panic in main: %v\n", r)
@@ -16,6 +15,7 @@ func main() {
 	}()
 
 	var numberDishes int
+
 	_, err := fmt.Scanln(&numberDishes)
 	if err != nil {
 		fmt.Println("Error scan number of dishes:", err)

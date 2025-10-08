@@ -8,10 +8,6 @@ import (
 )
 
 func main() {
-	var (
-		numberDishes, sequenceNumber int
-		heapRatings                  myheap.IntHeap
-	)
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -19,12 +15,15 @@ func main() {
 		}
 	}()
 
+	var numberDishes int
 	_, err := fmt.Scanln(&numberDishes)
 	if err != nil {
 		fmt.Println("Error scan number of dishes:", err)
 
 		return
 	}
+
+	var heapRatings myheap.IntHeap
 
 	for range numberDishes {
 		var rating int
@@ -39,9 +38,17 @@ func main() {
 		heap.Push(&heapRatings, rating)
 	}
 
+	var sequenceNumber int
+
 	_, err = fmt.Scanln(&sequenceNumber)
 	if err != nil {
 		fmt.Println("Error scan sequence number:", err)
+
+		return
+	}
+
+	if sequenceNumber > heapRatings.Len() {
+		fmt.Println("Too few Dishes")
 
 		return
 	}

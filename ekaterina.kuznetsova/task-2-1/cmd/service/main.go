@@ -14,55 +14,61 @@ var (
 	ErrTemperatureTooBig   = errors.New("temperature is too big")
 	ErrTemperatureTooSmall = errors.New("temperature is too small")
 	ErrTemperatureFail     = errors.New("temperature is fail")
-	ErrInvalidComparison   = errors.New("еrror compaison sign")
 )
 
 type TemperatureValidator struct {
 	minTemperature int
 	maxTemperature int
+	errTemperature error
 }
 
-func (v *TemperatureValidator) lessOrEqual(temperature int) error {
+func (v *TemperatureValidator) lessOrEqual(temperature int) {
 	if temperature < v.minTemperature || temperature < minTemperatureConst {
-		return ErrTemperatureTooSmall
+		v.errTemperature = ErrTemperatureTooSmall
+	}
+
+	if v.errTemperature != nil {
+		v.minTemperature = -1
+
+		return
 	}
 
 	if temperature < v.maxTemperature {
 		v.maxTemperature = temperature
 	}
-
-	return nil
 }
 
-func (v *TemperatureValidator) moreOrEqual(temperature int) error {
+func (v *TemperatureValidator) moreOrEqual(temperature int) {
 	if v.maxTemperature < temperature || temperature > maxTemperatureConst {
-		return ErrTemperatureTooBig
+		v.errTemperature = ErrTemperatureTooBig
+	}
+
+	if v.errTemperature != nil {
+		v.minTemperature = -1
+
+		return
 	}
 
 	if v.minTemperature < temperature {
 		v.minTemperature = temperature
 	}
-
-	return nil
 }
 
-func (v *TemperatureValidator) compareValues(temperature int, comparisonSign string) error {
+func (v *TemperatureValidator) compareValues(temperature int, comparisonSign string) {
 	switch comparisonSign {
 	case "<=":
-		return v.lessOrEqual(temperature)
+		v.lessOrEqual(temperature)
 	case ">=":
-		return v.moreOrEqual(temperature)
+		v.moreOrEqual(temperature)
 	default:
-		return ErrInvalidComparison
+		fmt.Println("Error compaison sign")
+
+		return
 	}
 }
 
 func main() {
-	var (
-		numberDepartaments, numberEmployees, temperature int
-		comparisonSign                                   string
-		errTemperature                                   error
-	)
+	var numberDepartaments int
 
 	_, err := fmt.Scanln(&numberDepartaments)
 	if err != nil {
@@ -70,6 +76,11 @@ func main() {
 
 		return
 	}
+
+	var (
+		numberEmployees, temperature int
+		comparisonSign               string
+	)
 
 	for range numberDepartaments {
 		_, err := fmt.Scanln(&numberEmployees)
@@ -82,8 +93,8 @@ func main() {
 		validator := TemperatureValidator{
 			minTemperature: minTemperatureConst,
 			maxTemperature: maxTemperatureConst,
+			errTemperature: nil,
 		}
-		errTemperature = nil
 
 		for range numberEmployees {
 			_, err = fmt.Scanf("%s %d\n", &comparisonSign, &temperature)
@@ -93,16 +104,8 @@ func main() {
 				return
 			}
 
-			if errTemperature != nil {
-				fmt.Println("-1")
-			} else {
-				errTemperature = validator.compareValues(temperature, comparisonSign)
-				if errTemperature != nil {
-					fmt.Println(-1)
-				} else {
-					fmt.Println(validator.minTemperature)
-				}
-			}
+			validator.compareValues(temperature, comparisonSign)
+			fmt.Println(validator.minTemperature)
 		}
 	}
 }

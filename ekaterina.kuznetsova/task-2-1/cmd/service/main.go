@@ -1,0 +1,111 @@
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+const (
+	minTemperatureConst = 15
+	maxTemperatureConst = 30
+)
+
+var (
+	ErrTemperatureTooBig   = errors.New("temperature is too big")
+	ErrTemperatureTooSmall = errors.New("temperature is too small")
+	ErrTemperatureFail     = errors.New("temperature is fail")
+)
+
+type TemperatureValidator struct {
+	minTemperature int
+	maxTemperature int
+	errTemperature error
+}
+
+func (v *TemperatureValidator) lessOrEqual(temperature int) {
+	if temperature < v.minTemperature || temperature < minTemperatureConst {
+		v.errTemperature = ErrTemperatureTooSmall
+	}
+
+	if v.errTemperature != nil {
+		v.minTemperature = -1
+
+		return
+	}
+
+	if temperature < v.maxTemperature {
+		v.maxTemperature = temperature
+	}
+}
+
+func (v *TemperatureValidator) moreOrEqual(temperature int) {
+	if v.maxTemperature < temperature || temperature > maxTemperatureConst {
+		v.errTemperature = ErrTemperatureTooBig
+	}
+
+	if v.errTemperature != nil {
+		v.minTemperature = -1
+
+		return
+	}
+
+	if v.minTemperature < temperature {
+		v.minTemperature = temperature
+	}
+}
+
+func (v *TemperatureValidator) compareValues(temperature int, comparisonSign string) {
+	switch comparisonSign {
+	case "<=":
+		v.lessOrEqual(temperature)
+	case ">=":
+		v.moreOrEqual(temperature)
+	default:
+		fmt.Println("Error compaison sign")
+
+		return
+	}
+}
+
+func main() {
+	var numberDepartaments int
+
+	_, err := fmt.Scanln(&numberDepartaments)
+	if err != nil {
+		fmt.Println("Error scan number of departaments:", err)
+
+		return
+	}
+
+	var (
+		numberEmployees, temperature int
+		comparisonSign               string
+	)
+
+	for range numberDepartaments {
+		_, err := fmt.Scanln(&numberEmployees)
+		if err != nil {
+			fmt.Println("Error scan number of employees:", err)
+
+			return
+		}
+
+		validator := TemperatureValidator{
+			minTemperature: minTemperatureConst,
+			maxTemperature: maxTemperatureConst,
+			errTemperature: nil,
+		}
+
+		for range numberEmployees {
+			_, err = fmt.Scanf("%s %d\n", &comparisonSign, &temperature)
+			if err != nil {
+				fmt.Println("Error scan comparison sign and temperature:", err)
+
+				return
+			}
+
+			validator.compareValues(temperature, comparisonSign)
+			fmt.Println(validator.minTemperature)
+		}
+	}
+}

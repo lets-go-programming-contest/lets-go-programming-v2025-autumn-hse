@@ -29,7 +29,7 @@ func parseValue(s string) (float64, error) {
 
 func FormateJSON(valCurs *xml.ValCurs) ([]byte, error) {
 	valutes := make([]ValuteJSON, len(valCurs.Valutes))
-	
+
 	for index, valute := range valCurs.Valutes {
 		numCode := 0
 

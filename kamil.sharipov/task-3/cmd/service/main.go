@@ -50,12 +50,8 @@ func main() {
 		panic(err)
 	}
 
-	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0755)
-
-	if err != nil {
-		fmt.Println("Error creating output directory:", err)
-
-		return
+	if err := os.MkdirAll(filepath.Dir(config.OutputFile), 0755); err != nil {
+		panic(err)
 	}
 
 	outputFile, err := os.Create(config.OutputFile)

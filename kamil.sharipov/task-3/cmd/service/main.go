@@ -50,7 +50,9 @@ func main() {
 		panic(err)
 	}
 
-	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0755)
+	mask := os.FileMode(0755)
+
+	err = os.MkdirAll(filepath.Dir(config.OutputFile), mask)
 	if err != nil {
 		panic(err)
 	}

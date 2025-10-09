@@ -16,7 +16,7 @@ type TemperatureRange struct {
 	max int
 }
 
-func (tr *TemperatureRange) Update(sign string, temperature int) {
+func (tr *TemperatureRange) Update(sign string, temperature int) error {
 	switch sign {
 	case ">=":
 		if tr.min < temperature {
@@ -27,8 +27,9 @@ func (tr *TemperatureRange) Update(sign string, temperature int) {
 			tr.max = temperature
 		}
 	default:
-		fmt.Printf("Incorrect temperature string input\n")
+		return fmt.Errorf("incorrect temperature sign: %s", sign)
 	}
+	return nil
 }
 
 func (tr *TemperatureRange) Optimum() int {
@@ -44,7 +45,6 @@ func NewTemperatureRange() TemperatureRange {
 }
 
 func main() {
-
 	var countDepartments int
 	returnVal, err := fmt.Scanln(&countDepartments)
 
@@ -87,7 +87,12 @@ func main() {
 				return
 			}
 
-			temperatureRange.Update(sign, temperature)
+			if err := temperatureRange.Update(sign, temperature); err != nil {
+				fmt.Println(err)
+
+				continue
+			}
+
 			fmt.Println(temperatureRange.Optimum())
 		}
 	}

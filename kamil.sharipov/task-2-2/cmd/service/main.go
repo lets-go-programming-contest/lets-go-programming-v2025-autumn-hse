@@ -53,7 +53,7 @@ func main() {
 	}
 
 	var ans int
-	for i := 0; i < rank; i++ {
+	for i := range rank {
 		result := heap.Pop(heapInstance)
 		if i == rank-1 {
 			if rating, ok := result.(int); ok {

@@ -24,29 +24,27 @@ func parseValue(s string) (float64, error) {
 func FormateJSON(valCurs *xml.ValCurs) ([]byte, error) {
 	valutes := make([]ValuteJSON, len(valCurs.Valutes))
 	for i, valute := range valCurs.Valutes {
-		if valute.NumCode == "" {
-			return nil, fmt.Errorf("empty NumCode found")
+		numCode := 0
+		if valute.NumCode != "" {
+			var err error
+			numCode, err = strconv.Atoi(valute.NumCode)
+			if err != nil {
+				return nil, fmt.Errorf("invalid numCode %q: %w", valute.NumCode, err)
+			}
 		}
 
-		if valute.CharCode == "" {
-			return nil, fmt.Errorf("empty CharCode found")
+		charCode := valute.CharCode
+
+		value := 0.0
+		if valute.Value != "" {
+			var err error
+			value, err = parseValue(valute.Value)
+			if err != nil {
+				return nil, fmt.Errorf("invalid Value %q: %w", valute.Value, err)
+			}
 		}
 
-		if valute.Value == "" {
-			return nil, fmt.Errorf("empty Value found")
-		}
-
-		numCode, err := strconv.Atoi(valute.NumCode)
-		if err != nil {
-			return nil, fmt.Errorf("invalid numCode %q: %w", valute.NumCode, err)
-		}
-
-		value, err := parseValue(valute.Value)
-		if err != nil {
-			return nil, fmt.Errorf("invalid Value %q: %w", valute.Value, err)
-		}
-
-		valutes[i].CharCode = valute.CharCode
+		valutes[i].CharCode = charCode
 		valutes[i].NumCode = numCode
 		valutes[i].Value = value
 	}

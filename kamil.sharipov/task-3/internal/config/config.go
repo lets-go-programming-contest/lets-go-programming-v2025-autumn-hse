@@ -23,9 +23,12 @@ func LoadConfig(path string) (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open config file %q: %w", path, err)
 	}
-	defer file.Close()
+	defer func() {
+		file.Close()
+	}()
 
 	var config Config
+
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(&config); err != nil {
 		return nil, fmt.Errorf("failed to decode config: %w", err)
@@ -34,6 +37,7 @@ func LoadConfig(path string) (*Config, error) {
 	if config.InputFile == "" {
 		return nil, errNoInputFile
 	}
+
 	if config.OutputFile == "" {
 		return nil, errNoOutputFile
 	}

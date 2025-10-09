@@ -19,13 +19,20 @@ type ValuteJSON struct {
 func parseValue(s string) (float64, error) {
 	s = strings.Replace(s, ",", ".", 1)
 
-	return strconv.ParseFloat(s, 64)
+	value, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse float %q: %w", s, err)
+	}
+
+	return value, nil
 }
 
 func FormateJSON(valCurs *xml.ValCurs) ([]byte, error) {
 	valutes := make([]ValuteJSON, len(valCurs.Valutes))
+	
 	for index, valute := range valCurs.Valutes {
 		numCode := 0
+
 		if valute.NumCode != "" {
 			var err error
 
@@ -61,5 +68,6 @@ func FormateJSON(valCurs *xml.ValCurs) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal: %w", err)
 	}
+
 	return bytes, nil
 }

@@ -23,8 +23,9 @@ func LoadConfig(path string) (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open config file %q: %w", path, err)
 	}
+
 	defer func() {
-		file.Close()
+		_ = file.Close()
 	}()
 
 	var config Config

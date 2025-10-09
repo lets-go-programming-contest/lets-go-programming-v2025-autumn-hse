@@ -60,8 +60,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	defer func() {
-		outputFile.Close()
+		_ = outputFile.Close()
 	}()
 
 	_, err = outputFile.Write(bytes)

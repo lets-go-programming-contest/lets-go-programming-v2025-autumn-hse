@@ -12,47 +12,41 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			os.Exit(1)
+		}
+	}()
+
 	configPath := flag.String("config", "", "config file path")
 	flag.Parse()
 
 	if *configPath == "" {
-		fmt.Println("no config path")
-
-		return
+		panic("no config path")
 	}
 
 	config, err := config.LoadConfig(*configPath)
 	if err != nil {
-		fmt.Println(err)
-
-		return
+		panic(err)
 	}
 
 	if _, err := os.Stat(config.InputFile); err != nil {
-		fmt.Println("input file does not exist:", err)
-
-		return
+		panic(err)
 	}
 
 	xmlData, err := os.ReadFile(config.InputFile)
 	if err != nil {
-		fmt.Println("Error reading input file:", err)
-
-		return
+		panic(err)
 	}
 
 	valCurs, err := xml.ParseXML(xmlData)
 	if err != nil {
-		fmt.Println(err)
-
-		return
+		panic(err)
 	}
 
 	bytes, err := json.FormateJSON(valCurs)
 	if err != nil {
-		fmt.Println(err)
-
-		return
+		panic(err)
 	}
 
 	if err := os.MkdirAll(filepath.Dir(config.OutputFile), 0755); err != nil {
@@ -63,16 +57,12 @@ func main() {
 
 	outputFile, err := os.Create(config.OutputFile)
 	if err != nil {
-		fmt.Println("Error creating output file:", err)
-
-		return
+		panic(err)
 	}
 	defer outputFile.Close()
 
 	_, err = outputFile.Write(bytes)
 	if err != nil {
-		fmt.Println("Error writing to output file:", err)
-
-		return
+		panic(err)
 	}
 }

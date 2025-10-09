@@ -3,6 +3,7 @@ package xml
 import (
 	"bytes"
 	"encoding/xml"
+	"errors"
 	"fmt"
 
 	"golang.org/x/net/html/charset"
@@ -26,6 +27,8 @@ type Valute struct {
 	VunitRate string   `xml:"VunitRate"`
 }
 
+var errNoValutes = errors.New("XML contains no valutes")
+
 func ParseXML(xmlData []byte) (*ValCurs, error) {
 	xmlDecoder := xml.NewDecoder(bytes.NewReader(xmlData))
 	xmlDecoder.CharsetReader = charset.NewReaderLabel
@@ -36,7 +39,7 @@ func ParseXML(xmlData []byte) (*ValCurs, error) {
 	}
 
 	if len(valCurs.Valutes) == 0 {
-		return nil, fmt.Errorf("XML contains no valutes")
+		return nil, errNoValutes
 	}
 
 	return &valCurs, nil

@@ -24,6 +24,18 @@ func parseValue(s string) (float64, error) {
 func FormateJSON(valCurs *xml.ValCurs) ([]byte, error) {
 	valutes := make([]ValuteJSON, len(valCurs.Valutes))
 	for i, valute := range valCurs.Valutes {
+		if valute.NumCode == "" {
+			return nil, fmt.Errorf("empty NumCode found")
+		}
+
+		if valute.CharCode == "" {
+			return nil, fmt.Errorf("empty CharCode found")
+		}
+
+		if valute.Value == "" {
+			return nil, fmt.Errorf("empty Value found")
+		}
+
 		numCode, err := strconv.Atoi(valute.NumCode)
 		if err != nil {
 			return nil, fmt.Errorf("invalid numCode %q: %w", valute.NumCode, err)

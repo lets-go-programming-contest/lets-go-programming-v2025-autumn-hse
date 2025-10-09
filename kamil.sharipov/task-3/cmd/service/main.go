@@ -51,7 +51,6 @@ func main() {
 	}
 
 	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0755)
-
 	if err != nil {
 		panic(err)
 	}

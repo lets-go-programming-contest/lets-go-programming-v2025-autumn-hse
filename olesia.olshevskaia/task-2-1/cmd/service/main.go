@@ -46,8 +46,8 @@ func NewTemperatureRange() TemperatureRange {
 func main() {
 
 	var countDepartments int
-
 	returnVal, err := fmt.Scanln(&countDepartments)
+
 	if err != nil {
 		fmt.Printf("Error reading department count: %d values read, error: %v\n", returnVal, err)
 
@@ -70,6 +70,7 @@ func main() {
 		}
 
 		temperatureRange := NewTemperatureRange()
+
 		var (
 			sign        string
 			temperature int

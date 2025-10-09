@@ -29,7 +29,7 @@ func main() {
 	}
 
 	if _, err := os.Stat(config.InputFile); err != nil {
-		fmt.Println("no such file or directory:", err)
+		fmt.Println("input file does not exist:", err)
 
 		return
 	}

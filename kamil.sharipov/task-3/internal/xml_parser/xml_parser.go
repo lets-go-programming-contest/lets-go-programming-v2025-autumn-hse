@@ -39,17 +39,5 @@ func ParseXML(xmlData []byte) (*ValCurs, error) {
 		return nil, fmt.Errorf("XML contains no valutes")
 	}
 
-	for _, valute := range valCurs.Valutes {
-		if valute.NumCode == "" {
-			return nil, fmt.Errorf("empty NumCode found")
-		}
-		if valute.CharCode == "" {
-			return nil, fmt.Errorf("empty CharCode found")
-		}
-		if valute.Value == "" {
-			return nil, fmt.Errorf("empty Value found")
-		}
-	}
-
 	return &valCurs, nil
 }

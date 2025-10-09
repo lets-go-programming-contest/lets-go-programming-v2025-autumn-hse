@@ -48,8 +48,8 @@ func FormateJSON(valCurs *xml.ValCurs) ([]byte, error) {
 
 		if valute.Value != "" {
 			var err error
-			value, err = parseValue(valute.Value)
 
+			value, err = parseValue(valute.Value)
 			if err != nil {
 				return nil, fmt.Errorf("invalid Value %q: %w", valute.Value, err)
 			}

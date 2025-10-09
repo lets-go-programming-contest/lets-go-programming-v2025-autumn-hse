@@ -11,20 +11,21 @@ func main() {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("Panic occurred: %v\n", r)
-
-			return
 		}
 	}()
 
-	var dishCount, dish, rank, ans int
+	var dishCount int
 
 	_, err := fmt.Scanln(&dishCount)
 	if err != nil {
+		fmt.Printf("Error scanning dishCount: %v\n", err)
+
 		return
 	}
 
 	heapInstance := intheap.InitIntHeap()
 
+	var dish int
 	for range dishCount {
 		_, err := fmt.Scan(&dish)
 		if err != nil {
@@ -36,6 +37,8 @@ func main() {
 		heap.Push(heapInstance, dish)
 	}
 
+	var rank int
+
 	_, err = fmt.Scanln(&rank)
 	if err != nil {
 		fmt.Printf("Error scanning rank: %v\n", err)
@@ -43,17 +46,25 @@ func main() {
 		return
 	}
 
-	for range rank {
+	if heapInstance.Len() < rank {
+		fmt.Println("Not enough elements in heap")
+
+		return
+	}
+
+	var ans int
+	for i := 0; i < rank; i++ {
 		result := heap.Pop(heapInstance)
-		if rating, ok := result.(int); ok {
-			ans = rating
-		} else {
-			return
+		if i == rank-1 {
+			if rating, ok := result.(int); ok {
+				ans = rating
+			} else {
+				fmt.Println("Unexpected type in heap")
+
+				return
+			}
 		}
 	}
 
-	_, err = fmt.Println(ans)
-	if err != nil {
-		return
-	}
+	fmt.Println(ans)
 }

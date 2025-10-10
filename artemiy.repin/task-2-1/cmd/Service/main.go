@@ -19,7 +19,7 @@ func main() {
 			fmt.Println("couldn't read number of employees")
 		}
 
-		t := temp.UpdateTemperature()
+		temperature := temp.UpdateTemperature()
 
 		for range employees {
 			var (
@@ -31,8 +31,8 @@ func main() {
 				fmt.Println("couldn't read temp")
 			}
 
-			t.UpdateInterval(operator, val)
-			opt := t.GetOptimal()
+			temperature.UpdateInterval(operator, val)
+			opt := temperature.GetOptimal()
 			fmt.Println(opt)
 		}
 	}

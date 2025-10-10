@@ -6,24 +6,34 @@ import (
 	"github.com/Nevermind0911/task-2-1/internal/temp"
 )
 
-func main() {
-	var N int
-	fmt.Scan(&N)
+const (
+	minBound = 15
+	maxBound = 30
+)
 
-	for dept := 0; dept < N; dept++ {
-		var K int
-		fmt.Scan(&K)
-		L := 15
-		R := 30
-		for emp := 0; emp < K; emp++ {
+func main() {
+	var n int
+	if _, err := fmt.Scan(&n); err != nil {
+		fmt.Println("couldn't read number of departments")
+	}
+
+	for range n {
+		var k int
+		if _, err := fmt.Scan(&k); err != nil {
+			fmt.Println("couldn't read number of employees")
+		}
+		leftBound, rightBound := minBound, maxBound
+		for range k {
 			var (
 				val int
 				op  string
 			)
-			fmt.Scan(&op, &val)
+			if _, err := fmt.Scan(&op, &val); err != nil {
+				fmt.Println("couldn't read temp")
+			}
 
-			L, R = temp.UpdateInterval(L, R, op, val)
-			opt := temp.GetOptimal(L, R)
+			leftBound, rightBound = temp.UpdateInterval(leftBound, rightBound, op, val)
+			opt := temp.GetOptimal(leftBound, rightBound)
 			fmt.Println(opt)
 		}
 	}

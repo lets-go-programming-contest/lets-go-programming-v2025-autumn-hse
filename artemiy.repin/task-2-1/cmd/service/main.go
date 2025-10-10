@@ -10,13 +10,17 @@ func main() {
 	var departments int
 
 	if _, err := fmt.Scan(&departments); err != nil {
-		fmt.Println("couldn't read number of departments")
+		fmt.Println("couldn't read number of departments, ", err)
+
+		return
 	}
 
 	for range departments {
 		var employees int
 		if _, err := fmt.Scan(&employees); err != nil {
-			fmt.Println("couldn't read number of employees")
+			fmt.Println("couldn't read number of employees, ", err)
+
+			return
 		}
 
 		temperature := temp.UpdateTemperature()

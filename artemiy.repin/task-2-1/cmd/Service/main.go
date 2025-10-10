@@ -13,6 +13,7 @@ const (
 
 func main() {
 	var n int
+
 	if _, err := fmt.Scan(&n); err != nil {
 		fmt.Println("couldn't read number of departments")
 	}
@@ -22,17 +23,21 @@ func main() {
 		if _, err := fmt.Scan(&k); err != nil {
 			fmt.Println("couldn't read number of employees")
 		}
+
 		leftBound, rightBound := minBound, maxBound
+
 		for range k {
 			var (
 				val int
-				op  string
+				operator  string
 			)
-			if _, err := fmt.Scan(&op, &val); err != nil {
+
+			if _, err := fmt.Scan(&operator, &val); err != nil {
 				fmt.Println("couldn't read temp")
 			}
 
-			leftBound, rightBound = temp.UpdateInterval(leftBound, rightBound, op, val)
+			leftBound, rightBound = temp.UpdateInterval(leftBound, rightBound, operator, val)
+
 			opt := temp.GetOptimal(leftBound, rightBound)
 			fmt.Println(opt)
 		}

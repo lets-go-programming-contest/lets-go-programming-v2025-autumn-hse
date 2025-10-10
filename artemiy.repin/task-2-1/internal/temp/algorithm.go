@@ -5,21 +5,27 @@ const (
 	MaxBound = 30
 )
 
-func UpdateInterval(left int, right int, op string, val int) (int, int) {
-	if op == "<=" {
-		if val < right {
-			right = val
-		}
-	} else if op == ">=" {
-		if val > left {
-			left = val
-		}
+func UpdateInterval(left int, right int, operator string, value int) (int, int) {
+	switch operator {
+		case "<=":
+			if value < right {
+				right = value
+			}
+		case ">=":
+			if value > left {
+				left = value
+			}
+		default:
+
+			return MinBound, MaxBound
 	}
+
 	return left, right
 }
 
 func GetOptimal(left int, right int) int {
 	if left > right {
+
 		return -1
 	}
 
@@ -31,7 +37,9 @@ func GetOptimal(left int, right int) int {
 	}
 
 	if left > right {
+
 		return -1
 	}
+
 	return left
 }

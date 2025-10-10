@@ -1,28 +1,37 @@
 package temp
 
-func UpdateInterval(L int, R int, op string, val int) (int, int) {
+const (
+	MinBound = 15
+	MaxBound = 30
+)
+
+func UpdateInterval(left int, right int, op string, val int) (int, int) {
 	if op == "<=" {
-		if val < R {
-			R = val
+		if val < right {
+			right = val
 		}
 	} else if op == ">=" {
-		if val > L {
-			L = val
+		if val > left {
+			left = val
 		}
 	}
-	return L, R
+	return left, right
 }
 
-func GetOptimal(L int, R int) int {
-	if L > R {
+func GetOptimal(left int, right int) int {
+	if left > right {
 		return -1
 	}
 
-	if L < 15 {
-		L = 15
+	if left < MinBound {
+		left = MinBound
 	}
-	if R > 30 {
-		R = 30
+	if right > MaxBound {
+		right = MaxBound
 	}
-	return L
+
+	if left > right {
+		return -1
+	}
+	return left
 }

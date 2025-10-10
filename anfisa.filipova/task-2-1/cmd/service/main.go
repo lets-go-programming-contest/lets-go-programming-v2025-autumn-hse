@@ -1,34 +1,48 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 )
 
-type TemperatureBound struct {
+type TemperatureManager struct {
 	UpperBound int
 	LowerBound int
 }
 
-func (t *TemperatureBound) setUpperBound(newBound int) {
-	t.UpperBound = newBound
+var (
+	errSignFormat = errors.New("wrong math sign format ")
+	errNotExist   = errors.New("optimal temperature does not existed")
+)
+
+func (t *TemperatureManager) updateBounds(mathSign string, value int) error {
+	switch mathSign {
+	case "<=":
+		t.UpperBound = min(value, t.UpperBound)
+
+	case ">=":
+		t.LowerBound = max(value, t.LowerBound)
+
+	default:
+		return errSignFormat
+	}
+
+	return nil
 }
 
-func (t *TemperatureBound) setLowerBound(newBound int) {
-	t.LowerBound = newBound
+func (t *TemperatureManager) getOptimalTemperature() (int, error) {
+	if t.UpperBound < t.LowerBound {
+		return 0, errNotExist
+	}
+
+	return t.LowerBound, nil
 }
 
-func (t *TemperatureBound) getUpperBound() int {
-	return t.UpperBound
-}
-
-func (t *TemperatureBound) getLowerBound() int {
-	return t.LowerBound
-}
-
-func printOptimalTemperature(departmentCount int) {
+func main() {
 	var (
-		employeeCount int
-		mathSign      string
+		departmentCount int
+		employeeCount   int
+		mathSign        string
 	)
 
 	const (
@@ -36,11 +50,17 @@ func printOptimalTemperature(departmentCount int) {
 		defaultLowerBound int = 15
 	)
 
+	if _, err := fmt.Scan(&departmentCount); err != nil {
+		fmt.Println("Reading error: ", err)
+
+		return
+	}
+
 	for range departmentCount {
-		bound := TemperatureBound{defaultUpperBound, defaultLowerBound}
+		bound := TemperatureManager{defaultUpperBound, defaultLowerBound}
 
 		if _, err := fmt.Scan(&employeeCount); err != nil {
-			fmt.Println("Reading error", err)
+			fmt.Println("Reading error: ", err)
 
 			return
 		}
@@ -48,41 +68,22 @@ func printOptimalTemperature(departmentCount int) {
 		for range employeeCount {
 			var value int
 			if _, err := fmt.Scan(&mathSign, &value); err != nil {
-				fmt.Println("Reading error", err)
+				fmt.Println("Reading error: ", err)
 
 				return
 			}
-
-			switch mathSign {
-			case "<=":
-				bound.setUpperBound(min(value, bound.getUpperBound()))
-			case ">=":
-				bound.setLowerBound(max(value, bound.getLowerBound()))
-
-			default:
-				fmt.Println("Wrong format")
+			if err := bound.updateBounds(mathSign, value); err != nil {
+				fmt.Println("Error: ", err)
 
 				return
 			}
-
-			if bound.getUpperBound() < bound.getLowerBound() {
-				fmt.Println(-1)
-
-				continue
-			}
-
-			fmt.Println(bound.getLowerBound())
 		}
+		res, err := bound.getOptimalTemperature()
+		if err != nil {
+			fmt.Println("Error: ", err)
+
+			return
+		}
+		fmt.Println(res)
 	}
-}
-
-func main() {
-	var departmentCount int
-	if _, err := fmt.Scan(&departmentCount); err != nil {
-		fmt.Println("Reading error")
-
-		return
-	}
-
-	printOptimalTemperature(departmentCount)
 }

@@ -6,39 +6,33 @@ import (
 	"github.com/Nevermind0911/task-2-1/internal/temp"
 )
 
-const (
-	minBound = 15
-	maxBound = 30
-)
-
 func main() {
-	var n int
+	var departments int
 
-	if _, err := fmt.Scan(&n); err != nil {
+	if _, err := fmt.Scan(&departments); err != nil {
 		fmt.Println("couldn't read number of departments")
 	}
 
-	for range n {
-		var k int
-		if _, err := fmt.Scan(&k); err != nil {
+	for range departments {
+		var employees int
+		if _, err := fmt.Scan(&employees); err != nil {
 			fmt.Println("couldn't read number of employees")
 		}
 
-		leftBound, rightBound := minBound, maxBound
+		t := temp.UpdateTemperature()
 
-		for range k {
+		for range employees {
 			var (
-				val int
-				operator  string
+				val      int
+				operator string
 			)
 
 			if _, err := fmt.Scan(&operator, &val); err != nil {
 				fmt.Println("couldn't read temp")
 			}
 
-			leftBound, rightBound = temp.UpdateInterval(leftBound, rightBound, operator, val)
-
-			opt := temp.GetOptimal(leftBound, rightBound)
+			t.UpdateInterval(operator, val)
+			opt := t.GetOptimal()
 			fmt.Println(opt)
 		}
 	}

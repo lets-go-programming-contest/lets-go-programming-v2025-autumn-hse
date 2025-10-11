@@ -18,7 +18,6 @@ func main() {
 	heap.Init(myHeap)
 
 	var numberDishes int
-
 	if _, err := fmt.Scanln(&numberDishes); err != nil {
 		fmt.Println("error reading the number of dishes", err)
 
@@ -54,7 +53,6 @@ func main() {
 	}
 
 	value := heap.Pop(myHeap)
-
 	if value == nil {
 		fmt.Println("Heap is empty")
 
@@ -62,7 +60,6 @@ func main() {
 	}
 
 	count, typeCastingOk := value.(int)
-
 	if !typeCastingOk {
 		fmt.Println("invalid type from heap.Pop")
 

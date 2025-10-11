@@ -72,18 +72,22 @@ func main() {
 
 				return
 			}
+
 			if err := bound.updateBounds(mathSign, value); err != nil {
 				fmt.Println("Error: ", err)
 
 				return
 			}
-		}
-		res, err := bound.getOptimalTemperature()
-		if err != nil {
-			fmt.Println("Error: ", err)
 
-			return
+			res, err := bound.getOptimalTemperature()
+
+			if err != nil {
+				fmt.Println(-1)
+
+				continue
+			}
+
+			fmt.Println(res)
 		}
-		fmt.Println(res)
 	}
 }

@@ -80,7 +80,6 @@ func main() {
 			}
 
 			res, err := bound.getOptimalTemperature()
-
 			if err != nil {
 				fmt.Println(-1)
 

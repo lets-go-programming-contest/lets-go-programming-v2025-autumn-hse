@@ -7,6 +7,31 @@ import (
 	"github.com/olesia.olshevsraia/task-2-2/intheap"
 )
 
+func popDesiredDish(h *intheap.IntHeap, desired int) (int, error) {
+	if desired > h.Len() {
+		return 0, fmt.Errorf("desired dish is greater than the number of dishes in the heap")
+	}
+
+	for range desired - 1 {
+		val := heap.Pop(h)
+		if val == nil {
+			return 0, fmt.Errorf("Heap is empty")
+		}
+	}
+
+	val := heap.Pop(h)
+	if val == nil {
+		return 0, fmt.Errorf("heap is empty")
+	}
+
+	count, ok := val.(int)
+	if !ok {
+		return 0, fmt.Errorf("invalid type from heap.Pop")
+	}
+
+	return count, nil
+}
+
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -42,34 +67,11 @@ func main() {
 		return
 	}
 
-	if desiredDish > myHeap.Len() {
-		fmt.Println("Desired dish is greater than the number of dishes in the heap")
+	result, err := popDesiredDish(myHeap, desiredDish)
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
-	for range desiredDish - 1 {
-		val := heap.Pop(myHeap)
-
-		if val == nil {
-			fmt.Println("Heap is empty")
-
-			break
-		}
-	}
-
-	value := heap.Pop(myHeap)
-	if value == nil {
-		fmt.Println("Heap is empty")
-
-		return
-	}
-
-	count, typeCastingOk := value.(int)
-	if !typeCastingOk {
-		fmt.Println("invalid type from heap.Pop")
-
-		return
-	}
-
-	fmt.Println(count)
+	fmt.Println(result)
 }

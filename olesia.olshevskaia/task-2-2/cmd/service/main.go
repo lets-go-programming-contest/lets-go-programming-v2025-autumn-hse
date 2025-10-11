@@ -48,6 +48,13 @@ func main() {
 	}
 
 	x := heap.Pop(myHeap)
+
+	if x == nil {
+		fmt.Println("Heap is empty")
+
+		return
+	}
+
 	count, typeCastingOk := x.(int)
 
 	if !typeCastingOk {

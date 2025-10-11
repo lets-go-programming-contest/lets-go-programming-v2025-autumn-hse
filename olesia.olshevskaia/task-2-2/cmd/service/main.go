@@ -63,9 +63,6 @@ func main() {
 		return
 	}
 
-	if _, err := fmt.Println(count); err != nil {
-		fmt.Println("error while displaying the response", err)
+	fmt.Println(count)
 
-		return
-	}
 }

@@ -8,10 +8,10 @@ import (
 )
 
 func main() {
-	var numberDishes, desiredDish, count int
-
 	myHeap := &intheap.IntHeap{}
 	heap.Init(myHeap)
+
+	var numberDishes int
 
 	if _, err := fmt.Scanln(&numberDishes); err != nil {
 		fmt.Println("error reading the number of dishes", err)
@@ -30,6 +30,7 @@ func main() {
 		heap.Push(myHeap, dish)
 	}
 
+	var desiredDish int
 	if _, err := fmt.Scanln(&desiredDish); err != nil {
 		fmt.Println("error reading priority", err)
 

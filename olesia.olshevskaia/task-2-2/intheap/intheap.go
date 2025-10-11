@@ -1,9 +1,5 @@
 package intheap
 
-import (
-	"fmt"
-)
-
 type IntHeap []int
 
 func (h *IntHeap) Len() int {
@@ -32,8 +28,6 @@ func (h *IntHeap) Pop() any {
 	length := len(*h)
 
 	if length == 0 {
-		fmt.Println("intHeap is empty")
-
 		return nil
 	}
 

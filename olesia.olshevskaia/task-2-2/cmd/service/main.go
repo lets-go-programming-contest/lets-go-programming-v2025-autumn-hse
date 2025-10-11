@@ -38,7 +38,13 @@ func main() {
 	}
 
 	for range desiredDish - 1 {
-		heap.Pop(myHeap)
+		val := heap.Pop(myHeap)
+
+		if val == nil {
+			fmt.Println("Heap is empty")
+
+			break
+		}
 	}
 
 	x := heap.Pop(myHeap)

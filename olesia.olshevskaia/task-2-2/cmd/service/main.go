@@ -47,15 +47,15 @@ func main() {
 		}
 	}
 
-	x := heap.Pop(myHeap)
+	value := heap.Pop(myHeap)
 
-	if x == nil {
+	if value == nil {
 		fmt.Println("Heap is empty")
 
 		return
 	}
 
-	count, typeCastingOk := x.(int)
+	count, typeCastingOk := value.(int)
 
 	if !typeCastingOk {
 		fmt.Println("invalid type from heap.Pop")

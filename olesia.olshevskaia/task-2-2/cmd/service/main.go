@@ -2,31 +2,38 @@ package main
 
 import (
 	"container/heap"
+	"errors"
 	"fmt"
 
 	"github.com/olesia.olshevsraia/task-2-2/intheap"
 )
 
-func popDesiredDish(h *intheap.IntHeap, desired int) (int, error) {
-	if desired > h.Len() {
-		return 0, fmt.Errorf("desired dish is greater than the number of dishes in the heap")
+var (
+	ErrDesiredDishTooBig = errors.New("desired dish is greater than the number of dishes in the heap")
+	ErrHeapEmpty         = errors.New("heap is empty")
+	ErrInvalidType       = errors.New("invalid type from heap.Pop")
+)
+
+func popDesiredDish(heapInt *intheap.IntHeap, desired int) (int, error) {
+	if desired > (*heapInt).Len() {
+		return 0, ErrDesiredDishTooBig
 	}
 
-	for range desired - 1 {
-		val := heap.Pop(h)
+	for i := 0; i < desired-1; i++ {
+		val := heap.Pop(heapInt)
 		if val == nil {
-			return 0, fmt.Errorf("Heap is empty")
+			return 0, ErrHeapEmpty
 		}
 	}
 
-	val := heap.Pop(h)
+	val := heap.Pop(heapInt)
 	if val == nil {
-		return 0, fmt.Errorf("heap is empty")
+		return 0, ErrHeapEmpty
 	}
 
 	count, ok := val.(int)
 	if !ok {
-		return 0, fmt.Errorf("invalid type from heap.Pop")
+		return 0, ErrInvalidType
 	}
 
 	return count, nil
@@ -70,6 +77,7 @@ func main() {
 	result, err := popDesiredDish(myHeap, desiredDish)
 	if err != nil {
 		fmt.Println(err)
+
 		return
 	}
 

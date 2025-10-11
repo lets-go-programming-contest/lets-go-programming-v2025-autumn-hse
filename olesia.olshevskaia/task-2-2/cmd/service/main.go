@@ -42,6 +42,11 @@ func main() {
 		return
 	}
 
+	if desiredDish > myHeap.Len() {
+		fmt.Println("Desired dish is greater than the number of dishes in the heap")
+		return
+	}
+
 	for range desiredDish - 1 {
 		val := heap.Pop(myHeap)
 

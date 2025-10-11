@@ -17,7 +17,7 @@ func (h *IntHeap) Swap(i, j int) {
 func (h *IntHeap) Push(x any) {
 	newX, ok := x.(int)
 	if !ok {
-		panic("intHeap.Push: invalid type, expected int")
+		panic("invalid type, expected int")
 	}
 
 	*h = append(*h, newX)

@@ -18,7 +18,20 @@ func main() {
 	}
 
 	for range departmentCount {
+		var employeeCount int
+
+		_, err := fmt.Fscan(os.Stdin, &employeeCount)
+		if err != nil {
+			fmt.Println("Error reading employee count:", err)
+
+			return
+		}
+
 		processor := temperature.NewTemperatureProcessor()
-		processor.ProcessDepartment(os.Stdin)
+		err = processor.ProcessDepartment(employeeCount, os.Stdin)
+
+		if err != nil {
+			fmt.Println("Error during processing department:", err)
+		}
 	}
 }

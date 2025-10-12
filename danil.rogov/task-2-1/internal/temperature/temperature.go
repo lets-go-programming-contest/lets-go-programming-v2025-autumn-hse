@@ -3,8 +3,6 @@ package temperature
 import (
 	"fmt"
 	"io"
-
-	"github.com/Tapochek2894/task-2/subtask-1/internal/intmath"
 )
 
 const (
@@ -18,6 +16,11 @@ type TemperatureProcessor struct {
 	upperBound int
 }
 
+type preference struct {
+	sign        string
+	temperature int
+}
+
 func NewTemperatureProcessor() *TemperatureProcessor {
 	return &TemperatureProcessor{
 		lowerBound: minimumTemperature,
@@ -25,16 +28,31 @@ func NewTemperatureProcessor() *TemperatureProcessor {
 	}
 }
 
-func (tp *TemperatureProcessor) addPreference(sign string, temperature int) int {
-	if temperature < minimumTemperature || temperature > maximumTemperature {
+func readPreference(reader io.Reader) (preference, error) {
+	var pref preference
+
+	_, err := fmt.Fscan(reader, &pref.sign, &pref.temperature)
+	if err != nil {
+		return pref, err
+	}
+
+	return pref, nil
+}
+
+func printResult(result int) {
+	fmt.Println(result)
+}
+
+func (tp *TemperatureProcessor) addPreference(pref preference) int {
+	if pref.temperature < minimumTemperature || pref.temperature > maximumTemperature {
 		return errorTemperature
 	}
 
-	switch sign {
+	switch pref.sign {
 	case ">=":
-		tp.lowerBound = intmath.LargerInt(tp.lowerBound, temperature)
+		tp.lowerBound = max(tp.lowerBound, pref.temperature)
 	case "<=":
-		tp.upperBound = intmath.SmallerInt(tp.upperBound, temperature)
+		tp.upperBound = min(tp.upperBound, pref.temperature)
 	}
 
 	if tp.lowerBound > tp.upperBound {
@@ -44,30 +62,16 @@ func (tp *TemperatureProcessor) addPreference(sign string, temperature int) int 
 	return tp.lowerBound
 }
 
-func (tp *TemperatureProcessor) ProcessDepartment(reader io.Reader) {
-	var employeeCount int
-
-	_, err := fmt.Fscan(reader, &employeeCount)
-	if err != nil {
-		fmt.Println("Error reading employee count:", err)
-
-		return
-	}
-
+func (tp *TemperatureProcessor) ProcessDepartment(employeeCount int, reader io.Reader) error {
 	for range employeeCount {
-		var (
-			sign        string
-			temperature int
-		)
+		pref, err := readPreference(reader)
 
-		_, err := fmt.Fscan(reader, &sign, &temperature)
 		if err != nil {
-			fmt.Println("Error reading sign and temperature:", err)
-
-			return
+			return fmt.Errorf("error reading sign and temperature: %w", err)
 		}
 
-		result := tp.addPreference(sign, temperature)
-		fmt.Println(result)
+		printResult(tp.addPreference(pref))
 	}
+
+	return nil
 }

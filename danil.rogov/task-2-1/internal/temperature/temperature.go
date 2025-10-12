@@ -33,14 +33,14 @@ func readPreference(reader io.Reader) (preference, error) {
 
 	_, err := fmt.Fscan(reader, &pref.sign, &pref.temperature)
 	if err != nil {
-		return pref, err
+		return preference{}, fmt.Errorf("failed to read preference: %w", err)
 	}
 
 	return pref, nil
 }
 
-func printResult(result int) {
-	fmt.Println(result)
+func printResult(result int, writer io.Writer) {
+	fmt.Fprintln(writer, result)
 }
 
 func (tp *TemperatureProcessor) addPreference(pref preference) int {
@@ -62,15 +62,18 @@ func (tp *TemperatureProcessor) addPreference(pref preference) int {
 	return tp.lowerBound
 }
 
-func (tp *TemperatureProcessor) ProcessDepartment(employeeCount int, reader io.Reader) error {
+func (tp *TemperatureProcessor) ProcessDepartment(
+	employeeCount int,
+	reader io.Reader,
+	writer io.Writer,
+) error {
 	for range employeeCount {
 		pref, err := readPreference(reader)
-
 		if err != nil {
-			return fmt.Errorf("error reading sign and temperature: %w", err)
+			return err
 		}
 
-		printResult(tp.addPreference(pref))
+		printResult(tp.addPreference(pref), writer)
 	}
 
 	return nil

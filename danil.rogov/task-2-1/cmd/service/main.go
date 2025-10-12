@@ -28,8 +28,7 @@ func main() {
 		}
 
 		processor := temperature.NewTemperatureProcessor()
-		err = processor.ProcessDepartment(employeeCount, os.Stdin)
-
+		err = processor.ProcessDepartment(employeeCount, os.Stdin, os.Stdout)
 		if err != nil {
 			fmt.Println("Error during processing department:", err)
 		}

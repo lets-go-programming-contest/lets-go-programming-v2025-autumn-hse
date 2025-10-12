@@ -39,8 +39,13 @@ func readPreference(reader io.Reader) (preference, error) {
 	return pref, nil
 }
 
-func printResult(result int, writer io.Writer) {
-	fmt.Fprintln(writer, result)
+func printResult(result int, writer io.Writer) error {
+	_, err := fmt.Fprintln(writer, result)
+	if err != nil {
+		return fmt.Errorf("failed to write result: %w", err)
+	}
+
+	return nil
 }
 
 func (tp *TemperatureProcessor) addPreference(pref preference) int {
@@ -73,7 +78,10 @@ func (tp *TemperatureProcessor) ProcessDepartment(
 			return err
 		}
 
-		printResult(tp.addPreference(pref), writer)
+		err = printResult(tp.addPreference(pref), writer)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

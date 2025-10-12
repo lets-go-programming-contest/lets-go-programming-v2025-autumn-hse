@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Anfisa111/task-2-2/intheap"
+	"github.com/Anfisa111/task-2-2/internal/intheap"
 )
 
 var (
@@ -13,8 +13,16 @@ var (
 	errTypeAssertion = errors.New("error type assertion")
 )
 
-func getPreferredDish(dishCount int) (int, error) {
-	var priority, choiceIdx int
+func readInput() (intheap.IntHeap, int, error) {
+	var (
+		dishCount int
+		priority  int
+		choiceIdx int
+	)
+
+	if _, err := fmt.Scan(&dishCount); err != nil {
+		return nil, 0, errReading
+	}
 
 	heapint := &intheap.IntHeap{}
 
@@ -22,36 +30,41 @@ func getPreferredDish(dishCount int) (int, error) {
 
 	for range dishCount {
 		if _, err := fmt.Scan(&priority); err != nil {
-			return 0, errReading
+			return nil, 0, errReading
 		}
 
 		heap.Push(heapint, priority)
 	}
 
 	if _, err := fmt.Scan(&choiceIdx); err != nil {
-		return 0, errReading
+		return nil, 0, errReading
 	}
 
+	return *heapint, choiceIdx, nil
+}
+
+func getPreferredDish(heapint intheap.IntHeap, choiceIdx int) (int, error) {
 	for range choiceIdx - 1 {
-		heap.Pop(heapint)
+		heap.Pop(&heapint)
 	}
 
-	if val, ok := heap.Pop(heapint).(int); ok {
-		return val, nil
-	} else {
+	val, ok := heap.Pop(&heapint).(int)
+	if !ok {
 		return 0, errTypeAssertion
 	}
+
+	return val, nil
 }
 
 func main() {
-	var dishCount int
-	if _, err := fmt.Scan(&dishCount); err != nil {
-		fmt.Println("Error reading", err)
+	heapint, choiceIdx, err := readInput()
+	if err != nil {
+		fmt.Println("Error: ", err)
 
 		return
 	}
 
-	res, err := getPreferredDish(dishCount)
+	res, err := getPreferredDish(heapint, choiceIdx)
 	if err != nil {
 		fmt.Println("Error: ", err)
 

@@ -14,10 +14,7 @@ func main() {
 		}
 	}()
 
-	var (
-		dishCount, dishRank, preferredDish int
-		intHeap                            myheap.Heap
-	)
+	var dishCount, dishRank int
 
 	_, err := fmt.Scan(&dishCount)
 	if err != nil {
@@ -25,6 +22,8 @@ func main() {
 
 		return
 	}
+
+	var intHeap myheap.Heap
 
 	for range dishCount {
 		_, err := fmt.Scan(&dishRank)
@@ -37,6 +36,8 @@ func main() {
 		heap.Push(&intHeap, dishRank)
 	}
 
+	var preferredDish int
+
 	_, err = fmt.Scan(&preferredDish)
 	if err != nil {
 		fmt.Println("Error reading preferred dish:", err)
@@ -44,8 +45,8 @@ func main() {
 		return
 	}
 
-	if preferredDish > intHeap.Len() {
-		fmt.Println("Too big preffered dish")
+	if preferredDish > intHeap.Len() || preferredDish <= 0 {
+		fmt.Println("Invalid preferred dish")
 
 		return
 	}

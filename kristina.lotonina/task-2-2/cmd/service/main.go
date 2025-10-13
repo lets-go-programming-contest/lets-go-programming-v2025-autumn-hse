@@ -8,6 +8,12 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Recovered from panic:", r)
+		}
+	}()
+
 	var number int
 	if _, err := fmt.Scan(&number); err != nil {
 		fmt.Println("unable to read number:", err)

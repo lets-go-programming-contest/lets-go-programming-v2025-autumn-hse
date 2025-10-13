@@ -22,6 +22,7 @@ func (dishes *Heap) Push(x interface{}) {
 		panic(fmt.Sprintf("expected int, %v", x))
 	}
 	*dishes = append(*dishes, value)
+
 }
 
 func (dishes *Heap) Pop() interface{} {

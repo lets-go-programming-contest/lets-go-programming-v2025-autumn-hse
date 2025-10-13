@@ -35,7 +35,6 @@ func (values *Value) UpdateValues(operation string, temp int) error {
 			values.Higher = temp
 		}
 	default:
-
 		return fmt.Errorf("%w: %s", ErrUndefinedOperation, operation)
 	}
 

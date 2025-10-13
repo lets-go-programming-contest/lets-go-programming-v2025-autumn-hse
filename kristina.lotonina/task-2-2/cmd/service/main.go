@@ -45,7 +45,7 @@ func main() {
 		if intValue, ok := value.(int); ok {
 			result = intValue
 		} else {
-			fmt.Print("expected int, %v :", value)
+			fmt.Printf("expected int, %v :", value)
 		}
 	}
 

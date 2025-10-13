@@ -23,7 +23,6 @@ func (dishes *Heap) Push(x interface{}) {
 	}
 
 	*dishes = append(*dishes, value)
-
 }
 
 func (dishes *Heap) Pop() interface{} {

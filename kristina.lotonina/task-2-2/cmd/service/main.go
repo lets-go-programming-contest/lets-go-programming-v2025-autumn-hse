@@ -45,7 +45,7 @@ func main() {
 		if intValue, ok := value.(int); ok {
 			result = intValue
 		} else {
-			panic(fmt.Sprintf("expected int, %v :", value))
+			fmt.Print("expected int, %v :", value)
 		}
 	}
 

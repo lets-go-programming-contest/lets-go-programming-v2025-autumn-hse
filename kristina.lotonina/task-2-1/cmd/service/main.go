@@ -9,12 +9,14 @@ import (
 func FindTemp(values *temperature.Value, operation string, temp int) (int, error) {
 	err := values.UpdateValues(operation, temp)
 	if err != nil {
+
 		return 0, err
 	}
 
 	if values.Lower <= values.Higher {
 		return values.Lower, nil
 	}
+
 	return -1, nil
 }
 
@@ -37,7 +39,7 @@ func main() {
 
 		values := temperature.NewValues()
 
-		for j := 0; j < count; j++ {
+		for range count {
 			var (
 				operation string
 				temp      int
@@ -46,12 +48,15 @@ func main() {
 			_, err := fmt.Scanln(&operation, &temp)
 			if err != nil {
 				fmt.Println("unable to read:", err)
+
 				return
 			}
 
 			result, err := FindTemp(&values, operation, temp)
+
 			if err != nil {
 				fmt.Println("error:", err)
+
 				return
 			}
 			fmt.Println(result)

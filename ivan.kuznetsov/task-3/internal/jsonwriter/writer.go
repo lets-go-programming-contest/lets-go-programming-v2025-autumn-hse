@@ -2,6 +2,7 @@ package jsonwriter
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -17,7 +18,6 @@ type OutputValute struct {
 
 func WriteJSON(filename string, valutes []xmlparser.Valute) {
 	dir := filepath.Dir(filename)
-
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		panic("failed to create directory")
@@ -25,16 +25,16 @@ func WriteJSON(filename string, valutes []xmlparser.Valute) {
 
 	output := make([]OutputValute, 0, len(valutes))
 
-	for _, v := range valutes {
-		numCode, err := strconv.Atoi(v.NumCode)
+	for _, valute := range valutes {
+		numCode, err := strconv.Atoi(valute.NumCode)
 		if err != nil {
 			panic("failed to convert NumCode to int")
 		}
 
 		output = append(output, OutputValute{
 			NumCode:  numCode,
-			CharCode: v.CharCode,
-			Value:    float64(v.Value),
+			CharCode: valute.CharCode,
+			Value:    float64(valute.Value),
 		})
 	}
 
@@ -43,7 +43,13 @@ func WriteJSON(filename string, valutes []xmlparser.Valute) {
 		panic("failed to create output file")
 	}
 
-	defer file.Close()
+	defer func() {
+		err = file.Close()
+		if err != nil {
+			fmt.Println("error closing file", err)
+		}
+	}()
+
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 

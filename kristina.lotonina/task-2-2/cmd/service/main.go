@@ -52,7 +52,7 @@ func main() {
 		return
 	}
 
-	for i := 0; i < neededPreference; i++ {
+	for i := range neededPreference {
 		value := heap.Pop(dishesContainer)
 		if i == neededPreference-1 {
 			intValue, ok := value.(int)
@@ -61,6 +61,7 @@ func main() {
 
 				return
 			}
+
 			result = intValue
 		}
 	}

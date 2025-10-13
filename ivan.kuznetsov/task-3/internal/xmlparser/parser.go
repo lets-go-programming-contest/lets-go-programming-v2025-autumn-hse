@@ -2,6 +2,7 @@ package xmlparser
 
 import (
 	"encoding/xml"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -10,16 +11,16 @@ import (
 type CommaFloat float64
 
 func (cf *CommaFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var s string
-	if err := d.DecodeElement(&s, &start); err != nil {
-		return err
+	var str string
+	if err := d.DecodeElement(&str, &start); err != nil {
+		return fmt.Errorf("decode element failed: %w", err)
 	}
 
-	s = strings.Replace(s, ",", ".", 1)
+	str = strings.Replace(str, ",", ".", 1)
 
-	value, err := strconv.ParseFloat(s, 64)
+	value, err := strconv.ParseFloat(str, 64)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse float failed: %w", err)
 	}
 
 	*cf = CommaFloat(value)
@@ -40,14 +41,14 @@ type Valute struct {
 func ParseXML(filename string) *ValCurs {
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		panic("failed to read XML file")
+		panic(err.Error())
 	}
 
 	var valCurs ValCurs
 
 	err = xml.Unmarshal(data, &valCurs)
 	if err != nil {
-		panic("failed to parse XML")
+		panic(err.Error())
 	}
 
 	return &valCurs

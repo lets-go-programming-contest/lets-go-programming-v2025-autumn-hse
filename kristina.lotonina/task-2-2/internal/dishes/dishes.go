@@ -17,11 +17,10 @@ func (dishes *Heap) Swap(i int, j int) {
 }
 
 func (dishes *Heap) Push(x interface{}) {
-	if value, ok := x.(int); ok {
-		*dishes = append(*dishes, value)
-	} else {
+	if value, ok := x.(int); !ok {
 		panic(fmt.Sprintf("expected int, %v", x))
 	}
+	*dishes = append(*dishes, value)
 }
 
 func (dishes *Heap) Pop() interface{} {

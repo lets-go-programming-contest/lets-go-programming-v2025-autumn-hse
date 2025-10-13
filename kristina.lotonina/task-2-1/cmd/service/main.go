@@ -53,7 +53,6 @@ func main() {
 			}
 
 			result, err := FindTemp(&values, operation, temp)
-
 			if err != nil {
 				fmt.Println("error:", err)
 

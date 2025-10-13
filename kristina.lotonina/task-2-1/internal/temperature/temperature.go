@@ -1,6 +1,11 @@
 package temperature
 
-import "errors"
+import (
+	"fmt"
+	"errors"
+)
+
+var ErrUndefinedOperation = errors.New("undefined operation")
 
 type Value struct {
 	Higher int
@@ -30,7 +35,9 @@ func (values *Value) UpdateValues(operation string, temp int) error {
 			values.Higher = temp
 		}
 	default:
-		return errors.New("undefined operation :" + operation)
+
+		return fmt.Errorf("%w: %s", ErrUndefinedOperation, operation)
 	}
+
 	return nil
 }

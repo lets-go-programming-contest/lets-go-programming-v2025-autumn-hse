@@ -9,8 +9,7 @@ import (
 func FindTemp(values *temperature.Value, operation string, temp int) (int, error) {
 	err := values.UpdateValues(operation, temp)
 	if err != nil {
-
-		return 0, err
+		return 0, fmt.Errorf("failed to update temperature values: %w", err)
 	}
 
 	if values.Lower <= values.Higher {
@@ -34,6 +33,7 @@ func main() {
 		_, err = fmt.Scan(&count)
 		if err != nil {
 			fmt.Println("unable to read:", err)
+
 			return
 		}
 

@@ -1,10 +1,10 @@
 package temperature
 
-import "fmt"
+import "errors"
 
 type Value struct {
-	higher int
-	lower  int
+	Higher int
+	Lower  int
 }
 
 const (
@@ -12,52 +12,25 @@ const (
 	MinTemp = 15
 )
 
-func TValues() Value {
+func NewValues() Value {
 	return Value{
-		higher: MaxTemp,
-		lower:  MinTemp,
+		Higher: MaxTemp,
+		Lower:  MinTemp,
 	}
 }
 
-func (values *Value) UpdateValues(operation string, temp int) {
+func (values *Value) UpdateValues(operation string, temp int) error {
 	switch operation {
 	case ">=":
-		if temp > values.lower {
-			values.lower = temp
+		if temp > values.Lower {
+			values.Lower = temp
 		}
 	case "<=":
-		if temp < values.higher {
-			values.higher = temp
+		if temp < values.Higher {
+			values.Higher = temp
 		}
 	default:
-		fmt.Println("undefined operation")
-
-		return
+		return errors.New("undefined operation :" + operation)
 	}
-}
-
-func FindTemp(count int) {
-	var (
-		operation string
-		temp      int
-	)
-
-	values := TValues()
-
-	for range count {
-		_, err := fmt.Scanln(&operation, &temp)
-		if err != nil {
-			fmt.Println("unable to read :", err)
-
-			return
-		}
-
-		values.UpdateValues(operation, temp)
-
-		if values.lower <= values.higher {
-			fmt.Println(values.lower)
-		} else {
-			fmt.Println(-1)
-		}
-	}
+	return nil
 }

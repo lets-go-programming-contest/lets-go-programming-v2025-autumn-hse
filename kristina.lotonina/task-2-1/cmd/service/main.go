@@ -58,6 +58,7 @@ func main() {
 
 				return
 			}
+
 			fmt.Println(result)
 		}
 	}

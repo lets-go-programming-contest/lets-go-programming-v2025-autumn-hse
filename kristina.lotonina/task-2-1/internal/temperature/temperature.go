@@ -1,8 +1,8 @@
 package temperature
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 )
 
 var ErrUndefinedOperation = errors.New("undefined operation")

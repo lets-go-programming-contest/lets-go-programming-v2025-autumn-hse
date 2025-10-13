@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -22,17 +23,23 @@ func Load() *Config {
 
 	configFile, err := os.Open(*configFlag)
 	if err != nil {
-		panic("config file does not exist")
+		panic(err.Error())
 	}
 
-	defer configFile.Close()
+	defer func() {
+		err = configFile.Close()
+		if err != nil {
+			fmt.Println("error closing file", err)
+		}
+	}()
 
 	var configData Config
+
 	decoder := yaml.NewDecoder(configFile)
 
 	err = decoder.Decode(&configData)
 	if err != nil {
-		panic("failed to decode YAML config")
+		panic(err.Error())
 	}
 
 	return &configData

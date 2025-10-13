@@ -10,7 +10,7 @@ import (
 func main() {
 	var number int
 	if _, err := fmt.Scan(&number); err != nil {
-		fmt.Println("unable to read number :", err)
+		fmt.Println("unable to read number:", err)
 
 		return
 	}
@@ -21,7 +21,7 @@ func main() {
 	for range number {
 		var preferences int
 		if _, err := fmt.Scan(&preferences); err != nil {
-			fmt.Println("unable to read preference :", err)
+			fmt.Println("unable to read preference:", err)
 
 			return
 		}
@@ -33,12 +33,18 @@ func main() {
 
 	_, err := fmt.Scan(&neededPreference)
 	if err != nil {
-		fmt.Println("unable to read needed preference :", err)
+		fmt.Println("unable to read needed preference:", err)
 
 		return
 	}
 
 	var result int
+
+	if neededPreference > dishesContainer.Len() {
+		fmt.Println("incorrect preference number")
+
+		return
+	}
 
 	for range neededPreference {
 		value := heap.Pop(dishesContainer)

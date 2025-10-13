@@ -52,13 +52,16 @@ func main() {
 		return
 	}
 
-	for range neededPreference {
+	for i := 0; i < neededPreference; i++ {
 		value := heap.Pop(dishesContainer)
-		if intValue, ok := value.(int); ok {
-			result = intValue
-		} else {
-			fmt.Printf("expected int, %v :", value)
+		if i == neededPreference-1 {
+		intValue, ok := value.(int)
+		if !ok {
+			fmt.Printf("expected int, got %T: %v\n", value, value)
+			return
 		}
+		result = intValue
+	}
 	}
 
 	fmt.Println(result)

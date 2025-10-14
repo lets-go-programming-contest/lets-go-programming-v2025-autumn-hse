@@ -14,6 +14,7 @@ var (
 	ErrTemperatureTooBig   = errors.New("temperature is too big")
 	ErrTemperatureTooSmall = errors.New("temperature is too small")
 	ErrTemperatureFail     = errors.New("temperature is fail")
+	ErrCompaisonSign       = errors.New("Error compaison sign")
 )
 
 type TemperatureValidator struct {
@@ -61,7 +62,7 @@ func (v *TemperatureValidator) compareValues(temperature int, comparisonSign str
 	case ">=":
 		v.moreOrEqual(temperature)
 	default:
-		return errors.New("Error compaison sign")
+		return ErrCompaisonSign
 	}
 
 	return nil

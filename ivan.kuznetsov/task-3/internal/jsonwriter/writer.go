@@ -5,20 +5,22 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/kuzid-17/task-3/internal/xmlparser"
 )
 
 type OutputValute struct {
-	NumCode  string  `json:"num_code"`
+	NumCode  int     `json:"num_code"`
 	CharCode string  `json:"char_code"`
 	Value    float64 `json:"value"`
 }
 
 func WriteJSON(filename string, valutes []xmlparser.Valute) {
 	dir := filepath.Dir(filename)
+	const mode = 0o755
 
-	err := os.MkdirAll(dir, 0o755)
+	err := os.MkdirAll(dir, mode)
 	if err != nil {
 		panic("failed to create directory")
 	}
@@ -26,8 +28,13 @@ func WriteJSON(filename string, valutes []xmlparser.Valute) {
 	output := make([]OutputValute, 0, len(valutes))
 
 	for _, valute := range valutes {
+		numCode, err := strconv.Atoi(valute.NumCode)
+		if err != nil {
+			numCode = 0
+		}
+
 		output = append(output, OutputValute{
-			NumCode:  valute.NumCode,
+			NumCode:  numCode,
 			CharCode: valute.CharCode,
 			Value:    float64(valute.Value),
 		})

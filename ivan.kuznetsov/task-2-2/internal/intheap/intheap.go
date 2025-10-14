@@ -6,22 +6,22 @@ func (rating *Rating) Len() int {
 	return len(*rating)
 }
 
-func (rating *Rating) Less(i, j int) bool {
+func (rating *Rating) Less(index, jndex int) bool {
 	length := rating.Len()
-	if 0 > i || i >= length || 0 > j || j >= length {
+	if 0 > index || index >= length || 0 > jndex || jndex >= length {
 		panic("index out of range")
 	}
 
-	return (*rating)[i] > (*rating)[j]
+	return (*rating)[index] > (*rating)[jndex]
 }
 
-func (rating *Rating) Swap(i, j int) {
+func (rating *Rating) Swap(index, jndex int) {
 	length := rating.Len()
-	if 0 > i || i >= length || 0 > j || j >= length {
+	if 0 > index || index >= length || 0 > jndex || jndex >= length {
 		panic("index out of range")
 	}
 
-	(*rating)[i], (*rating)[j] = (*rating)[j], (*rating)[i]
+	(*rating)[index], (*rating)[jndex] = (*rating)[jndex], (*rating)[index]
 }
 
 func (rating *Rating) Push(x interface{}) {

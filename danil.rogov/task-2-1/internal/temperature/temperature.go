@@ -48,9 +48,9 @@ func printResult(result int, writer io.Writer) error {
 	return nil
 }
 
-func (tp *TemperatureProcessor) addPreference(pref preference) int {
+func (tp *TemperatureProcessor) addPreference(pref preference) (int, error) {
 	if pref.temperature < minimumTemperature || pref.temperature > maximumTemperature {
-		return errorTemperature
+		return errorTemperature, nil
 	}
 
 	switch pref.sign {
@@ -58,13 +58,15 @@ func (tp *TemperatureProcessor) addPreference(pref preference) int {
 		tp.lowerBound = max(tp.lowerBound, pref.temperature)
 	case "<=":
 		tp.upperBound = min(tp.upperBound, pref.temperature)
+	default:
+		return 0, fmt.Errorf("invalid sign: %s", pref.sign)
 	}
 
 	if tp.lowerBound > tp.upperBound {
-		return errorTemperature
+		return errorTemperature, nil
 	}
 
-	return tp.lowerBound
+	return tp.lowerBound, nil
 }
 
 func (tp *TemperatureProcessor) ProcessDepartment(
@@ -73,12 +75,17 @@ func (tp *TemperatureProcessor) ProcessDepartment(
 	writer io.Writer,
 ) error {
 	for range employeeCount {
-		pref, err := readPreference(reader)
+		preference, err := readPreference(reader)
 		if err != nil {
 			return err
 		}
 
-		err = printResult(tp.addPreference(pref), writer)
+		newPreference, err := tp.addPreference(preference)
+		if err != nil {
+			return err
+		}
+
+		err = printResult(newPreference, writer)
 		if err != nil {
 			return err
 		}

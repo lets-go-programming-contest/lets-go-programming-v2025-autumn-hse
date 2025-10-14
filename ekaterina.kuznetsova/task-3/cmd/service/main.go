@@ -21,10 +21,9 @@ type Config struct {
 }
 
 type Valute struct {
-	XMLName  xml.Name `xml:"Valute"`
-	NumCode  string   `xml:"NumCode"`
-	CharCode string   `xml:"CharCode"`
-	Value    string   `xml:"Value"`
+	NumCode  string `xml:"NumCode"`
+	CharCode string `xml:"CharCode"`
+	Value    string `xml:"Value"`
 }
 
 type ValuteCurs struct {

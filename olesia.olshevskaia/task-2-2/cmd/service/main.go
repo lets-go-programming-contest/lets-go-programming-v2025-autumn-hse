@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/olesia.olshevsraia/task-2-2/intheap"
+	"github.com/olesia.olshevsraia/task-2-2/internal/intheap"
 )
 
 var (

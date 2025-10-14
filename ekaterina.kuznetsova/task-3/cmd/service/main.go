@@ -40,42 +40,43 @@ type ValuteCursJSON struct {
 	Valutes []ValuteJSON `json:"Valutes"`
 }
 
-func main() {
+func LoadConfigYaml() (Config, error) {
 	configPath := flag.String("config", "", "path of config file")
 	flag.Parse()
 
 	dataConfig, err := os.ReadFile(*configPath)
 	if err != nil {
-		fmt.Printf("read config: %v\n", err)
-
-		return
+		return Config{}, fmt.Errorf("error read config: %w", err)
 	}
 
 	var config Config
 
 	err = yaml.Unmarshal(dataConfig, &config)
 	if err != nil {
-		fmt.Printf("Error parsing yaml: %v\n", err)
+		return Config{}, fmt.Errorf("error parsing yaml: %w", err)
+	}
 
-		return
+	return config, nil
+}
+
+func ParseValuteCursXML(inputFile string) (ValuteCurs, error) {
+	dataXML, err := os.ReadFile(inputFile)
+	if err != nil {
+
+		return ValuteCurs{}, fmt.Errorf("read input file: %w", err)
 	}
 
 	var valCurs ValuteCurs
 
-	dataXML, err := os.ReadFile(config.InputFile)
-	if err != nil {
-		fmt.Printf("read config: %v\n", err)
-
-		return
-	}
-
 	err = xml.Unmarshal(dataXML, &valCurs)
 	if err != nil {
-		fmt.Printf("Error parsing XML: %v\n", err)
-
-		return
+		return ValuteCurs{}, fmt.Errorf("error parsing XML: %w", err)
 	}
 
+	return valCurs, nil
+}
+
+func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
 	var valutesOutput ValuteCursJSON
 
 	for _, valute := range valCurs.Valutes {
@@ -94,22 +95,45 @@ func main() {
 
 	outputJSON, err := json.MarshalIndent(valutesOutput, "", "    ")
 	if err != nil {
-		fmt.Printf("Error marshaling JSON: %v", err)
-
-		return
+		return nil, fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	err = os.MkdirAll(filepath.Dir(config.OutputFile), 0766)
+	return outputJSON, nil
+}
+
+func WriteFileJSON(outputFile string, outputJSON []byte) error {
+	err := os.MkdirAll(filepath.Dir(outputFile), 0766)
 	if err != nil {
-		fmt.Printf("Error creating directory: %v", err)
-
-		return
+		return fmt.Errorf("error creating directory: %w", err)
 	}
 
-	err = os.WriteFile(config.OutputFile, outputJSON, 0644)
+	err = os.WriteFile(outputFile, outputJSON, 0644)
 	if err != nil {
-		fmt.Printf("Error writing output file: %v", err)
-
-		return
+		return fmt.Errorf("error writing output file: %w", err)
 	}
+
+	return nil
+}
+
+func main() {
+	config, err := LoadConfigYaml()
+	if err != nil {
+		panic(err)
+	}
+
+	valCurs, err := ParseValuteCursXML(config.InputFile)
+	if err != nil {
+		panic(err)
+	}
+
+	outputJSON, err := CreateValuteCursJSON(valCurs)
+	if err != nil {
+		panic(err)
+	}
+
+	err = WriteFileJSON(config.OutputFile, outputJSON)
+	if err != nil {
+		panic(err)
+	}
+
 }

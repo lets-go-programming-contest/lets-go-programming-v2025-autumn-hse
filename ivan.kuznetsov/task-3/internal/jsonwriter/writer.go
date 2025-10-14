@@ -16,9 +16,11 @@ type OutputValute struct {
 	Value    float64 `json:"value"`
 }
 
+const mode = 0o755
+
 func WriteJSON(filename string, valutes []xmlparser.Valute) {
 	dir := filepath.Dir(filename)
-	const mode = 0o755
+
 	err := os.MkdirAll(dir, mode)
 	if err != nil {
 		panic("failed to create directory")

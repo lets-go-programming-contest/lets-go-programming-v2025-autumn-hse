@@ -7,10 +7,18 @@ func (h *Heap) Len() int {
 }
 
 func (h *Heap) Less(i, j int) bool {
+	if i < 0 || i > h.Len() || j < 0 || j > h.Len() {
+		panic("invalid index")
+	}
+
 	return (*h)[i] < (*h)[j]
 }
 
 func (h *Heap) Swap(i, j int) {
+	if i < 0 || i > h.Len() || j < 0 || j > h.Len() {
+		panic("invalid index")
+	}
+
 	(*h)[i], (*h)[j] = (*h)[j], (*h)[i]
 }
 

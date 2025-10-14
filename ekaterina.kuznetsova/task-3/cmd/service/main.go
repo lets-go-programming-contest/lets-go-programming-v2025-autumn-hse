@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -141,55 +140,56 @@ func ParseValuteCursXML(inputFile string) (ValuteCurs, error) {
 // 	return outputJSON, nil
 // }
 
-func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
-	sort.Slice(valCurs.Valutes, func(i, j int) bool {
-		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
-	})
+// func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
+// 	sort.Slice(valCurs.Valutes, func(i, j int) bool {
+// 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
+// 	})
 
-	outputJSON, err := json.MarshalIndent(valCurs.Valutes, "", "    ")
-	if err != nil {
-		return nil, fmt.Errorf("error marshaling JSON: %w", err)
-	}
-
-	return outputJSON, nil
-}
-
-// func WriteFileJSON(outputFile string, value any) error {
-// 	err := os.MkdirAll(filepath.Dir(outputFile), 0766)
+// 	outputJSON, err := json.MarshalIndent(valCurs.Valutes, "", "    ")
 // 	if err != nil {
-// 		return fmt.Errorf("error creating directory: %w", err)
+// 		return nil, fmt.Errorf("error marshaling JSON: %w", err)
 // 	}
 
-// 	file, err := os.Create(outputFile)
-// 	if err != nil {
-// 		return fmt.Errorf("error open output file: %w", err)
-// 	}
+// 	return outputJSON, nil
+// }
 
-// 	defer func() {
-// 		file.Close()
-// 	}()
-
-// 	dataJSON := json.NewEncoder(file)
-// 	err = dataJSON.Encode(&value)
-// 	if err != nil {
-// 		return fmt.Errorf("erorr json encode  %w", err)
-// 	}
-
-//		return nil
-//	}
-func WriteFileJSON(outputFile string, outputJSON []byte) error {
-	err := os.MkdirAll(filepath.Dir(outputFile), 0755)
+func WriteFileJSON(outputFile string, value any) error {
+	err := os.MkdirAll(filepath.Dir(outputFile), 0766)
 	if err != nil {
 		return fmt.Errorf("error creating directory: %w", err)
 	}
 
-	err = os.WriteFile(outputFile, outputJSON, 0644)
+	file, err := os.Create(outputFile)
 	if err != nil {
-		return fmt.Errorf("error writing output file: %w", err)
+		return fmt.Errorf("error open output file: %w", err)
+	}
+
+	defer func() {
+		file.Close()
+	}()
+
+	dataJSON := json.NewEncoder(file)
+	err = dataJSON.Encode(&value)
+	if err != nil {
+		return fmt.Errorf("erorr json encode  %w", err)
 	}
 
 	return nil
 }
+
+// func WriteFileJSON(outputFile string, outputJSON []byte) error {
+// 	err := os.MkdirAll(filepath.Dir(outputFile), 0755)
+// 	if err != nil {
+// 		return fmt.Errorf("error creating directory: %w", err)
+// 	}
+
+// 	err = os.WriteFile(outputFile, outputJSON, 0644)
+// 	if err != nil {
+// 		return fmt.Errorf("error writing output file: %w", err)
+// 	}
+
+// 	return nil
+// }
 
 func main() {
 	config, err := LoadConfigYaml()
@@ -202,12 +202,12 @@ func main() {
 		panic(err)
 	}
 
-	outputJSON, err := CreateValuteCursJSON(valCurs)
-	if err != nil {
-		panic(err)
-	}
+	// outputJSON, err := CreateValuteCursJSON(valCurs)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	err = WriteFileJSON(config.OutputFile, outputJSON)
+	err = WriteFileJSON(config.OutputFile, valCurs.Valutes)
 	if err != nil {
 		panic(err)
 	}

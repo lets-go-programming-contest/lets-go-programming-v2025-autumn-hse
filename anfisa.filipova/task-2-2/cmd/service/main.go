@@ -9,17 +9,13 @@ import (
 )
 
 var (
-	errReading       = errors.New("reading error")
-	errTypeAssertion = errors.New("error type assertion")
+	errReading          = errors.New("reading error")
+	errTypeAssertion    = errors.New("error type assertion")
+	errInvalidChoiceIdx = errors.New("error invalid choiceIdx")
 )
 
 func readInput() (intheap.IntHeap, int, error) {
-	var (
-		dishCount int
-		priority  int
-		choiceIdx int
-	)
-
+	var dishCount int
 	if _, err := fmt.Scan(&dishCount); err != nil {
 		return nil, 0, errReading
 	}
@@ -29,6 +25,7 @@ func readInput() (intheap.IntHeap, int, error) {
 	heap.Init(heapint)
 
 	for range dishCount {
+		var priority int
 		if _, err := fmt.Scan(&priority); err != nil {
 			return nil, 0, errReading
 		}
@@ -36,6 +33,7 @@ func readInput() (intheap.IntHeap, int, error) {
 		heap.Push(heapint, priority)
 	}
 
+	var choiceIdx int
 	if _, err := fmt.Scan(&choiceIdx); err != nil {
 		return nil, 0, errReading
 	}
@@ -44,6 +42,11 @@ func readInput() (intheap.IntHeap, int, error) {
 }
 
 func getPreferredDish(heapint intheap.IntHeap, choiceIdx int) (int, error) {
+	heapSize := len(heapint)
+	if heapSize < choiceIdx {
+		return 0, errInvalidChoiceIdx
+	}
+
 	for range choiceIdx - 1 {
 		heap.Pop(&heapint)
 	}
@@ -57,6 +60,12 @@ func getPreferredDish(heapint intheap.IntHeap, choiceIdx int) (int, error) {
 }
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Recovered from panic:", r)
+		}
+	}()
+
 	heapint, choiceIdx, err := readInput()
 	if err != nil {
 		fmt.Println("Error: ", err)

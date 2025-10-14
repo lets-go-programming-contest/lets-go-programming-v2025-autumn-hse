@@ -14,7 +14,7 @@ var (
 	ErrTemperatureTooBig   = errors.New("temperature is too big")
 	ErrTemperatureTooSmall = errors.New("temperature is too small")
 	ErrTemperatureFail     = errors.New("temperature is fail")
-	ErrCompaisonSign       = errors.New("Error compaison sign")
+	ErrCompaisonSign       = errors.New("compaison sign is not match")
 )
 
 type TemperatureValidator struct {

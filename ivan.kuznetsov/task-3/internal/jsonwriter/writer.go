@@ -18,6 +18,7 @@ type OutputValute struct {
 
 func WriteJSON(filename string, valutes []xmlparser.Valute) {
 	dir := filepath.Dir(filename)
+
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		panic("failed to create directory")

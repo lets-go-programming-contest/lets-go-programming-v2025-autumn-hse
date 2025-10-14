@@ -1,11 +1,14 @@
 package xmlparser
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
+
+	"golang.org/x/net/html/charset"
 )
 
 type CommaFloat float64
@@ -44,9 +47,12 @@ func ParseXML(filename string) *ValCurs {
 		panic(err.Error())
 	}
 
+	decoder := xml.NewDecoder(bytes.NewReader(data))
+	decoder.CharsetReader = charset.NewReaderLabel
+
 	var valCurs ValCurs
 
-	err = xml.Unmarshal(data, &valCurs)
+	err = decoder.Decode(&valCurs)
 	if err != nil {
 		panic(err.Error())
 	}

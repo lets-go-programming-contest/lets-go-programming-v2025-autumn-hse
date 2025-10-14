@@ -20,8 +20,8 @@ func main() {
 		panic(err)
 	}
 
-	var valCurs valute.ValCursXML
-	if err := xmlin.Read(cfg.Input, &valCurs); err != nil {
+	valCurs, err := xmlin.Read(cfg.Input)
+	if err != nil {
 		panic(err)
 	}
 

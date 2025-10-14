@@ -8,7 +8,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var errInvalidArgs error = errors.New("invalid arguments")
+var errInvalidArgs error = errors.New("empty path")
 
 type Config struct {
 	Input  string `yaml:"input-file"`

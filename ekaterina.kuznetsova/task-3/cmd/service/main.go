@@ -68,11 +68,11 @@ func (d *Decimal) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
 		return nil
 	}
 
-	str = strings.ReplaceAll(str, ",", ".")
+	str = strings.Replace(str, ",", ".", -1)
 
 	val, err := strconv.ParseFloat(str, 64)
 	if err != nil {
-		return fmt.Errorf("parse xml Decimal %q: %w", str, err)
+		return fmt.Errorf("parse xml Decimal %w", err)
 	}
 
 	*d = Decimal(val)

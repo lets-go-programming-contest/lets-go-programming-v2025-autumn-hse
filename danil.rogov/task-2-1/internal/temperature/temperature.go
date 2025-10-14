@@ -1,6 +1,7 @@
 package temperature
 
 import (
+	"errors"
 	"fmt"
 	"io"
 )
@@ -20,6 +21,8 @@ type preference struct {
 	sign        string
 	temperature int
 }
+
+var errInvalidSign = errors.New("invalid sign")
 
 func NewTemperatureProcessor() *TemperatureProcessor {
 	return &TemperatureProcessor{
@@ -59,7 +62,7 @@ func (tp *TemperatureProcessor) addPreference(pref preference) (int, error) {
 	case "<=":
 		tp.upperBound = min(tp.upperBound, pref.temperature)
 	default:
-		return 0, fmt.Errorf("invalid sign: %s", pref.sign)
+		return 0, fmt.Errorf("%w: %s", errInvalidSign, pref.sign)
 	}
 
 	if tp.lowerBound > tp.upperBound {

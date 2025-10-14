@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/net/html/charset"
 	"gopkg.in/yaml.v3"
 )
 
@@ -60,17 +61,23 @@ func LoadConfigYaml() (Config, error) {
 }
 
 func ParseValuteCursXML(inputFile string) (ValuteCurs, error) {
-	dataXML, err := os.ReadFile(inputFile)
-	if err != nil {
-
-		return ValuteCurs{}, fmt.Errorf("read input file: %w", err)
-	}
-
 	var valCurs ValuteCurs
 
-	err = xml.Unmarshal(dataXML, &valCurs)
+	file, err := os.Open(inputFile)
 	if err != nil {
-		return ValuteCurs{}, fmt.Errorf("error parsing XML: %w", err)
+		return valCurs, fmt.Errorf("open input file: %w", err)
+	}
+
+	defer func() {
+		file.Close()
+	}()
+
+	decoder := xml.NewDecoder(file)
+	decoder.CharsetReader = charset.NewReaderLabel
+
+	err = decoder.Decode(&valCurs)
+	if err != nil {
+		return valCurs, fmt.Errorf("error parsing XML: %w", err)
 	}
 
 	return valCurs, nil
@@ -135,5 +142,4 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 }

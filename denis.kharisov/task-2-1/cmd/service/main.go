@@ -39,14 +39,18 @@ func (tempRange *temperatureRange) optimalTemperature(operType operation, temper
 	case greaterOrEqualOperation:
 		if temperature > tempRange.maxTemperature {
 			tempRange.invalid = true
+
 			return errTemperatureExceedMax
 		}
+
 		tempRange.minTemperature = max(temperature, tempRange.minTemperature)
 	case lessOrEqualOperation:
 		if temperature < tempRange.minTemperature {
 			tempRange.invalid = true
+
 			return errTemperatureBelowMin
 		}
+
 		tempRange.maxTemperature = min(temperature, tempRange.maxTemperature)
 
 	default:
@@ -55,6 +59,7 @@ func (tempRange *temperatureRange) optimalTemperature(operType operation, temper
 
 	if tempRange.maxTemperature < tempRange.minTemperature {
 		tempRange.invalid = true
+
 		return errInvalidRange
 	}
 

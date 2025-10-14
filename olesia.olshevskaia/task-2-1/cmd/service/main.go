@@ -8,7 +8,7 @@ const (
 	minTemperatureValue      = 15
 	maxTemperatureValue      = 30
 	expectedValuesPerInput   = 2
-	expectedcountDepartments = 1
+	expectedCountDepartments = 1
 )
 
 type TemperatureRange struct {
@@ -58,7 +58,7 @@ func main() {
 		return
 	}
 
-	if returnVal != expectedcountDepartments {
+	if returnVal != expectedCountDepartments {
 		fmt.Printf("Expected 1 value for countDepartments, read %d\n", returnVal)
 
 		return

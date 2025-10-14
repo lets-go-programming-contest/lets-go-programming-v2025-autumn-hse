@@ -27,17 +27,13 @@ type Valute struct {
 }
 
 type ValuteCurs struct {
-	Valutes []Valute `xml:"Valutes"`
+	Valutes []Valute `xml:"Valute"`
 }
 
 type ValuteJSON struct {
 	NumCode  int     `json:"NumCode"`
 	CharCode string  `json:"CharCode"`
 	Value    float64 `json:"Value"`
-}
-
-type ValuteCursJSON struct {
-	Valutes []ValuteJSON `json:"Valutes"`
 }
 
 func LoadConfigYaml() (Config, error) {

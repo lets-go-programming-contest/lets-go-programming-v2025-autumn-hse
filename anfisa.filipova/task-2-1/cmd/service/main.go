@@ -39,17 +39,12 @@ func (t *TemperatureManager) getOptimalTemperature() (int, error) {
 }
 
 func main() {
-	var (
-		departmentCount int
-		employeeCount   int
-		mathSign        string
-	)
-
 	const (
 		defaultUpperBound int = 30
 		defaultLowerBound int = 15
 	)
 
+	var departmentCount int
 	if _, err := fmt.Scan(&departmentCount); err != nil {
 		fmt.Println("Reading error: ", err)
 
@@ -59,6 +54,7 @@ func main() {
 	for range departmentCount {
 		bound := TemperatureManager{defaultUpperBound, defaultLowerBound}
 
+		var employeeCount int
 		if _, err := fmt.Scan(&employeeCount); err != nil {
 			fmt.Println("Reading error: ", err)
 
@@ -66,7 +62,11 @@ func main() {
 		}
 
 		for range employeeCount {
-			var value int
+			var (
+				mathSign string
+				value    int
+			)
+
 			if _, err := fmt.Scan(&mathSign, &value); err != nil {
 				fmt.Println("Reading error: ", err)
 

@@ -29,7 +29,7 @@ func WriteJSON(filename string, valutes []xmlparser.Valute) {
 	for _, valute := range valutes {
 		numCode, err := strconv.Atoi(valute.NumCode)
 		if err != nil {
-			panic("failed to convert NumCode to int")
+			continue
 		}
 
 		output = append(output, OutputValute{

@@ -1,7 +1,5 @@
 package maxheap
 
-import "fmt"
-
 type Maxheap []int
 
 func (heap *Maxheap) Len() int {
@@ -17,9 +15,9 @@ func (heap *Maxheap) Swap(i, j int) {
 }
 
 func (heap *Maxheap) Push(x any) {
-	value, errFlag := x.(int)
-	if !errFlag {
-		fmt.Printf("MaxHeap.Push: expected int")
+	value, flag := x.(int)
+	if !flag {
+		panic("MaxHeap.Push: expected int")
 	}
 	*heap = append(*heap, value)
 }

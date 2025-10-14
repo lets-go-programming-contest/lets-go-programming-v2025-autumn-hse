@@ -84,20 +84,20 @@ func ParseValuteCursXML(inputFile string) (ValuteCurs, error) {
 }
 
 func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
-	var valutesOutput ValuteCursJSON
+	var valutesOutput []ValuteJSON
 
 	for _, valute := range valCurs.Valutes {
 		numCode, _ := strconv.Atoi(valute.NumCode)
 		value, _ := strconv.ParseFloat(strings.ReplaceAll(valute.Value, ",", "."), 64)
-		valutesOutput.Valutes = append(valutesOutput.Valutes, ValuteJSON{
+		valutesOutput = append(valutesOutput, ValuteJSON{
 			NumCode:  numCode,
 			CharCode: valute.CharCode,
 			Value:    value,
 		})
 	}
 
-	sort.Slice(valutesOutput.Valutes, func(i, j int) bool {
-		return valutesOutput.Valutes[i].Value > valutesOutput.Valutes[j].Value
+	sort.Slice(valutesOutput, func(i, j int) bool {
+		return valutesOutput[i].Value > valutesOutput[j].Value
 	})
 
 	outputJSON, err := json.MarshalIndent(valutesOutput, "", "    ")

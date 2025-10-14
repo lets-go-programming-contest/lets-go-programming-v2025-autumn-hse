@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	"golang.org/x/net/html/charset"
 	"gopkg.in/yaml.v3"
@@ -50,6 +52,32 @@ func LoadConfigYaml() (Config, error) {
 	}
 
 	return config, nil
+}
+
+type Decimal float64
+
+func (d *Decimal) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
+	var str string
+	if err := dec.DecodeElement(&str, &start); err != nil {
+		return fmt.Errorf("decode element Decimal: %w", err)
+	}
+
+	if str == "" {
+		*d = Decimal(0)
+
+		return nil
+	}
+
+	str = strings.ReplaceAll(str, ",", ".")
+
+	val, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		return fmt.Errorf("parse xml Decimal %q: %w", str, err)
+	}
+
+	*d = Decimal(val)
+
+	return nil
 }
 
 func ParseValuteCursXML(inputFile string) (ValuteCurs, error) {

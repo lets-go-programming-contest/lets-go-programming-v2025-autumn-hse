@@ -8,95 +8,101 @@ import (
 type operation string
 
 const (
-	defaultMaxTemperature             = 30
-	defaultMinTemperature             = 15
 	lessOrEqualOperation    operation = "<="
 	greaterOrEqualOperation operation = ">="
+)
+
+const (
+	defaultMaxTemperature = 30
+	defaultMinTemperature = 15
 )
 
 var (
 	errTemperatureExceedMax = errors.New("temperature Exceed Max")
 	errTemperatureBelowMin  = errors.New("temperature Below Min")
 	errInvalidRange         = errors.New("max temperature < min temperature")
+	errUnknownOperation     = errors.New("unknown operation")
 )
 
 type temperatureRange struct {
 	maxTemperature int
 	minTemperature int
+	invalid        bool
 }
 
-func optimalTemperature(tempRange temperatureRange, operType operation, temperature int) (temperatureRange, error) {
+func (tempRange *temperatureRange) optimalTemperature(operType operation, temperature int) error {
+	if tempRange.invalid {
+		return errInvalidRange
+	}
+
 	switch operType {
 	case greaterOrEqualOperation:
 		if temperature > tempRange.maxTemperature {
-			return tempRange, errTemperatureExceedMax
-		} else {
-			tempRange.minTemperature = max(temperature, tempRange.minTemperature)
+			tempRange.invalid = true
+			return errTemperatureExceedMax
 		}
+		tempRange.minTemperature = max(temperature, tempRange.minTemperature)
 	case lessOrEqualOperation:
 		if temperature < tempRange.minTemperature {
-			return tempRange, errTemperatureBelowMin
-		} else {
-			tempRange.maxTemperature = min(temperature, tempRange.maxTemperature)
+			tempRange.invalid = true
+			return errTemperatureBelowMin
 		}
+		tempRange.maxTemperature = min(temperature, tempRange.maxTemperature)
+
+	default:
+		return errUnknownOperation
 	}
 
 	if tempRange.maxTemperature < tempRange.minTemperature {
-		return tempRange, errInvalidRange
+		tempRange.invalid = true
+		return errInvalidRange
 	}
 
-	return tempRange, nil
+	return nil
 }
 
 func main() {
-	var (
-		numberOfDepartments, numberOfEmployees, temperature int
-		operationType                                       operation
-	)
+	var numberOfDepartments int
 
 	_, err := fmt.Scanln(&numberOfDepartments)
 	if err != nil {
-		fmt.Println("Invalid number of departments")
+		fmt.Printf("Invalid number of departments: %v\n", err)
 
 		return
 	}
 
-	for departmentNumber := 1; departmentNumber <= numberOfDepartments; departmentNumber++ {
+	var numberOfEmployees int
+	for range numberOfDepartments {
 		_, err = fmt.Scanln(&numberOfEmployees)
 		if err != nil {
-			fmt.Println("Invalid number of employees")
+			fmt.Printf("Invalid number of employees: %v\n", err)
 
 			return
 		}
 
 		var (
-			errorFlag = false
+			temperature   int
+			operationType operation
+
 			tempRange = temperatureRange{
 				maxTemperature: defaultMaxTemperature,
 				minTemperature: defaultMinTemperature,
+				invalid:        false,
 			}
 		)
 
-		for employee := 1; employee <= numberOfEmployees; employee++ {
+		for range numberOfEmployees {
 			_, err = fmt.Scanln(&operationType, &temperature)
 			if err != nil {
-				fmt.Println("Invalid operation and temperature")
+				fmt.Printf("Invalid operation and temperature: %v\n", err)
 
 				return
 			}
 
-			if !errorFlag {
-				newRange, err := optimalTemperature(tempRange, operationType, temperature)
-				if err != nil {
-					errorFlag = true
-
-					fmt.Println("-1")
-				} else {
-					tempRange = newRange
-					fmt.Println(tempRange.minTemperature)
-				}
-			} else {
+			if err := tempRange.optimalTemperature(operationType, temperature); err != nil {
 				fmt.Println("-1")
+			} else {
+				fmt.Println(tempRange.minTemperature)
 			}
 		}
 	}

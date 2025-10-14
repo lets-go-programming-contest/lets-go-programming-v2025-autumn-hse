@@ -10,9 +10,10 @@ import (
 func main() {
 	var numberOfDishes, preferredDishNumber int
 	_, err := fmt.Scan(&numberOfDishes)
-
 	if err != nil {
 		fmt.Println("Invalid number of dishes")
+
+		return
 	}
 
 	dishes := make([]int, numberOfDishes)
@@ -21,13 +22,16 @@ func main() {
 		_, err = fmt.Scan(&dishes[i])
 		if err != nil {
 			fmt.Println("Invalid dish number")
+
+			return
 		}
 	}
 
 	_, err = fmt.Scan(&preferredDishNumber)
-
 	if err != nil {
 		fmt.Println("Invalid preferred dish number")
+
+		return
 	}
 
 	heapOfDishes := &maxheap.Maxheap{}
@@ -40,7 +44,11 @@ func main() {
 	var result int
 
 	for range preferredDishNumber {
-		result = heap.Pop(heapOfDishes).(int)
+		if res, flag := heap.Pop(heapOfDishes).(int); flag {
+			result = res
+		} else {
+			panic("unexpected type from heap")
+		}
 	}
 
 	fmt.Println(result)

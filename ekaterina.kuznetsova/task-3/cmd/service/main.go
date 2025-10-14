@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -54,29 +55,41 @@ func LoadConfigYaml() (Config, error) {
 	return config, nil
 }
 
-type Decimal float64
+type Value float64
 
-func (d *Decimal) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
-	var str string
-	if err := dec.DecodeElement(&str, &start); err != nil {
-		return fmt.Errorf("decode element Decimal: %w", err)
+func (v *Value) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var s string
+	if err := d.DecodeElement(&s, &start); err != nil {
+		return err
 	}
 
-	if str == "" {
-		*d = Decimal(0)
+	s = strings.TrimSpace(s)
+	s = strings.Replace(s, ",", ".", -1)
 
-		return nil
-	}
-
-	str = strings.Replace(str, ",", ".", -1)
-
-	val, err := strconv.ParseFloat(str, 64)
+	val, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		return fmt.Errorf("parse xml Decimal %w", err)
+		return fmt.Errorf("parse Value '%s': %w", s, err)
 	}
 
-	*d = Decimal(val)
+	*v = Value(val)
+	return nil
+}
 
+type xmlValute struct {
+	NumCode  int    `xml:"NumCode"`
+	CharCode string `xml:"CharCode"`
+	Value    Value  `xml:"Value"`
+}
+
+func (v *Valute) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var xv xmlValute
+	if err := d.DecodeElement(&xv, &start); err != nil {
+		return err
+	}
+
+	v.NumCode = int(xv.NumCode)
+	v.CharCode = xv.CharCode
+	v.Value = float64(xv.Value)
 	return nil
 }
 
@@ -128,25 +141,51 @@ func ParseValuteCursXML(inputFile string) (ValuteCurs, error) {
 // 	return outputJSON, nil
 // }
 
-func WriteFileJSON(outputFile string, value any) error {
-	err := os.MkdirAll(filepath.Dir(outputFile), 0766)
+func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
+	sort.Slice(valCurs.Valutes, func(i, j int) bool {
+		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
+	})
+
+	outputJSON, err := json.MarshalIndent(valCurs.Valutes, "", "    ")
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling JSON: %w", err)
+	}
+
+	return outputJSON, nil
+}
+
+// func WriteFileJSON(outputFile string, value any) error {
+// 	err := os.MkdirAll(filepath.Dir(outputFile), 0766)
+// 	if err != nil {
+// 		return fmt.Errorf("error creating directory: %w", err)
+// 	}
+
+// 	file, err := os.Create(outputFile)
+// 	if err != nil {
+// 		return fmt.Errorf("error open output file: %w", err)
+// 	}
+
+// 	defer func() {
+// 		file.Close()
+// 	}()
+
+// 	dataJSON := json.NewEncoder(file)
+// 	err = dataJSON.Encode(&value)
+// 	if err != nil {
+// 		return fmt.Errorf("erorr json encode  %w", err)
+// 	}
+
+//		return nil
+//	}
+func WriteFileJSON(outputFile string, outputJSON []byte) error {
+	err := os.MkdirAll(filepath.Dir(outputFile), 0755)
 	if err != nil {
 		return fmt.Errorf("error creating directory: %w", err)
 	}
 
-	file, err := os.Create(outputFile)
+	err = os.WriteFile(outputFile, outputJSON, 0644)
 	if err != nil {
-		return fmt.Errorf("error open output file: %w", err)
-	}
-
-	defer func() {
-		file.Close()
-	}()
-
-	dataJSON := json.NewEncoder(file)
-	err = dataJSON.Encode(&value)
-	if err != nil {
-		return fmt.Errorf("erorr json encode  %w", err)
+		return fmt.Errorf("error writing output file: %w", err)
 	}
 
 	return nil
@@ -163,12 +202,12 @@ func main() {
 		panic(err)
 	}
 
-	// outputJSON, err := CreateValuteCursJSON(valCurs)
-	// if err != nil {
-	// 	panic(err)
-	// }
+	outputJSON, err := CreateValuteCursJSON(valCurs)
+	if err != nil {
+		panic(err)
+	}
 
-	err = WriteFileJSON(config.OutputFile, valCurs.Valutes)
+	err = WriteFileJSON(config.OutputFile, outputJSON)
 	if err != nil {
 		panic(err)
 	}

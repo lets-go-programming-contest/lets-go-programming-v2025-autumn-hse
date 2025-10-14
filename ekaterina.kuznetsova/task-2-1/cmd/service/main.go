@@ -54,17 +54,17 @@ func (v *TemperatureValidator) moreOrEqual(temperature int) {
 	}
 }
 
-func (v *TemperatureValidator) compareValues(temperature int, comparisonSign string) {
+func (v *TemperatureValidator) compareValues(temperature int, comparisonSign string) error {
 	switch comparisonSign {
 	case "<=":
 		v.lessOrEqual(temperature)
 	case ">=":
 		v.moreOrEqual(temperature)
 	default:
-		fmt.Println("Error compaison sign")
-
-		return
+		return errors.New("Error compaison sign")
 	}
+
+	return nil
 }
 
 func main() {
@@ -104,7 +104,13 @@ func main() {
 				return
 			}
 
-			validator.compareValues(temperature, comparisonSign)
+			err = validator.compareValues(temperature, comparisonSign)
+			if err != nil {
+				fmt.Println("Error:", err)
+
+				return
+			}
+
 			fmt.Println(validator.minTemperature)
 		}
 	}

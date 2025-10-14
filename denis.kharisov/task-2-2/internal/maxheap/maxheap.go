@@ -15,11 +15,11 @@ func (heap *Maxheap) Swap(i, j int) {
 }
 
 func (heap *Maxheap) Push(x any) {
-	value, flag := x.(int)
-	if !flag {
+	if val, flag := x.(int); flag {
+		*heap = append(*heap, val)
+	} else {
 		panic("MaxHeap.Push: expected int")
 	}
-	*heap = append(*heap, value)
 }
 
 func (heap *Maxheap) Pop() any {

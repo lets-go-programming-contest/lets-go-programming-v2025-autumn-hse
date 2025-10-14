@@ -18,6 +18,7 @@ func (h *IntHeap) Swap(i, j int) {
 	if i < 0 || j < 0 || i >= len(*h) || j >= len(*h) {
 		panic("index out of range")
 	}
+
 	(*h)[i], (*h)[j] = (*h)[j], (*h)[i]
 }
 

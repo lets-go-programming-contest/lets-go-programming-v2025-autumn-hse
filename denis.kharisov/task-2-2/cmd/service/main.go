@@ -10,6 +10,7 @@ import (
 func main() {
 	var numberOfDishes, preferredDishNumber int
 	_, err := fmt.Scan(&numberOfDishes)
+
 	if err != nil {
 		fmt.Println("Invalid number of dishes")
 

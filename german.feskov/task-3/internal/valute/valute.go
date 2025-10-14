@@ -42,14 +42,3 @@ func (d *Decimal) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
 
 	return nil
 }
-
-func (d *Decimal) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
-	str := strconv.FormatFloat(float64(*d), 'f', -1, 64)
-	str = strings.ReplaceAll(str, ".", ",")
-
-	if err := enc.EncodeElement(str, start); err != nil {
-		return fmt.Errorf("encode element Decimal: %w", err)
-	}
-
-	return nil
-}

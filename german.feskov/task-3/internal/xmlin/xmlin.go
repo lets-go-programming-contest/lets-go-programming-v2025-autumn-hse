@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/6ermvH/german.feskov/task-3/internal/valute"
 	"golang.org/x/net/html/charset"
 )
 
-func Read(path string, val any) error {
+func Read(path string) (valute.ValCursXML, error) {
+	var valCurs valute.ValCursXML
+
 	file, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("open %q: %w", path, err)
+		return valCurs, fmt.Errorf("open %q: %w", path, err)
 	}
 
 	defer func() {
@@ -23,9 +26,9 @@ func Read(path string, val any) error {
 	dec := xml.NewDecoder(file)
 	dec.CharsetReader = charset.NewReaderLabel
 
-	if err := dec.Decode(val); err != nil {
-		return fmt.Errorf("decode to %q: %w", path, err)
+	if err := dec.Decode(&valCurs); err != nil {
+		return valCurs, fmt.Errorf("decode to %q: %w", path, err)
 	}
 
-	return nil
+	return valCurs, nil
 }

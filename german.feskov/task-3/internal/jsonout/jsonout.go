@@ -25,13 +25,9 @@ func Write(path string, val any) error {
 		}
 	}()
 
-	data, err := json.Marshal(val)
-	if err != nil {
-		return fmt.Errorf("marshal to %q: %w", path, err)
-	}
-
-	if _, err := file.Write(data); err != nil {
-		return fmt.Errorf("write to %q: %w", path, err)
+	enc := json.NewEncoder(file)
+	if err := enc.Encode(&val); err != nil {
+		return fmt.Errorf("encode to %q: %w", path, err)
 	}
 
 	return nil

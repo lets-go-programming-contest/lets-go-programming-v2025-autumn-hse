@@ -7,10 +7,18 @@ func (h *PrefOrder) Len() int {
 }
 
 func (h *PrefOrder) Less(i, j int) bool {
+	if len(*h) < i || len(*h) < j {
+		panic("Index out of range in less")
+	}
+
 	return (*h)[i] < (*h)[j]
 }
 
 func (h *PrefOrder) Swap(i, j int) {
+	if len(*h) < i || len(*h) < j {
+		panic("Index out of range in swap")
+	}
+
 	(*h)[i], (*h)[j] = (*h)[j], (*h)[i]
 }
 

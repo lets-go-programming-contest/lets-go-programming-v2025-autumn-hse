@@ -7,10 +7,20 @@ func (rating *Rating) Len() int {
 }
 
 func (rating *Rating) Less(i, j int) bool {
+	length := rating.Len()
+	if 0 > i || i >= length || 0 > j || j >= length {
+		panic("index out of range")
+	}
+
 	return (*rating)[i] > (*rating)[j]
 }
 
 func (rating *Rating) Swap(i, j int) {
+	length := rating.Len()
+	if 0 > i || i >= length || 0 > j || j >= length {
+		panic("index out of range")
+	}
+
 	(*rating)[i], (*rating)[j] = (*rating)[j], (*rating)[i]
 }
 

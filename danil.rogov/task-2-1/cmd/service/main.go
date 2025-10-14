@@ -20,7 +20,7 @@ func main() {
 	for range departmentCount {
 		var employeeCount int
 
-		_, err := fmt.Fscan(os.Stdin, &employeeCount)
+		_, err := fmt.Scan(&employeeCount)
 		if err != nil {
 			fmt.Println("Error reading employee count:", err)
 

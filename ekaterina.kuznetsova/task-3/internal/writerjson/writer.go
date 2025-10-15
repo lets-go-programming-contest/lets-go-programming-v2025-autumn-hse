@@ -25,6 +25,7 @@ func CreateValuteCursJSON(valCurs parsexml.ValuteCurs) ([]byte, error) {
 		if err != nil {
 			numCode = 0
 		}
+
 		valutesOutput = append(valutesOutput, Valute{
 			NumCode:  numCode,
 			CharCode: valute.CharCode,

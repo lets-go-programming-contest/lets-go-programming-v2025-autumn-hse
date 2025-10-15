@@ -31,9 +31,9 @@ type ValuteCurs struct {
 }
 
 type Valute struct {
-	NumCode  int     `json:"NumCode"  xml:"NumCode"`
-	CharCode string  `json:"CharCode" xml:"CharCode"`
-	Value    float64 `json:"Value" xml:"Value"`
+	NumCode  int    `json:"NumCode"  xml:"NumCode"`
+	CharCode string `json:"CharCode" xml:"CharCode"`
+	Value    Value  `json:"Value" xml:"Value"`
 }
 
 func LoadConfigYaml() (Config, error) {

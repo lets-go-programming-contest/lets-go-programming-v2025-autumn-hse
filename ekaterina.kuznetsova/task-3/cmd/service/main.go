@@ -95,43 +95,45 @@ func ParseValuteCursXML(inputFile string) (ValuteCurs, error) {
 	return valCurs, nil
 }
 
-// func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
-// 	var valutesOutput []Valute
-
-// 	for _, valute := range valCurs.Valutes {
-// 		numCode, _ := strconv.Atoi(valute.NumCode)
-// 		value, _ := strconv.ParseFloat(strings.ReplaceAll(valute.Value, ",", "."), 64)
-// 		valutesOutput = append(valutesOutput, Valute{
-// 			NumCode:  numCode,
-// 			CharCode: valute.CharCode,
-// 			Value:    value,
-// 		})
-// 	}
-
-// 	sort.Slice(valutesOutput, func(i, j int) bool {
-// 		return valutesOutput[i].Value > valutesOutput[j].Value
-// 	})
-
-// 	outputJSON, err := json.MarshalIndent(valutesOutput, "", "    ")
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error marshaling JSON: %w", err)
-// 	}
-
-// 	return outputJSON, nil
-// }
-
 func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
-	sort.Slice(valCurs.Valutes, func(i, j int) bool {
-		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
+	var valutesOutput []Valute
+
+	for _, valute := range valCurs.Valutes {
+		numCode, err := strconv.Atoi(valute.NumCode)
+		if err != nil {
+			return nil, fmt.Errorf("error cast NumCode: %w", err)
+		}
+		valutesOutput = append(valutesOutput, Valute{
+			NumCode:  numCode,
+			CharCode: valute.CharCode,
+			Value:    float64(valute.Value),
+		})
+	}
+
+	sort.Slice(valutesOutput, func(i, j int) bool {
+		return valutesOutput[i].Value > valutesOutput[j].Value
 	})
 
-	outputJSON, err := json.MarshalIndent(valCurs.Valutes, "", "    ")
+	outputJSON, err := json.MarshalIndent(valutesOutput, "", "    ")
 	if err != nil {
 		return nil, fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
 	return outputJSON, nil
 }
+
+// func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
+// 	sort.Slice(valCurs.Valutes, func(i, j int) bool {
+// 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
+// 	})
+
+// 	outputJSON, err := json.MarshalIndent(valCurs.Valutes, "", "    ")
+// 	if err != nil {
+// 		return nil, fmt.Errorf("error marshaling JSON: %w", err)
+// 	}
+
+// 	return outputJSON, nil
+// }
 
 // func WriteFileJSON(outputFile string, value any) error {
 // 	err := os.MkdirAll(filepath.Dir(outputFile), 0755)

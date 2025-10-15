@@ -123,12 +123,15 @@ func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
 }
 
 func WriteFileJSON(outputFile string, outputJSON []byte) error {
-	err := os.MkdirAll(filepath.Dir(outputFile), 0o755)
+	const dirMode = 0o755
+	const fileMode = 0o600
+
+	err := os.MkdirAll(filepath.Dir(outputFile), dirMode)
 	if err != nil {
 		return fmt.Errorf("error creating directory: %w", err)
 	}
 
-	err = os.WriteFile(outputFile, outputJSON, 0o644)
+	err = os.WriteFile(outputFile, outputJSON, fileMode)
 	if err != nil {
 		return fmt.Errorf("error writing output file: %w", err)
 	}

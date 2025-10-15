@@ -61,10 +61,10 @@ func LoadConfigYaml() (Config, error) {
 func (v *Value) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var str string
 	if err := d.DecodeElement(&str, &start); err != nil {
-		return err
+		return fmt.Errorf("error decode xml: %w", err)
 	}
 
-	str = strings.Replace(str, ",", ".", -1)
+	str = strings.ReplaceAll(str, ",", ".")
 
 	value, err := strconv.ParseFloat(str, 64)
 	if err != nil {
@@ -96,7 +96,7 @@ func ParseValuteCursXML(inputFile string) (ValuteCurs, error) {
 }
 
 func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
-	var valutesOutput []Valute
+	valutesOutput := make([]Valute, 0, len(valCurs.Valutes))
 
 	for _, valute := range valCurs.Valutes {
 		numCode, err := strconv.Atoi(valute.NumCode)
@@ -123,12 +123,12 @@ func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
 }
 
 func WriteFileJSON(outputFile string, outputJSON []byte) error {
-	err := os.MkdirAll(filepath.Dir(outputFile), 0755)
+	err := os.MkdirAll(filepath.Dir(outputFile), 0o755)
 	if err != nil {
 		return fmt.Errorf("error creating directory: %w", err)
 	}
 
-	err = os.WriteFile(outputFile, outputJSON, 0644)
+	err = os.WriteFile(outputFile, outputJSON, 0o644)
 	if err != nil {
 		return fmt.Errorf("error writing output file: %w", err)
 	}

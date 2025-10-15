@@ -34,9 +34,9 @@ type ValuteCurs struct {
 }
 
 type Valute struct {
-	NumCode  int     `json:"NumCode"`
-	CharCode string  `json:"CharCode"`
-	Value    float64 `json:"Value"`
+	NumCode  int     `json:"num_code"`
+	CharCode string  `json:"char_code"`
+	Value    float64 `json:"value"`
 }
 
 func LoadConfigYaml() (Config, error) {
@@ -114,50 +114,13 @@ func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
 		return valutesOutput[i].Value > valutesOutput[j].Value
 	})
 
-	outputJSON, err := json.MarshalIndent(valutesOutput, "", "    ")
+	outputJSON, err := json.MarshalIndent(valutesOutput, "", "  ")
 	if err != nil {
 		return nil, fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
 	return outputJSON, nil
 }
-
-// func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
-// 	sort.Slice(valCurs.Valutes, func(i, j int) bool {
-// 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
-// 	})
-
-// 	outputJSON, err := json.MarshalIndent(valCurs.Valutes, "", "    ")
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error marshaling JSON: %w", err)
-// 	}
-
-// 	return outputJSON, nil
-// }
-
-// func WriteFileJSON(outputFile string, value any) error {
-// 	err := os.MkdirAll(filepath.Dir(outputFile), 0755)
-// 	if err != nil {
-// 		return fmt.Errorf("error creating directory: %w", err)
-// 	}
-
-// 	file, err := os.Create(outputFile)
-// 	if err != nil {
-// 		return fmt.Errorf("error open output file: %w", err)
-// 	}
-
-// 	defer func() {
-// 		file.Close()
-// 	}()
-
-// 	dataJSON := json.NewEncoder(file)
-// 	err = dataJSON.Encode(&value)
-// 	if err != nil {
-// 		return fmt.Errorf("erorr json encode  %w", err)
-// 	}
-
-// 	return nil
-// }
 
 func WriteFileJSON(outputFile string, outputJSON []byte) error {
 	err := os.MkdirAll(filepath.Dir(outputFile), 0755)

@@ -30,6 +30,8 @@ type ValuteCurs struct {
 	Valutes []Valute `xml:"Valute"`
 }
 
+type Value float64
+
 type Valute struct {
 	NumCode  int    `json:"NumCode"  xml:"NumCode"`
 	CharCode string `json:"CharCode" xml:"CharCode"`
@@ -55,8 +57,6 @@ func LoadConfigYaml() (Config, error) {
 	return config, nil
 }
 
-type Value float64
-
 func (v *Value) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var str string
 	if err := d.DecodeElement(&str, &start); err != nil {
@@ -72,24 +72,6 @@ func (v *Value) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 	*v = Value(value)
 
-	return nil
-}
-
-type xmlValute struct {
-	NumCode  int    `xml:"NumCode"`
-	CharCode string `xml:"CharCode"`
-	Value    Value  `xml:"Value"`
-}
-
-func (v *Valute) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var xv xmlValute
-	if err := d.DecodeElement(&xv, &start); err != nil {
-		return err
-	}
-
-	v.NumCode = int(xv.NumCode)
-	v.CharCode = xv.CharCode
-	v.Value = float64(xv.Value)
 	return nil
 }
 

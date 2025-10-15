@@ -101,7 +101,7 @@ func CreateValuteCursJSON(valCurs ValuteCurs) ([]byte, error) {
 	for _, valute := range valCurs.Valutes {
 		numCode, err := strconv.Atoi(valute.NumCode)
 		if err != nil {
-			return nil, fmt.Errorf("error cast NumCode: %w", err)
+			numCode = 0
 		}
 		valutesOutput = append(valutesOutput, Valute{
 			NumCode:  numCode,

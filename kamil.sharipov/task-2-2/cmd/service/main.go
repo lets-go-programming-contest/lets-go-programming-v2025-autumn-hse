@@ -63,6 +63,7 @@ func main() {
 
 				return
 			}
+
 			ans = rating
 		}
 	}

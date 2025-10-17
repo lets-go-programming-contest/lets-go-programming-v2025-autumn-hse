@@ -57,13 +57,13 @@ func main() {
 	for i := range rank {
 		result := heap.Pop(heapInstance)
 		if i == rank-1 {
-			if rating, ok := result.(int); ok {
-				ans = rating
-			} else {
+			rating, ok := result.(int)
+			if !ok {
 				fmt.Println("Unexpected type in heap")
 
 				return
 			}
+			ans = rating
 		}
 	}
 

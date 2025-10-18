@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -18,30 +17,33 @@ type Config struct {
 	OutputFile string `yaml:"output-file"`
 }
 
-func LoadConfig(path string) (*Config, error) {
-	file, err := os.Open(path)
+func panicOnErr(err error) {
 	if err != nil {
-		return nil, fmt.Errorf("failed to open config file %q: %w", path, err)
+		panic(err)
 	}
+}
 
-	defer func() {
-		_ = file.Close()
-	}()
+func (c *Config) Validate() error {
+	if c.InputFile == "" {
+		return errNoInputFile
+	}
+	if c.OutputFile == "" {
+		return errNoOutputFile
+	}
+	return nil
+}
+
+func LoadConfig(path string) Config {
+	file, err := os.Open(path)
+	panicOnErr(err)
+	defer file.Close()
 
 	var config Config
+	err = yaml.NewDecoder(file).Decode(&config)
+	panicOnErr(err)
 
-	decoder := yaml.NewDecoder(file)
-	if err := decoder.Decode(&config); err != nil {
-		return nil, fmt.Errorf("failed to decode config: %w", err)
-	}
+	config.Validate()
+	panicOnErr(config.Validate())
 
-	if config.InputFile == "" {
-		return nil, errNoInputFile
-	}
-
-	if config.OutputFile == "" {
-		return nil, errNoOutputFile
-	}
-
-	return &config, nil
+	return config
 }

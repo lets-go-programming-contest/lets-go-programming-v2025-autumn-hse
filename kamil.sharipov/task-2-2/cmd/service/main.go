@@ -1,7 +1,6 @@
 package main
 
 import (
-	"container/heap"
 	"fmt"
 
 	"github.com/kamilSharipov/task-2-2/internal/intheap"
@@ -23,18 +22,15 @@ func main() {
 		return
 	}
 
-	heapInstance := intheap.InitIntHeap()
+	dishes := make([]int, dishCount)
 
-	var dish int
-	for range dishCount {
-		_, err := fmt.Scan(&dish)
+	for i := range dishes {
+		_, err := fmt.Scan(&dishes[i])
 		if err != nil {
 			fmt.Printf("Error scanning dish: %v\n", err)
 
 			return
 		}
-
-		heap.Push(heapInstance, dish)
 	}
 
 	var rank int
@@ -46,26 +42,11 @@ func main() {
 		return
 	}
 
-	if heapInstance.Len() < rank {
-		fmt.Println("Not enough elements in heap")
+	ans, err := intheap.KthMaximum(dishes, rank)
+	if err != nil {
+		fmt.Printf("Error to find %d-th maximum: %v\n", rank, err)
 
 		return
-	}
-
-	var ans int
-
-	for i := range rank {
-		result := heap.Pop(heapInstance)
-		if i == rank-1 {
-			rating, ok := result.(int)
-			if !ok {
-				fmt.Println("Unexpected type in heap")
-
-				return
-			}
-
-			ans = rating
-		}
 	}
 
 	fmt.Println(ans)

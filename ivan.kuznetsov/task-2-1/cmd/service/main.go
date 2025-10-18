@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/kuzid-17/task-2-1/internal/temperature"
 )
@@ -47,13 +48,13 @@ func main() {
 				return
 			}
 
-			temperatureRange = temperature.OptimalTemperature(limitSign, temperatureLimitValue, temperatureRange)
+			err = temperatureRange.OptimalTemperature(limitSign, temperatureLimitValue)
 
-			if temperatureRange == nil {
-				fmt.Printf("Invalid comparison sign '%s'\nThe temperature range has not changed\n", limitSign)
+			if err != nil {
+				log.Printf("The temperature range has not changed: %v", err)
 			}
 
-			fmt.Println(temperature.GetOptimalTemperature(temperatureRange))
+			fmt.Println(temperatureRange.GetOptimalTemperature())
 		}
 	}
 }

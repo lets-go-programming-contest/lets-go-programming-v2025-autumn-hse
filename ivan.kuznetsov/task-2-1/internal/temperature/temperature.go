@@ -1,5 +1,7 @@
 package temperature
 
+import "fmt"
+
 type TemperatureRange struct {
 	Min int
 	Max int
@@ -14,7 +16,7 @@ func TemperatureRangeInit() *TemperatureRange {
 	return &TemperatureRange{Min: MinTemperature, Max: MaxTemperature}
 }
 
-func OptimalTemperature(sign string, value int, temperature *TemperatureRange) *TemperatureRange {
+func (temperature *TemperatureRange) OptimalTemperature(sign string, value int) error {
 	switch sign {
 	case "<=":
 		if value < temperature.Max {
@@ -25,13 +27,13 @@ func OptimalTemperature(sign string, value int, temperature *TemperatureRange) *
 			temperature.Min = value
 		}
 	default:
-		return nil
+		return fmt.Errorf("invalid comparison sign: %s", sign)
 	}
 
-	return temperature
+	return nil
 }
 
-func GetOptimalTemperature(temperature *TemperatureRange) int {
+func (temperature *TemperatureRange) GetOptimalTemperature() int {
 	if temperature.Min > temperature.Max {
 		return -1
 	}

@@ -71,14 +71,15 @@ func KthMaximum(arr []int, kth int) (int, error) {
 		return 0, ErrNotEnoughElements
 	}
 
-	h := InitIntHeap()
+	IntHeap := InitIntHeap()
 	for _, x := range arr {
-		heap.Push(h, x)
+		heap.Push(IntHeap, x)
 	}
 
 	var result int
+
 	for i := range kth {
-		val := heap.Pop(h)
+		val := heap.Pop(IntHeap)
 
 		if i == kth-1 {
 			rating, ok := val.(int)

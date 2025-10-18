@@ -13,6 +13,7 @@ func (dishes *Heap) Less(first int, second int) bool {
 	if first < 0 || first >= length || second < 0 || second >= length {
 		return false
 	}
+
 	return (*dishes)[first] > (*dishes)[second]
 }
 

@@ -58,6 +58,7 @@ func main() {
 
 	value := heap.Pop(dishesContainer)
 	intValue, ok := value.(int)
+
 	if !ok {
 		fmt.Printf("expected int, got %T: %v\n", value, value)
 

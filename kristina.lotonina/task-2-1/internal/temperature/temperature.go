@@ -32,15 +32,15 @@ func (v *Value) FindTemp(operation string, temp int) (int, error) {
 	return -1, nil
 }
 
-func (values *Value) UpdateValues(operation string, temp int) error {
+func (v *Value) UpdateValues(operation string, temp int) error {
 	switch operation {
 	case ">=":
-		if temp > values.Lower {
-			values.Lower = temp
+		if temp > v.Lower {
+			v.Lower = temp
 		}
 	case "<=":
-		if temp < values.Higher {
-			values.Higher = temp
+		if temp < v.Higher {
+			v.Higher = temp
 		}
 	default:
 		return fmt.Errorf("%w: %s", ErrUndefinedOperation, operation)

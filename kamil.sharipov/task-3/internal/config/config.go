@@ -38,6 +38,7 @@ func (c *Config) Validate() error {
 func LoadConfig(path string) Config {
 	file, err := os.Open(path)
 	panicOnErr(err)
+
 	defer func() {
 		_ = file.Close()
 	}()
@@ -47,8 +48,8 @@ func LoadConfig(path string) Config {
 	err = yaml.NewDecoder(file).Decode(&config)
 	panicOnErr(err)
 
-	_ = config.Validate()
-	panicOnErr(config.Validate())
+	err = config.Validate()
+	panicOnErr(err)
 
 	return config
 }

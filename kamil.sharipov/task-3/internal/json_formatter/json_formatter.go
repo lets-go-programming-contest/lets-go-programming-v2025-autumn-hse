@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
-	"strings"
 
 	xml "github.com/kamilSharipov/task-3/internal/xml_parser"
 )
@@ -14,17 +13,6 @@ type ValuteJSON struct {
 	NumCode  int     `json:"num_code"`
 	CharCode string  `json:"char_code"`
 	Value    float64 `json:"value"`
-}
-
-func parseValue(s string) (float64, error) {
-	s = strings.Replace(s, ",", ".", 1)
-
-	value, err := strconv.ParseFloat(s, 64)
-	if err != nil {
-		return 0, fmt.Errorf("failed to parse float %q: %w", s, err)
-	}
-
-	return value, nil
 }
 
 func FormateJSON(valutesXML []xml.Valute) ([]byte, error) {
@@ -49,7 +37,7 @@ func FormateJSON(valutesXML []xml.Valute) ([]byte, error) {
 		if valute.Value != "" {
 			var err error
 
-			value, err = parseValue(valute.Value)
+			value, err = valute.GetValue()
 			if err != nil {
 				return nil, fmt.Errorf("invalid Value %q: %w", valute.Value, err)
 			}

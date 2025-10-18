@@ -5,6 +5,8 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"golang.org/x/net/html/charset"
 )
@@ -13,6 +15,17 @@ type Valute struct {
 	NumCode  string `xml:"NumCode"`
 	CharCode string `xml:"CharCode"`
 	Value    string `xml:"Value"`
+}
+
+func (v *Valute) GetValue() (float64, error) {
+	s := strings.Replace(v.Value, ",", ".", 1)
+
+	value, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse float %q: %w", s, err)
+	}
+
+	return value, nil
 }
 
 var errNoValutes = errors.New("XML contains no valutes")

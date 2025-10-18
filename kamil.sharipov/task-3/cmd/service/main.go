@@ -11,6 +11,10 @@ import (
 	xml "github.com/kamilSharipov/task-3/internal/xml_parser"
 )
 
+const (
+	dirPermissions = 0o755
+)
+
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -50,9 +54,7 @@ func main() {
 		panic(err)
 	}
 
-	fileMode := os.FileMode(0o755)
-
-	err = os.MkdirAll(filepath.Dir(config.OutputFile), fileMode)
+	err = os.MkdirAll(filepath.Dir(config.OutputFile), dirPermissions)
 	if err != nil {
 		panic(err)
 	}

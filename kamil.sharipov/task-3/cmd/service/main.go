@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/kamilSharipov/task-3/internal/config"
 	json "github.com/kamilSharipov/task-3/internal/json_formatter"
@@ -48,6 +49,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	sort.Slice(valCurs, func(i, j int) bool {
+		v1, err1 := valCurs[i].GetValue()
+		v2, err2 := valCurs[j].GetValue()
+
+		if err1 != nil || err2 != nil {
+			return false
+		}
+
+		return v1 > v2
+	})
 
 	bytes, err := json.FormateJSON(valCurs)
 	if err != nil {

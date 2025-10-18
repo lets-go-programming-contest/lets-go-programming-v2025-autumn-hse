@@ -3,7 +3,6 @@ package json
 import (
 	"encoding/json"
 	"fmt"
-	"sort"
 
 	xml "github.com/kamilSharipov/task-3/internal/xml_parser"
 )
@@ -36,10 +35,6 @@ func FormateJSON(valutesXML []xml.Valute) ([]byte, error) {
 		valutes[index].NumCode = numCode
 		valutes[index].Value = value
 	}
-
-	sort.Slice(valutes, func(i, j int) bool {
-		return valutes[i].Value > valutes[j].Value
-	})
 
 	bytes, err := json.Marshal(valutes)
 	if err != nil {

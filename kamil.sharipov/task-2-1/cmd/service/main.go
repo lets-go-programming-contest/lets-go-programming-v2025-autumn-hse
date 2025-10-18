@@ -48,6 +48,8 @@ func main() {
 			}
 
 			if comfortTemperature.AddConstraint(parsedOp, temp) != nil {
+				fmt.Println("Failed to add constraint", err)
+
 				return
 			}
 

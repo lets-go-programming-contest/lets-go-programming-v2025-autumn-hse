@@ -63,7 +63,7 @@ func InitIntHeap() *IntHeap {
 }
 
 func KthMaximum(arr []int, kth int) (int, error) {
-	if k <= 0 {
+	if kth <= 0 {
 		return 0, ErrInvalidK
 	}
 

@@ -2,6 +2,7 @@ package intheap
 
 import (
 	"container/heap"
+	"fmt"
 )
 
 type IntHeap []int
@@ -53,4 +54,29 @@ func InitIntHeap() *IntHeap {
 	heap.Init(h)
 
 	return h
+}
+
+func KthMaximum(arr []int, k int) (int, error) {
+	if k <= 0 {
+		return 0, fmt.Errorf("k must be positive")
+	}
+
+	if len(arr) < k {
+		return 0, fmt.Errorf("not enough elements to find %d-th maximum", k)
+	}
+
+	h := InitIntHeap()
+	for _, x := range arr {
+		heap.Push(h, x)
+		if h.Len() > k {
+			heap.Pop(h)
+		}
+	}
+
+	result := heap.Pop(h)
+	if rating, ok := result.(int); !ok {
+		return rating, nil
+	}
+
+	return 0, fmt.Errorf("type assertion failed")
 }

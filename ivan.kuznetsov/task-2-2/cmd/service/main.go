@@ -47,13 +47,9 @@ func main() {
 
 	ratingValue := heap.Pop(ratings)
 
-	if ratingValue == nil {
-		fmt.Printf("Preference doesn't exist. Not enought number of dishes: %v\n", err)
-	}
-
 	resultValue, ok := ratingValue.(int)
 	if !ok {
-		panic("type conversion error")
+		panic("rating value is not an integer: empty or type mismatch")
 	}
 
 	fmt.Println(resultValue)

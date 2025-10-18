@@ -55,6 +55,7 @@ func readXMLFile(path string) []byte {
 	if err != nil {
 		panic(err)
 	}
+
 	return data
 }
 
@@ -63,6 +64,7 @@ func parseXMLData(data []byte) []xml.Valute {
 	if err != nil {
 		panic(err)
 	}
+
 	return valCurs
 }
 
@@ -84,6 +86,7 @@ func formatJSON(valCurs []xml.Valute) []byte {
 	if err != nil {
 		panic(err)
 	}
+
 	return bytes
 }
 

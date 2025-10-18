@@ -31,10 +31,7 @@ func main() {
 		panic("no config path")
 	}
 
-	config, err := config.LoadConfig(*configPath)
-	if err != nil {
-		panic(err)
-	}
+	config := config.LoadConfig(*configPath)
 
 	if _, err := os.Stat(config.InputFile); err != nil {
 		panic(err)
@@ -51,14 +48,14 @@ func main() {
 	}
 
 	sort.Slice(valCurs, func(i, j int) bool {
-		v1, err1 := valCurs[i].GetValue()
-		v2, err2 := valCurs[j].GetValue()
+		value1, err1 := valCurs[i].GetValue()
+		value2, err2 := valCurs[j].GetValue()
 
 		if err1 != nil || err2 != nil {
-			return false
+			panic(err1)
 		}
 
-		return v1 > v2
+		return value1 > value2
 	})
 
 	bytes, err := json.FormateJSON(valCurs)

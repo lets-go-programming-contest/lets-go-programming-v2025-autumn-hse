@@ -42,13 +42,9 @@ func NewComfortTemperature() ComfortTemperature {
 func (cr *ComfortTemperature) AddConstraint(operator SignType, temp int) error {
 	switch operator {
 	case opLessEqual:
-		if temp < cr.max {
-			cr.max = temp
-		}
+		cr.max = min(cr.max, temp)
 	case opGreaterEqual:
-		if temp > cr.min {
-			cr.min = temp
-		}
+		cr.min = max(cr.min, temp)
 	default:
 		return ErrInvalidOperator
 	}

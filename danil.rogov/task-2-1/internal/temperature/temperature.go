@@ -3,7 +3,6 @@ package temperature
 import (
 	"errors"
 	"fmt"
-	"io"
 )
 
 const (
@@ -17,12 +16,12 @@ type TemperatureProcessor struct {
 	upperBound int
 }
 
-type preference struct {
-	sign        string
-	temperature int
+type Preference struct {
+	Sign        string
+	Temperature int
 }
 
-var errInvalidSign = errors.New("invalid sign")
+var ErrInvalidSign = errors.New("invalid sign")
 
 func NewTemperatureProcessor() *TemperatureProcessor {
 	return &TemperatureProcessor{
@@ -31,38 +30,18 @@ func NewTemperatureProcessor() *TemperatureProcessor {
 	}
 }
 
-func readPreference(reader io.Reader) (preference, error) {
-	var pref preference
-
-	_, err := fmt.Fscan(reader, &pref.sign, &pref.temperature)
-	if err != nil {
-		return preference{}, fmt.Errorf("failed to read preference: %w", err)
-	}
-
-	return pref, nil
-}
-
-func printResult(result int, writer io.Writer) error {
-	_, err := fmt.Fprintln(writer, result)
-	if err != nil {
-		return fmt.Errorf("failed to write result: %w", err)
-	}
-
-	return nil
-}
-
-func (tp *TemperatureProcessor) addPreference(pref preference) (int, error) {
-	if pref.temperature < minimumTemperature || pref.temperature > maximumTemperature {
+func (tp *TemperatureProcessor) AddPreference(pref Preference) (int, error) {
+	if pref.Temperature < minimumTemperature || pref.Temperature > maximumTemperature {
 		return errorTemperature, nil
 	}
 
-	switch pref.sign {
+	switch pref.Sign {
 	case ">=":
-		tp.lowerBound = max(tp.lowerBound, pref.temperature)
+		tp.lowerBound = max(tp.lowerBound, pref.Temperature)
 	case "<=":
-		tp.upperBound = min(tp.upperBound, pref.temperature)
+		tp.upperBound = min(tp.upperBound, pref.Temperature)
 	default:
-		return 0, fmt.Errorf("%w: %s", errInvalidSign, pref.sign)
+		return 0, fmt.Errorf("%w: %s", ErrInvalidSign, pref.Sign)
 	}
 
 	if tp.lowerBound > tp.upperBound {
@@ -70,29 +49,4 @@ func (tp *TemperatureProcessor) addPreference(pref preference) (int, error) {
 	}
 
 	return tp.lowerBound, nil
-}
-
-func (tp *TemperatureProcessor) ProcessDepartment(
-	employeeCount int,
-	reader io.Reader,
-	writer io.Writer,
-) error {
-	for range employeeCount {
-		preference, err := readPreference(reader)
-		if err != nil {
-			return err
-		}
-
-		newPreference, err := tp.addPreference(preference)
-		if err != nil {
-			return err
-		}
-
-		err = printResult(newPreference, writer)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

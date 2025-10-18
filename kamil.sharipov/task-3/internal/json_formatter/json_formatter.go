@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
-	"strconv"
 
 	xml "github.com/kamilSharipov/task-3/internal/xml_parser"
 )
@@ -19,17 +18,7 @@ func FormateJSON(valutesXML []xml.Valute) ([]byte, error) {
 	valutes := make([]ValuteJSON, len(valutesXML))
 
 	for index, valute := range valutesXML {
-		numCode := 0
-
-		if valute.NumCode != "" {
-			var err error
-
-			numCode, err = strconv.Atoi(valute.NumCode)
-			if err != nil {
-				return nil, fmt.Errorf("invalid numCode %q: %w", valute.NumCode, err)
-			}
-		}
-
+		numCode := valute.NumCode
 		charCode := valute.CharCode
 
 		value := 0.0

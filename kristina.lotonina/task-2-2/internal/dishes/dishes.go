@@ -12,13 +12,13 @@ func (dishes *Heap) Less(i int, j int) bool {
 	return (*dishes)[i] > (*dishes)[j]
 }
 
-func (dishes *Heap) Swap(i int, j int) {
+func (dishes *Heap) Swap(first int, second int) {
 	length := len(*dishes)
-	if i < 0 || i >= length || j < 0 || j >= length {
+	if first < 0 || first >= length || second < 0 || second >= length {
 		return
 	}
 
-	(*dishes)[i], (*dishes)[j] = (*dishes)[j], (*dishes)[i]
+	(*dishes)[first], (*dishes)[second] = (*dishes)[second], (*dishes)[first]
 }
 
 func (dishes *Heap) Push(x interface{}) {

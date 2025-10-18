@@ -34,17 +34,17 @@ func processDepartment(employeeCount int, reader io.Reader, writer io.Writer) er
 	for range employeeCount {
 		pref, err := readPreference(reader)
 		if err != nil {
-			return err
+			return fmt.Errorf("read preference: %w", err)
 		}
 
 		result, err := processor.AddPreference(pref)
 		if err != nil {
-			return err
+			return fmt.Errorf("add preference: %w", err)
 		}
 
 		err = printResult(result, writer)
 		if err != nil {
-			return err
+			return fmt.Errorf("print result: %w", err)
 		}
 	}
 

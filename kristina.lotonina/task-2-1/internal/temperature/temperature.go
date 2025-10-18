@@ -12,16 +12,24 @@ type Value struct {
 	Lower  int
 }
 
-const (
-	MaxTemp = 30
-	MinTemp = 15
-)
-
-func NewValues() Value {
+func NewValues(higher, lower int) Value {
 	return Value{
-		Higher: MaxTemp,
-		Lower:  MinTemp,
+		Higher: higher,
+		Lower:  lower,
 	}
+}
+
+func (v* Value) FindTemp(operation string, temp int) (int, error) {
+	err := v.UpdateValues(operation, temp)
+	if err != nil {
+		return 0, fmt.Errorf("failed to update temperature values: %w", err)
+	}
+
+	if v.Lower <= v.Higher {
+		return v.Lower, nil
+	}
+
+	return -1, nil
 }
 
 func (values *Value) UpdateValues(operation string, temp int) error {

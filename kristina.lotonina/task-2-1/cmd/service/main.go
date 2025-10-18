@@ -6,21 +6,13 @@ import (
 	"github.com/kef1rch1k/task-2-1/internal/temperature"
 )
 
-func FindTemp(values *temperature.Value, operation string, temp int) (int, error) {
-	err := values.UpdateValues(operation, temp)
-	if err != nil {
-		return 0, fmt.Errorf("failed to update temperature values: %w", err)
-	}
-
-	if values.Lower <= values.Higher {
-		return values.Lower, nil
-	}
-
-	return -1, nil
-}
+const (
+	MaxTemp = 30
+	MinTemp = 15
+)
 
 func main() {
-	var number, count int
+	var number int
 
 	_, err := fmt.Scan(&number)
 	if err != nil {
@@ -30,6 +22,8 @@ func main() {
 	}
 
 	for range number {
+		var count int
+
 		_, err = fmt.Scan(&count)
 		if err != nil {
 			fmt.Println("unable to read:", err)
@@ -37,7 +31,7 @@ func main() {
 			return
 		}
 
-		values := temperature.NewValues()
+		values := temperature.NewValues(MaxTemp, MinTemp)
 
 		for range count {
 			var (
@@ -52,7 +46,7 @@ func main() {
 				return
 			}
 
-			result, err := FindTemp(&values, operation, temp)
+			result, err := values.FindTemp(operation, temp)
 			if err != nil {
 				fmt.Println("error:", err)
 

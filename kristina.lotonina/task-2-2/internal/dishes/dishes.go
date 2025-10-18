@@ -13,6 +13,11 @@ func (dishes *Heap) Less(i int, j int) bool {
 }
 
 func (dishes *Heap) Swap(i int, j int) {
+	length := len(*dishes)
+	if i < 0 || i >= length || j < 0 || j >= length {
+		return
+	}
+
 	(*dishes)[i], (*dishes)[j] = (*dishes)[j], (*dishes)[i]
 }
 

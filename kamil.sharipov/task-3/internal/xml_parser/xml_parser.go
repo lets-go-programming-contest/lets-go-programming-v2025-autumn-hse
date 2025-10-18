@@ -12,7 +12,7 @@ import (
 )
 
 type Valute struct {
-	NumCode  string `xml:"NumCode"`
+	NumCode  int    `xml:"NumCode"`
 	CharCode string `xml:"CharCode"`
 	Value    string `xml:"Value"`
 }

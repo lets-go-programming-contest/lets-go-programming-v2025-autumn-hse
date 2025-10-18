@@ -49,7 +49,6 @@ func main() {
 			}
 
 			err = temperatureRange.OptimalTemperature(limitSign, temperatureLimitValue)
-
 			if err != nil {
 				log.Printf("The temperature range has not changed: %v", err)
 			}

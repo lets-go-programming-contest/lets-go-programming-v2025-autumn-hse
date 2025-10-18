@@ -1,6 +1,8 @@
 package temperature
 
-import "fmt"
+import "errors"
+
+var ErrInvalidSign = errors.New("invalid comparison sign")
 
 type TemperatureRange struct {
 	Min int
@@ -27,7 +29,7 @@ func (temperature *TemperatureRange) OptimalTemperature(sign string, value int) 
 			temperature.Min = value
 		}
 	default:
-		return fmt.Errorf("invalid comparison sign: %s", sign)
+		return ErrInvalidSign
 	}
 
 	return nil

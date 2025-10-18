@@ -8,8 +8,12 @@ func (dishes *Heap) Len() int {
 	return len(*dishes)
 }
 
-func (dishes *Heap) Less(i int, j int) bool {
-	return (*dishes)[i] > (*dishes)[j]
+func (dishes *Heap) Less(first int, second int) bool {
+	length := len(*dishes)
+	if first < 0 || first >= length || second < 0 || second >= length {
+		return false
+	}
+	return (*dishes)[first] > (*dishes)[second]
 }
 
 func (dishes *Heap) Swap(first int, second int) {
@@ -24,7 +28,7 @@ func (dishes *Heap) Swap(first int, second int) {
 func (dishes *Heap) Push(x interface{}) {
 	value, ok := x.(int)
 	if !ok {
-		panic(fmt.Sprintf("expected int, %v", x))
+		panic(fmt.Sprintf("expected int, got %T", x))
 	}
 
 	*dishes = append(*dishes, value)

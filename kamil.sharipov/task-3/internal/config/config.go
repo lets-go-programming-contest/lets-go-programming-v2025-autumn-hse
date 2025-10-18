@@ -27,22 +27,27 @@ func (c *Config) Validate() error {
 	if c.InputFile == "" {
 		return errNoInputFile
 	}
+
 	if c.OutputFile == "" {
 		return errNoOutputFile
 	}
+
 	return nil
 }
 
 func LoadConfig(path string) Config {
 	file, err := os.Open(path)
 	panicOnErr(err)
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 
 	var config Config
+
 	err = yaml.NewDecoder(file).Decode(&config)
 	panicOnErr(err)
 
-	config.Validate()
+	_ = config.Validate()
 	panicOnErr(config.Validate())
 
 	return config

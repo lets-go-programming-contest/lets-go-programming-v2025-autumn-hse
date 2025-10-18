@@ -68,15 +68,21 @@ func KthMaximum(arr []int, k int) (int, error) {
 	h := InitIntHeap()
 	for _, x := range arr {
 		heap.Push(h, x)
-		if h.Len() > k {
-			heap.Pop(h)
+	}
+
+	var result int
+	for i := 0; i < k; i++ {
+		val := heap.Pop(h)
+
+		if i == k-1 {
+			rating, ok := val.(int)
+			if !ok {
+				return 0, fmt.Errorf("type assertion failed")
+			}
+
+			result = rating
 		}
 	}
 
-	result := heap.Pop(h)
-	if rating, ok := result.(int); !ok {
-		return rating, nil
-	}
-
-	return 0, fmt.Errorf("type assertion failed")
+	return result, nil
 }

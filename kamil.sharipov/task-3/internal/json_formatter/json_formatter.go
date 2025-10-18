@@ -27,10 +27,10 @@ func parseValue(s string) (float64, error) {
 	return value, nil
 }
 
-func FormateJSON(valCurs *xml.ValCurs) ([]byte, error) {
-	valutes := make([]ValuteJSON, len(valCurs.Valutes))
+func FormateJSON(valutesXML []xml.Valute) ([]byte, error) {
+	valutes := make([]ValuteJSON, len(valutesXML))
 
-	for index, valute := range valCurs.Valutes {
+	for index, valute := range valutesXML {
 		numCode := 0
 
 		if valute.NumCode != "" {

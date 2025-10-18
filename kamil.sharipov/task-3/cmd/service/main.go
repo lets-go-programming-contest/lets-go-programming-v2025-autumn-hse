@@ -24,6 +24,18 @@ func main() {
 		}
 	}()
 
+	cfg := loadConfig()
+
+	xmlData := readXMLFile(cfg.InputFile)
+
+	valCurs := parseXMLData(xmlData)
+	sortValCurs(valCurs)
+
+	jsonBytes := formatJSON(valCurs)
+	writeOutput(cfg.OutputFile, jsonBytes)
+}
+
+func loadConfig() config.Config {
 	configPath := flag.String("config", "", "config file path")
 	flag.Parse()
 
@@ -31,22 +43,30 @@ func main() {
 		panic("no config path")
 	}
 
-	config := config.LoadConfig(*configPath)
+	return config.LoadConfig(*configPath)
+}
 
-	if _, err := os.Stat(config.InputFile); err != nil {
+func readXMLFile(path string) []byte {
+	if _, err := os.Stat(path); err != nil {
 		panic(err)
 	}
 
-	xmlData, err := os.ReadFile(config.InputFile)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
+	return data
+}
 
-	valCurs, err := xml.ParseXML(xmlData)
+func parseXMLData(data []byte) []xml.Valute {
+	valCurs, err := xml.ParseXML(data)
 	if err != nil {
 		panic(err)
 	}
+	return valCurs
+}
 
+func sortValCurs(valCurs []xml.Valute) {
 	sort.Slice(valCurs, func(i, j int) bool {
 		value1, err1 := valCurs[i].GetValue()
 		value2, err2 := valCurs[j].GetValue()
@@ -57,18 +77,23 @@ func main() {
 
 		return value1 > value2
 	})
+}
 
+func formatJSON(valCurs []xml.Valute) []byte {
 	bytes, err := json.FormateJSON(valCurs)
 	if err != nil {
 		panic(err)
 	}
+	return bytes
+}
 
-	err = os.MkdirAll(filepath.Dir(config.OutputFile), dirPermissions)
+func writeOutput(outputPath string, data []byte) {
+	err := os.MkdirAll(filepath.Dir(outputPath), dirPermissions)
 	if err != nil {
 		panic(err)
 	}
 
-	outputFile, err := os.Create(config.OutputFile)
+	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		panic(err)
 	}
@@ -77,7 +102,7 @@ func main() {
 		_ = outputFile.Close()
 	}()
 
-	_, err = outputFile.Write(bytes)
+	_, err = outputFile.Write(data)
 	if err != nil {
 		panic(err)
 	}

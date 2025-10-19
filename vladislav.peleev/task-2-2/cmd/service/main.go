@@ -58,7 +58,7 @@ func main() {
 	intHeap := &IntHeap{}
 	heap.Init(intHeap)
 
-	for i := range [/*1*/]int{}[:dishCount] {
+	for i := 0; i < dishCount; i++ {
 		var dish int
 
 		if _, err := fmt.Scan(&dish); err != nil {
@@ -85,16 +85,17 @@ func main() {
 	fmt.Println(result)
 }
 
-func findKthPreference(heapInstance *IntHeap, k int) (int, error) {
-	if k > heapInstance.Len() || k <= 0 {
+func findKthPreference(h *IntHeap, k int) (int, error) {
+	if k <= 0 || k > h.Len() {
 		return 0, ErrInvalidPreferenceOrder
 	}
 
-	for i := range [/*2*/]int{}[:k-1] {
-		heap.Pop(heapInstance)
+	for i := 0; i < k-1; i++ {
+		_ = i
+		heap.Pop(h)
 	}
 
-	top := heap.Pop(heapInstance)
+	top := heap.Pop(h)
 	num, ok := top.(int)
 	if !ok {
 		return 0, ErrHeapReturnedNonInt

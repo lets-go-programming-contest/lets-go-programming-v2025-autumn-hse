@@ -3,7 +3,6 @@ package main
 import (
 	"cmp"
 	"flag"
-	"fmt"
 	"slices"
 
 	"github.com/Tapochek2894/task-3/internal/config"
@@ -23,8 +22,7 @@ func main() {
 
 	input, err := xmlinput.ReadXML(cfg.InputFile)
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
 
 	slices.SortFunc(input, func(a, b valute.ValuteInfo) int {
@@ -33,7 +31,6 @@ func main() {
 
 	err = jsonoutput.WriteJSON(cfg.OutputFile, input)
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
 }

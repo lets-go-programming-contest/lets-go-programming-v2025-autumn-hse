@@ -17,6 +17,7 @@ func ReadXML(path string) ([]valute.ValuteInfo, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open file: %w", err)
 	}
+
 	defer file.Close()
 
 	decoder := xml.NewDecoder(file)
@@ -35,9 +36,10 @@ func ReadXML(path string) ([]valute.ValuteInfo, error) {
 	result := make([]valute.ValuteInfo, 0, len(valCurs.Valutes))
 	for _, v := range valCurs.Valutes {
 		value, _ := strconv.ParseFloat(strings.ReplaceAll(v.Value, ",", "."), 64)
+		numcode, _ := strconv.Atoi(v.NumCode)
 
 		result = append(result, valute.ValuteInfo{
-			NumCode:  v.NumCode,
+			NumCode:  numcode,
 			CharCode: v.CharCode,
 			Value:    value,
 		})

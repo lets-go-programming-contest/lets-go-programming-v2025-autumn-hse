@@ -43,6 +43,7 @@ func (d *Department) ProcessConstraint(operator string, temperature int) (string
 		}
 	default:
 		d.isValid = false
+
 		return "-1", fmt.Errorf("%w: %s", errInvalidOperator, operator)
 	}
 
@@ -57,36 +58,45 @@ func (d *Department) ProcessConstraint(operator string, temperature int) (string
 
 func main() {
 	var departmentsCount int
+
 	if _, err := fmt.Scan(&departmentsCount); err != nil {
 		fmt.Println("Invalid department number:", err)
+
 		return
 	}
 
-	for i := 0; i < departmentsCount; i++ {
+	for range departmentsCount {
 		var employeesCount int
+
 		if _, err := fmt.Scan(&employeesCount); err != nil {
 			fmt.Println("Invalid employee number:", err)
+
 			return
 		}
 
 		dept := NewDepartment()
 
-		for j := 0; j < employeesCount; j++ {
+		for range employeesCount {
 			var operator string
+
 			if _, err := fmt.Scan(&operator); err != nil {
 				fmt.Println("Invalid operator:", err)
+
 				return
 			}
 
 			var temperature int
+
 			if _, err := fmt.Scan(&temperature); err != nil {
 				fmt.Println("Invalid temperature:", err)
+
 				return
 			}
 
 			result, err := dept.ProcessConstraint(operator, temperature)
 			if err != nil {
 				fmt.Println("Invalid process:", err)
+
 				return
 			}
 

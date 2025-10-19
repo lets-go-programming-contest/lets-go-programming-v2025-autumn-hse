@@ -1,66 +1,87 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strconv"
-	"strings"
 )
 
-func main() {
-	scanner := bufio.NewScanner(os.Stdin)
+const (
+	MinTempLimit = 15
+	MaxTempLimit = 30
+)
 
-	scanner.Scan()
-	departmentsCount, _ := strconv.Atoi(scanner.Text())
+type Department struct {
+	minTemp int
+	maxTemp int
+	isValid bool
+}
 
-	results := []string{}
+func NewDepartment() *Department {
+	return &Department{
+		minTemp: MinTempLimit,
+		maxTemp: MaxTempLimit,
+		isValid: true,
+	}
+}
 
-	for range departmentsCount {
-		scanner.Scan()
-		employeesCount, _ := strconv.Atoi(scanner.Text())
-
-		minTemperature := 15
-		maxTemperature := 30
-		isValid := true
-		departmentResults := []string{}
-
-		for range employeesCount {
-			scanner.Scan()
-			line := scanner.Text()
-			parts := strings.Fields(line)
-
-			if !isValid {
-				departmentResults = append(departmentResults, "-1")
-
-				continue
-			}
-
-			operator := parts[0]
-			temperature, _ := strconv.Atoi(parts[1])
-
-			if operator == ">=" {
-				if temperature > minTemperature {
-					minTemperature = temperature
-				}
-			} else if operator == "<=" {
-				if temperature < maxTemperature {
-					maxTemperature = temperature
-				}
-			}
-
-			if minTemperature <= maxTemperature {
-				departmentResults = append(departmentResults, strconv.Itoa(minTemperature))
-			} else {
-				departmentResults = append(departmentResults, "-1")
-				isValid = false
-			}
-		}
-
-		results = append(results, departmentResults...)
+func (d *Department) ProcessConstraint(operator string, temperature int) (string, error) {
+	if !d.isValid {
+		return "-1", nil
 	}
 
-	for _, result := range results {
-		fmt.Println(result)
+	switch operator {
+	case ">=":
+		if temperature > d.minTemp {
+			d.minTemp = temperature
+		}
+	case "<=":
+		if temperature < d.maxTemp {
+			d.maxTemp = temperature
+		}
+	default:
+		d.isValid = false
+		return "-1", fmt.Errorf("Invalid operand: %s", operator)
+	}
+
+	if d.minTemp <= d.maxTemp {
+		return fmt.Sprintf("%d", d.minTemp), nil
+	} else {
+		d.isValid = false
+		return "-1", nil
+	}
+}
+
+func main() {
+	var departmentsCount int
+	if _, err := fmt.Scan(&departmentsCount); err != nil {
+		fmt.Println("Invalid dep number:", err)
+		return
+	}
+
+	for i := 0; i < departmentsCount; i++ {
+		var employeesCount int
+		if _, err := fmt.Scan(&employeesCount); err != nil {
+			fmt.Println("Invalid employee number:", err)
+			return
+		}
+
+		dept := NewDepartment()
+
+		for j := 0; j < employeesCount; j++ {
+			var operator string
+			var temperature int
+
+			if _, err := fmt.Scan(&operator, &temperature); err != nil {
+				fmt.Println("Invalid scan:", err)
+				return
+			}
+
+			result, err := dept.ProcessConstraint(operator, temperature)
+			if err != nil {
+				fmt.Println("Invalid processing:", err)
+				return
+			}
+
+			fmt.Println(result)
+		}
 	}
 }

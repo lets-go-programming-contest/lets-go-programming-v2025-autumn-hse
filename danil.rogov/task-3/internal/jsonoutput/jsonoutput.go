@@ -9,18 +9,22 @@ import (
 )
 
 func WriteJSON(path string, val []valute.ValuteInfo) error {
-	err := os.MkdirAll(filepath.Dir(path), 0o755)
-	if err != nil {
-		return err
+	dir := filepath.Dir(path)
+	if dir != "" && dir != "." {
+		err := os.MkdirAll(dir, 0o755)
+		if err != nil {
+			return err
+		}
 	}
 
 	file, err := os.Create(path)
 	if err != nil {
 		return err
 	}
+
 	defer file.Close()
 
-	data, err := json.Marshal(val)
+	data, err := json.MarshalIndent(val, "", "  ")
 	if err != nil {
 		return err
 	}
@@ -29,5 +33,6 @@ func WriteJSON(path string, val []valute.ValuteInfo) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

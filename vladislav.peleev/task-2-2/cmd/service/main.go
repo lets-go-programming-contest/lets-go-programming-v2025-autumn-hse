@@ -42,6 +42,7 @@ func (h *IntHeap) Pop() interface{} {
 	old := *h
 	n := len(old)
 	x := old[n-1]
+
 	*h = old[:n-1]
 
 	return x
@@ -52,20 +53,23 @@ func main() {
 
 	if _, err := fmt.Scan(&dishCount); err != nil {
 		fmt.Println("failed to read dish count:", err)
+
 		return
 	}
 
 	intHeap := &IntHeap{}
 	heap.Init(intHeap)
 
-	for i := 0; i < dishCount; i++ {
-		var dish int
-
-		if _, err := fmt.Scan(&dish); err != nil {
+	dishes := make([]int, dishCount)
+	for index := range dishes {
+		if _, err := fmt.Scan(&dishes[index]); err != nil {
 			fmt.Println("failed to read dish:", err)
+
 			return
 		}
+	}
 
+	for _, dish := range dishes {
 		heap.Push(intHeap, dish)
 	}
 
@@ -73,29 +77,31 @@ func main() {
 
 	if _, err := fmt.Scan(&preferenceOrder); err != nil {
 		fmt.Println("failed to read preference order:", err)
+
 		return
 	}
 
 	result, err := findKthPreference(intHeap, preferenceOrder)
 	if err != nil {
 		fmt.Println("error:", err)
+
 		return
 	}
 
 	fmt.Println(result)
 }
 
-func findKthPreference(h *IntHeap, k int) (int, error) {
-	if k <= 0 || k > h.Len() {
+func findKthPreference(dishHeap *IntHeap, k int) (int, error) {
+	if k <= 0 || k > dishHeap.Len() {
 		return 0, ErrInvalidPreferenceOrder
 	}
 
-	for i := 0; i < k-1; i++ {
-		_ = i
-		heap.Pop(h)
+	for range make([]struct{}, k-1) {
+		heap.Pop(dishHeap)
 	}
 
-	top := heap.Pop(h)
+	top := heap.Pop(dishHeap)
+
 	num, ok := top.(int)
 	if !ok {
 		return 0, ErrHeapReturnedNonInt

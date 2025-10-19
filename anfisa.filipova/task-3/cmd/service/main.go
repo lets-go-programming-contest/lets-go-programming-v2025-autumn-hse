@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -34,6 +35,10 @@ type ValuteOutput struct {
 	Value    float64 `json:"value"`
 }
 
+var errCharset = errors.New("unknown charset")
+
+const maxValuteCount = 70
+
 func DecodeValuteXML(filepath string) []ValuteOutput {
 	file, err := os.ReadFile(filepath)
 	if err != nil {
@@ -49,7 +54,7 @@ func DecodeValuteXML(filepath string) []ValuteOutput {
 			return charmap.Windows1251.NewDecoder().Reader(input), nil
 
 		default:
-			return nil, fmt.Errorf("unknown charset: %s", charset)
+			return nil, errCharset
 		}
 	}
 
@@ -59,8 +64,10 @@ func DecodeValuteXML(filepath string) []ValuteOutput {
 	}
 
 	var currencies []ValuteOutput
+	currencies = make([]ValuteOutput, 0, maxValuteCount)
+
 	for _, valute := range valCurs.Valutes {
-		valueStr := strings.Replace(valute.ValueStr, ",", ".", -1)
+		valueStr := strings.ReplaceAll(valute.ValueStr, ",", ".")
 
 		value, err := strconv.ParseFloat(valueStr, 64)
 		if err != nil {
@@ -94,9 +101,15 @@ func WriteJSON(currencies []ValuteOutput, filePath string) {
 		panic(fmt.Sprintf("Error creating file: %v", err))
 	}
 
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			panic(fmt.Sprintf("Error close file: %v", err))
+		}
+	}()
+
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", " ")
+
 	err = encoder.Encode(currencies)
 	if err != nil {
 		panic(fmt.Sprintf("Error encoding file: %v", err))
@@ -109,6 +122,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Recovered from panic: %v\n", r)
 		}
 	}()
+
 	configPath := flag.String("config", "", "Path to configuration file")
 	flag.Parse()
 
@@ -116,6 +130,7 @@ func main() {
 	if _, err := os.Stat(config.InputFile); os.IsNotExist(err) {
 		panic(fmt.Sprintf("Inputfile is not existing: %v", err))
 	}
+
 	currencies := DecodeValuteXML(config.InputFile)
 	SortCurrencies(currencies)
 	WriteJSON(currencies, config.OutputFile)

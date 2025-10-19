@@ -14,24 +14,18 @@ var (
 	ErrInvalidType       = errors.New("invalid type from heap.Pop")
 )
 
-func popDesiredDish(heapInt *intheap.IntHeap, desired int) (int, error) {
-	if desired > (*heapInt).Len() {
+func popDesiredDish(heapInt intheap.IntHeap, desired int) (int, error) {
+	if desired > (&heapInt).Len() {
 		return 0, ErrDesiredDishTooBig
 	}
 
 	for range desired - 1 {
-		val := heap.Pop(heapInt)
-		if val == nil {
-			return 0, ErrHeapEmpty
-		}
+		heap.Pop(&heapInt)
 	}
 
-	val := heap.Pop(heapInt)
-	if val == nil {
-		return 0, ErrHeapEmpty
-	}
-
+	val := heap.Pop(&heapInt)
 	count, ok := val.(int)
+
 	if !ok {
 		return 0, ErrInvalidType
 	}
@@ -76,7 +70,7 @@ func main() {
 
 	result, err := popDesiredDish(myHeap, desiredDish)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("failed to get dish with given id:", err)
 
 		return
 	}

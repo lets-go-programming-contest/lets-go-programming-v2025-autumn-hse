@@ -14,10 +14,19 @@ var (
 	errInvalidChoiceIdx = errors.New("error invalid choiceIdx")
 )
 
-func readInput() (intheap.IntHeap, int, error) {
+func readIndex() (int, error) {
+	var choiceIdx int
+	if _, err := fmt.Scan(&choiceIdx); err != nil {
+		return 0, errReading
+	}
+
+	return choiceIdx, nil
+}
+
+func readDishes() (intheap.IntHeap, error) {
 	var dishCount int
 	if _, err := fmt.Scan(&dishCount); err != nil {
-		return nil, 0, errReading
+		return nil, errReading
 	}
 
 	heapint := &intheap.IntHeap{}
@@ -27,18 +36,13 @@ func readInput() (intheap.IntHeap, int, error) {
 	for range dishCount {
 		var priority int
 		if _, err := fmt.Scan(&priority); err != nil {
-			return nil, 0, errReading
+			return nil, errReading
 		}
 
 		heap.Push(heapint, priority)
 	}
 
-	var choiceIdx int
-	if _, err := fmt.Scan(&choiceIdx); err != nil {
-		return nil, 0, errReading
-	}
-
-	return *heapint, choiceIdx, nil
+	return *heapint, nil
 }
 
 func getPreferredDish(heapint intheap.IntHeap, choiceIdx int) (int, error) {
@@ -66,16 +70,23 @@ func main() {
 		}
 	}()
 
-	heapint, choiceIdx, err := readInput()
+	dishes, err := readDishes()
 	if err != nil {
-		fmt.Println("Error: ", err)
+		fmt.Println("Failed to read dishes: ", err)
 
 		return
 	}
 
-	res, err := getPreferredDish(heapint, choiceIdx)
+	choiceIdx, err := readIndex()
 	if err != nil {
-		fmt.Println("Error: ", err)
+		fmt.Println("Failed to read choice index: ", err)
+
+		return
+	}
+
+	res, err := getPreferredDish(dishes, choiceIdx)
+	if err != nil {
+		fmt.Println("Failed to get preferred dish ", err)
 
 		return
 	}

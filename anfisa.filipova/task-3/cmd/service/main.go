@@ -35,7 +35,7 @@ type ValuteOutput struct {
 }
 
 func DecodeValuteXML(filepath string) []ValuteOutput {
-	file, err := os.ReadFile(filepath) //OpenFile(filepath, os.O_RDONLY, 0777)
+	file, err := os.ReadFile(filepath)
 	if err != nil {
 		panic(fmt.Sprintf("Error opening file: %v", err))
 	}
@@ -52,6 +52,7 @@ func DecodeValuteXML(filepath string) []ValuteOutput {
 			return nil, fmt.Errorf("unknown charset: %s", charset)
 		}
 	}
+
 	err = decoder.Decode(&valCurs)
 	if err != nil {
 		panic(fmt.Sprintf("Error decoding file: %v", err))
@@ -60,10 +61,12 @@ func DecodeValuteXML(filepath string) []ValuteOutput {
 	var currencies []ValuteOutput
 	for _, valute := range valCurs.Valutes {
 		valueStr := strings.Replace(valute.ValueStr, ",", ".", -1)
+
 		value, err := strconv.ParseFloat(valueStr, 64)
 		if err != nil {
 			panic(fmt.Sprintf("Error type converting: %v", err))
 		}
+
 		currencies = append(currencies, ValuteOutput{
 			NumCode:  valute.NumCode,
 			CharCode: valute.CharCode,

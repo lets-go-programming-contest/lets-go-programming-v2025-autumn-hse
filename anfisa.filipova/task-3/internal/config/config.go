@@ -19,6 +19,7 @@ func LoadConfig(configPath string) *Config {
 	}
 
 	var config Config
+
 	err = yaml.Unmarshal(file, &config)
 	if err != nil {
 		panic(fmt.Sprintf("Error unmarshaling file: %v", err))

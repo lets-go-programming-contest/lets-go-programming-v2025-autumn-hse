@@ -13,7 +13,6 @@ import (
 )
 
 func ReadXML(path string) ([]valute.ValuteInfo, error) {
-	// Check if input file exists
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return nil, err
 	}

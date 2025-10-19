@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -9,13 +10,15 @@ const (
 	maxTemperatureValue = 30
 )
 
+var ErrInvalidSign = errors.New("invalid sign")
+
 type TemperatureRange struct {
 	min int
 	max int
 }
 
-func NewTemperatureRange(min, max int) TemperatureRange {
-	return TemperatureRange{min: min, max: max}
+func NewTemperatureRange(minValue, maxValue int) TemperatureRange {
+	return TemperatureRange{min: minValue, max: maxValue}
 }
 
 func (tr *TemperatureRange) Update(sign string, temperature int) error {
@@ -29,7 +32,7 @@ func (tr *TemperatureRange) Update(sign string, temperature int) error {
 			tr.max = temperature
 		}
 	default:
-		return fmt.Errorf("invalid sign: %s", sign)
+		return fmt.Errorf("%w: %s", ErrInvalidSign, sign)
 	}
 
 	return nil

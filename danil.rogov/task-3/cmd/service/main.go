@@ -17,12 +17,12 @@ func main() {
 
 	cfg, err := config.LoadConfig(*configPath)
 	if err != nil {
-		panic(err)
+		panic("Config error: " + err.Error())
 	}
 
 	input, err := xmlinput.ReadXML(cfg.InputFile)
 	if err != nil {
-		panic(err)
+		panic("XML read error: " + err.Error())
 	}
 
 	slices.SortFunc(input, func(a, b valute.ValuteInfo) int {
@@ -31,6 +31,6 @@ func main() {
 
 	err = jsonoutput.WriteJSON(cfg.OutputFile, input)
 	if err != nil {
-		panic(err)
+		panic("JSON write error: " + err.Error())
 	}
 }

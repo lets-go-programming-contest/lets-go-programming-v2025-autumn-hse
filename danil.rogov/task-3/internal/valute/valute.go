@@ -17,7 +17,7 @@ type Valute struct {
 }
 
 type ValuteInfo struct {
-	NumCode  string
-	CharCode string
-	Value    float64
+	NumCode  int     `json:"num_code"`
+	CharCode string  `json:"char_code"`
+	Value    float64 `json:"value"`
 }

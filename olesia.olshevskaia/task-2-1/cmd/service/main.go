@@ -5,10 +5,8 @@ import (
 )
 
 const (
-	minTemperatureValue      = 15
-	maxTemperatureValue      = 30
-	expectedValuesPerInput   = 2
-	expectedCountDepartments = 1
+	minTemperatureValue = 15
+	maxTemperatureValue = 30
 )
 
 type TemperatureRange struct {
@@ -16,7 +14,11 @@ type TemperatureRange struct {
 	max int
 }
 
-func (tr *TemperatureRange) Update(sign string, temperature int) int {
+func NewTemperatureRange(min, max int) TemperatureRange {
+	return TemperatureRange{min: min, max: max}
+}
+
+func (tr *TemperatureRange) Update(sign string, temperature int) error {
 	switch sign {
 	case ">=":
 		if tr.min < temperature {
@@ -27,10 +29,10 @@ func (tr *TemperatureRange) Update(sign string, temperature int) int {
 			tr.max = temperature
 		}
 	default:
-		return -1
+		return fmt.Errorf("invalid sign: %s", sign)
 	}
 
-	return 0
+	return nil
 }
 
 func (tr *TemperatureRange) Optimum() int {
@@ -39,10 +41,6 @@ func (tr *TemperatureRange) Optimum() int {
 	}
 
 	return tr.min
-}
-
-func NewTemperatureRange() TemperatureRange {
-	return TemperatureRange{min: minTemperatureValue, max: maxTemperatureValue}
 }
 
 func main() {
@@ -58,12 +56,6 @@ func main() {
 		return
 	}
 
-	if returnVal != expectedCountDepartments {
-		fmt.Printf("Expected 1 value for countDepartments, read %d\n", returnVal)
-
-		return
-	}
-
 	var countEmployee int
 
 	for range countDepartments {
@@ -73,7 +65,7 @@ func main() {
 			return
 		}
 
-		temperatureRange := NewTemperatureRange()
+		temperatureRange := NewTemperatureRange(minTemperatureValue, maxTemperatureValue)
 
 		var (
 			sign        string
@@ -85,14 +77,10 @@ func main() {
 				fmt.Printf("Error reading data: %d values read, error: %v\n", returnVal, err)
 
 				return
-			} else if returnVal != expectedValuesPerInput {
-				fmt.Printf("Expected 2 values (sign and temperature), read %d\n", returnVal)
-
-				return
 			}
 
-			if err := temperatureRange.Update(sign, temperature); err == -1 {
-				fmt.Println("incorrect temperature sign")
+			if err := temperatureRange.Update(sign, temperature); err != nil {
+				fmt.Println("incorrect temperature sign", err)
 
 				continue
 			}

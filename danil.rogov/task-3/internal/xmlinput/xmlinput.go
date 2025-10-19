@@ -13,10 +13,6 @@ import (
 )
 
 func ReadXML(path string) ([]valute.ValuteInfo, error) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, err
-	}
-
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("open file: %w", err)

@@ -1,6 +1,8 @@
 package config
 
 import (
+	"flag"
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -11,32 +13,21 @@ type Config struct {
 	OutputFile string `yaml:"output_file"`
 }
 
-func LoadConfig(path string) (*Config, error) {
-	if path == "" {
-		return nil, &os.PathError{Op: "open", Path: "", Err: os.ErrNotExist}
-	}
+func Load() (Config, error) {
+	configPath := flag.String("config", "", "config file path")
+	flag.Parse()
 
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, err
-	}
-
-	data, err := os.ReadFile(path)
+	dataConfig, err := os.ReadFile(*configPath)
 	if err != nil {
-		return nil, err
+		return Config{}, fmt.Errorf("error read config: %w", err)
 	}
 
 	var config Config
-	err = yaml.Unmarshal(data, &config)
+
+	err = yaml.Unmarshal(dataConfig, &config)
 	if err != nil {
-		return nil, err
+		return Config{}, fmt.Errorf("error parsing yaml: %w", err)
 	}
 
-	if config.InputFile == "" {
-		return nil, &os.PathError{Op: "open", Path: "input_file", Err: os.ErrInvalid}
-	}
-	if config.OutputFile == "" {
-		return nil, &os.PathError{Op: "open", Path: "output_file", Err: os.ErrInvalid}
-	}
-
-	return &config, nil
+	return config, nil
 }

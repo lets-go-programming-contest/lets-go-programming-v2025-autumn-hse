@@ -13,9 +13,6 @@ import (
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
-		panic(err)
-	}
-	if err != nil {
 		panic("Config error: " + err.Error())
 	}
 

@@ -63,8 +63,7 @@ func DecodeValuteXML(filepath string) []ValuteOutput {
 		panic(fmt.Sprintf("Error decoding file: %v", err))
 	}
 
-	var currencies []ValuteOutput
-	currencies = make([]ValuteOutput, 0, maxValuteCount)
+	currencies := make([]ValuteOutput, 0, maxValuteCount)
 
 	for _, valute := range valCurs.Valutes {
 		valueStr := strings.ReplaceAll(valute.ValueStr, ",", ".")
@@ -92,6 +91,7 @@ func SortCurrencies(currencies []ValuteOutput) {
 
 func WriteJSON(currencies []ValuteOutput, filePath string) {
 	dir := filepath.Dir(filePath)
+
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		panic(fmt.Sprintf("Error creating directory: %v", err))
 	}

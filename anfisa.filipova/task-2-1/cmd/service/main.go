@@ -5,6 +5,11 @@ import (
 	"fmt"
 )
 
+const (
+	defaultUpperBound int = 30
+	defaultLowerBound int = 15
+)
+
 type TemperatureManager struct {
 	UpperBound int
 	LowerBound int
@@ -39,14 +44,9 @@ func (t *TemperatureManager) getOptimalTemperature() (int, error) {
 }
 
 func main() {
-	const (
-		defaultUpperBound int = 30
-		defaultLowerBound int = 15
-	)
-
 	var departmentCount int
 	if _, err := fmt.Scan(&departmentCount); err != nil {
-		fmt.Println("Reading error: ", err)
+		fmt.Println("Failed to read count of departments: ", err)
 
 		return
 	}
@@ -56,7 +56,7 @@ func main() {
 
 		var employeeCount int
 		if _, err := fmt.Scan(&employeeCount); err != nil {
-			fmt.Println("Reading error: ", err)
+			fmt.Println("Failed to read count of employees: ", err)
 
 			return
 		}
@@ -68,7 +68,7 @@ func main() {
 			)
 
 			if _, err := fmt.Scan(&mathSign, &value); err != nil {
-				fmt.Println("Reading error: ", err)
+				fmt.Println("Failed to read bound: ", err)
 
 				return
 			}

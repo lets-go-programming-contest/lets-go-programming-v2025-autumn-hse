@@ -2,7 +2,6 @@ package main
 
 import (
 	"cmp"
-	"flag"
 	"slices"
 
 	"github.com/Tapochek2894/task-3/internal/config"
@@ -12,10 +11,10 @@ import (
 )
 
 func main() {
-	configPath := flag.String("config", "", "path to config file")
-	flag.Parse()
-
-	cfg, err := config.LoadConfig(*configPath)
+	cfg, err := config.Load()
+	if err != nil {
+		panic(err)
+	}
 	if err != nil {
 		panic("Config error: " + err.Error())
 	}

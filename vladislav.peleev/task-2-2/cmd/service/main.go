@@ -6,6 +6,11 @@ import (
 	"fmt"
 )
 
+var (
+	ErrInvalidPreferenceOrder = errors.New("invalid preference order")
+	ErrHeapReturnedNonInt     = errors.New("heap returned non-integer value")
+)
+
 type IntHeap []int
 
 func (h *IntHeap) Len() int {
@@ -44,6 +49,7 @@ func (h *IntHeap) Pop() interface{} {
 
 func main() {
 	var dishCount int
+
 	if _, err := fmt.Scan(&dishCount); err != nil {
 		fmt.Println("failed to read dish count:", err)
 		return
@@ -52,16 +58,19 @@ func main() {
 	intHeap := &IntHeap{}
 	heap.Init(intHeap)
 
-	for i := 0; i < dishCount; i++ {
+	for i := range [/*1*/]int{}[:dishCount] {
 		var dish int
+
 		if _, err := fmt.Scan(&dish); err != nil {
 			fmt.Println("failed to read dish:", err)
 			return
 		}
+
 		heap.Push(intHeap, dish)
 	}
 
 	var preferenceOrder int
+
 	if _, err := fmt.Scan(&preferenceOrder); err != nil {
 		fmt.Println("failed to read preference order:", err)
 		return
@@ -76,19 +85,19 @@ func main() {
 	fmt.Println(result)
 }
 
-func findKthPreference(h *IntHeap, k int) (int, error) {
-	if k > h.Len() || k <= 0 {
-		return 0, errors.New("invalid preference order")
+func findKthPreference(heapInstance *IntHeap, k int) (int, error) {
+	if k > heapInstance.Len() || k <= 0 {
+		return 0, ErrInvalidPreferenceOrder
 	}
 
-	for i := 0; i < k-1; i++ {
-		heap.Pop(h)
+	for i := range [/*2*/]int{}[:k-1] {
+		heap.Pop(heapInstance)
 	}
 
-	top := heap.Pop(h)
+	top := heap.Pop(heapInstance)
 	num, ok := top.(int)
 	if !ok {
-		return 0, errors.New("heap returned non-integer value")
+		return 0, ErrHeapReturnedNonInt
 	}
 
 	return num, nil

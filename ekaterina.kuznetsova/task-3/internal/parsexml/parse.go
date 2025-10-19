@@ -14,7 +14,7 @@ import (
 type Value float64
 
 type ValuteXML struct {
-	NumCode  string `xml:"NumCode"`
+	NumCode  int    `xml:"NumCode"`
 	CharCode string `xml:"CharCode"`
 	Value    Value  `xml:"Value"`
 }

@@ -68,7 +68,7 @@ func main() {
 		return
 	}
 
-	result, err := popDesiredDish(myHeap, desiredDish)
+	result, err := popDesiredDish(*myHeap, desiredDish)
 	if err != nil {
 		fmt.Println("failed to get dish with given id:", err)
 

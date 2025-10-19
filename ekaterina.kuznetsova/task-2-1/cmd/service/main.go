@@ -20,36 +20,15 @@ var (
 type TemperatureValidator struct {
 	minTemperature int
 	maxTemperature int
-	errTemperature error
 }
 
 func (v *TemperatureValidator) lessOrEqual(temperature int) {
-	if temperature < v.minTemperature || temperature < minTemperatureConst {
-		v.errTemperature = ErrTemperatureTooSmall
-	}
-
-	if v.errTemperature != nil {
-		v.minTemperature = -1
-
-		return
-	}
-
 	if temperature < v.maxTemperature {
 		v.maxTemperature = temperature
 	}
 }
 
 func (v *TemperatureValidator) moreOrEqual(temperature int) {
-	if v.maxTemperature < temperature || temperature > maxTemperatureConst {
-		v.errTemperature = ErrTemperatureTooBig
-	}
-
-	if v.errTemperature != nil {
-		v.minTemperature = -1
-
-		return
-	}
-
 	if v.minTemperature < temperature {
 		v.minTemperature = temperature
 	}
@@ -66,6 +45,14 @@ func (v *TemperatureValidator) compareValues(temperature int, comparisonSign str
 	}
 
 	return nil
+}
+
+func (v *TemperatureValidator) getOptimum() int {
+	if v.minTemperature > v.maxTemperature {
+		return -1
+	}
+
+	return v.minTemperature
 }
 
 func main() {
@@ -94,7 +81,6 @@ func main() {
 		validator := TemperatureValidator{
 			minTemperature: minTemperatureConst,
 			maxTemperature: maxTemperatureConst,
-			errTemperature: nil,
 		}
 
 		for range numberEmployees {
@@ -112,7 +98,7 @@ func main() {
 				return
 			}
 
-			fmt.Println(validator.minTemperature)
+			fmt.Println(validator.getOptimum())
 		}
 	}
 }

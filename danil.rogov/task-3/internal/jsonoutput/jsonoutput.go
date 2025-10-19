@@ -3,27 +3,37 @@ package jsonoutput
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 
 	"github.com/Tapochek2894/task-3/internal/valute"
 )
 
-func WriteJSON(path string, val []valute.ValuteInfo) error {
+func WriteJSON(path string, valutes []valute.ValuteInfo) error {
+	dir := filepath.Dir(path)
+
+	err := os.MkdirAll(dir, 0o755)
+	if err != nil {
+		panic("failed to create directory")
+	}
+
 	file, err := os.Create(path)
 	if err != nil {
-		return err
+		panic("failed to create output file")
 	}
 
-	defer file.Close()
+	defer func() {
+		err = file.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
 
-	data, err := json.MarshalIndent(val, "", "  ")
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+
+	err = encoder.Encode(valutes)
 	if err != nil {
 		return err
 	}
-
-	_, err = file.Write(data)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }

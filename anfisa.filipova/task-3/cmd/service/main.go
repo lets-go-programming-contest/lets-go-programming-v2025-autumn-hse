@@ -106,7 +106,7 @@ func WriteJSON(currencies []ValuteOutput, filePath string) {
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("Recovered from panic: ", r)
+			fmt.Fprintf(os.Stderr, "Recovered from panic: %v\n", r)
 		}
 	}()
 	configPath := flag.String("config", "", "Path to configuration file")

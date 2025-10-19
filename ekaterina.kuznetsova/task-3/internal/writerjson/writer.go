@@ -24,11 +24,6 @@ func CreateValuteCursJSON(valCurs parsexml.ValuteCurs) ([]byte, error) {
 	valutesOutput := make([]Valute, 0, len(valCurs.Valutes))
 
 	for _, valute := range valCurs.Valutes {
-		// numCode, err := strconv.Atoi(valute.NumCode)
-		// if err != nil {
-		// 	numCode = 0
-		// }
-
 		valutesOutput = append(valutesOutput, Valute{
 			NumCode:  valute.NumCode,
 			CharCode: valute.CharCode,

@@ -38,6 +38,7 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("Failed to create output file: %v", err))
 	}
+
 	defer func() {
 		if err := file.Close(); err != nil {
 			panic(fmt.Sprintf("Failed to close file: %v", err))

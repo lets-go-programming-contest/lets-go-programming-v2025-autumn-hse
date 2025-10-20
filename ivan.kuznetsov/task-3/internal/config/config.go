@@ -16,6 +16,7 @@ func Load(configFlag *string) *Config {
 	configFile, err := os.Open(*configFlag)
 	if err != nil {
 		fmt.Println(err.Error())
+		return nil
 	}
 
 	defer func() {

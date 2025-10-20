@@ -49,9 +49,10 @@ func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 	sort.Slice(sorted, func(i, j int) bool {
 		return sorted[i].Value > sorted[j].Value
 	})
+
 	output := make([]models.OutputValute, 0, len(sorted))
 
-	for _, v := range valCurs.Valutes {
+	for _, v := range sorted {
 		output = append(output, models.OutputValute{
 			NumCode:  v.NumCode,
 			CharCode: v.CharCode,

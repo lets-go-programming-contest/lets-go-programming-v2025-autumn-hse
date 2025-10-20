@@ -5,51 +5,40 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/kuzid-17/task-3/internal/xmlparser"
 )
 
-type OutputValute struct {
-	NumCode  int     `json:"num_code"`
-	CharCode string  `json:"char_code"`
-	Value    float64 `json:"value"`
-}
-
 const mode = 0o755
 
-func WriteJSON(filename string, valutes []xmlparser.Valute) {
+func WriteJSON(filename string, valutes []xmlparser.OutputValute) {
 	dir := filepath.Dir(filename)
 
 	err := os.MkdirAll(dir, mode)
 	if err != nil {
-		panic("failed to create directory")
+		fmt.Println("failed to create directory")
 	}
 
-	output := make([]OutputValute, 0, len(valutes))
+	output := make([]xmlparser.OutputValute, 0, len(valutes))
 
 	for _, valute := range valutes {
-		numCode, err := strconv.Atoi(valute.NumCode)
-		if err != nil {
-			numCode = 0
-		}
 
-		output = append(output, OutputValute{
-			NumCode:  numCode,
+		output = append(output, xmlparser.OutputValute{
+			NumCode:  valute.NumCode,
 			CharCode: valute.CharCode,
-			Value:    float64(valute.Value),
+			Value:    xmlparser.CommaFloat(valute.Value),
 		})
 	}
 
 	file, err := os.Create(filename)
 	if err != nil {
-		panic("failed to create output file")
+		fmt.Println("failed to create output file")
 	}
 
 	defer func() {
 		err = file.Close()
 		if err != nil {
-			fmt.Println("error closing file", err)
+			panic("error closing file")
 		}
 	}()
 
@@ -58,6 +47,6 @@ func WriteJSON(filename string, valutes []xmlparser.Valute) {
 
 	err = encoder.Encode(output)
 	if err != nil {
-		panic("failed to encode JSON")
+		fmt.Println("failed to encode JSON")
 	}
 }

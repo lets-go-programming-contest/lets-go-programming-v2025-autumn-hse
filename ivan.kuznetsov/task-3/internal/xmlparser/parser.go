@@ -31,20 +31,20 @@ func (cf *CommaFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 	return nil
 }
 
-type ValCurs struct {
-	Valutes []Valute `xml:"Valute"`
+type OutputValute struct {
+	NumCode  int        `json:"num_code" xml:"NumCode"`
+	CharCode string     `json:"char_code" xml:"CharCode"`
+	Value    CommaFloat `json:"value" xml:"Value"`
 }
 
-type Valute struct {
-	NumCode  string     `xml:"NumCode"`
-	CharCode string     `xml:"CharCode"`
-	Value    CommaFloat `xml:"Value"`
+type ValCurs struct {
+	Valutes []OutputValute `xml:"Valute"`
 }
 
 func ParseXML(filename string) *ValCurs {
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		panic(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	decoder := xml.NewDecoder(bytes.NewReader(data))
@@ -54,7 +54,7 @@ func ParseXML(filename string) *ValCurs {
 
 	err = decoder.Decode(&valCurs)
 	if err != nil {
-		panic(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	return &valCurs

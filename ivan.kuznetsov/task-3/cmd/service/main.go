@@ -12,6 +12,7 @@ import (
 func main() {
 	configFlag := flag.String("config", "", "Config file path")
 	flag.Parse()
+
 	config := config.Load(configFlag)
 
 	valCurs := xmlparser.ParseXML(config.InputFile)

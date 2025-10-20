@@ -22,7 +22,6 @@ func WriteJSON(filename string, valutes []xmlparser.OutputValute) {
 	output := make([]xmlparser.OutputValute, 0, len(valutes))
 
 	for _, valute := range valutes {
-
 		output = append(output, xmlparser.OutputValute{
 			NumCode:  valute.NumCode,
 			CharCode: valute.CharCode,
@@ -38,7 +37,7 @@ func WriteJSON(filename string, valutes []xmlparser.OutputValute) {
 	defer func() {
 		err = file.Close()
 		if err != nil {
-			panic("error closing file")
+			panic(err.Error())
 		}
 	}()
 

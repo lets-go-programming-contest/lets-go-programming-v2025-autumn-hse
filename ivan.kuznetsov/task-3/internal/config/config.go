@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -12,10 +11,10 @@ type Config struct {
 	OutputFile string `yaml:"output-file"`
 }
 
-func Load(configFlag *string) *Config {
+func Load(configFlag *string) (*Config, error) {
 	configFile, err := os.Open(*configFlag)
 	if err != nil {
-		fmt.Println(err.Error())
+		return nil, err
 	}
 
 	defer func() {
@@ -31,8 +30,8 @@ func Load(configFlag *string) *Config {
 
 	err = decoder.Decode(&configData)
 	if err != nil {
-		fmt.Println(err.Error())
+		return nil, err
 	}
 
-	return &configData
+	return &configData, nil
 }

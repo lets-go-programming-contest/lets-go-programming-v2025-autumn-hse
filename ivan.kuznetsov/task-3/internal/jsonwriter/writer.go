@@ -11,12 +11,12 @@ import (
 
 const mode = 0o755
 
-func WriteJSON(filename string, valutes []xmlparser.OutputValute) {
+func WriteJSON(filename string, valutes []xmlparser.OutputValute) int {
 	dir := filepath.Dir(filename)
 
 	err := os.MkdirAll(dir, mode)
 	if err != nil {
-		panic("failed to create directory")
+		return -1
 	}
 
 	output := make([]xmlparser.OutputValute, 0, len(valutes))
@@ -31,13 +31,13 @@ func WriteJSON(filename string, valutes []xmlparser.OutputValute) {
 
 	file, err := os.Create(filename)
 	if err != nil {
-		panic("failed to create output file")
+		return -1
 	}
 
 	defer func() {
 		err = file.Close()
 		if err != nil {
-			panic(err.Error() + "111")
+			panic(err.Error())
 		}
 	}()
 
@@ -48,4 +48,6 @@ func WriteJSON(filename string, valutes []xmlparser.OutputValute) {
 	if err != nil {
 		fmt.Println("failed to encode JSON")
 	}
+
+	return 0
 }

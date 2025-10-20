@@ -38,6 +38,7 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("Failed to create output file: %v", err))
 	}
+
 	defer func() {
 		if err := file.Close(); err != nil {
 			panic(fmt.Sprintf("Failed to close file: %v", err))
@@ -46,9 +47,8 @@ func main() {
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
-	err = encoder.Encode(valutes)
 
-	if err != nil {
+	if err = encoder.Encode(valutes); err != nil {
 		panic(fmt.Sprintf("Failed to encode JSON: %v", err))
 	}
 

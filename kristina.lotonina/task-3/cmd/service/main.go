@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"os"
+
 	"github.com/kef1rch1k/task-3/internal/config"
 	"github.com/kef1rch1k/task-3/internal/parser"
 	"github.com/kef1rch1k/task-3/internal/utils"
-	"os"
 )
 
 func main() {

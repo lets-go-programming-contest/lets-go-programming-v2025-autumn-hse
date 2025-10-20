@@ -37,6 +37,7 @@ func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 	for index, v := range valCurs.Valutes {
 		val := strings.Replace(v.ValueStr, ",", ".", 1)
 		floatVal, err := strconv.ParseFloat(strings.TrimSpace(val), 64)
+
 		if err != nil {
 			return nil, fmt.Errorf("parsing float: %w", err)
 		}

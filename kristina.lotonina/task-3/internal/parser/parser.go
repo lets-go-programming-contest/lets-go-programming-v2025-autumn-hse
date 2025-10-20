@@ -48,7 +48,6 @@ func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 	sort.Slice(valCurs.Valutes, func(index, j int) bool {
 		return valCurs.Valutes[index].Value > valCurs.Valutes[j].Value
 	})
-
 	output := make([]models.OutputValute, 0, len(valCurs.Valutes))
 
 	for _, v := range valCurs.Valutes {

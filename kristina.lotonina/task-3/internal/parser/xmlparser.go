@@ -13,7 +13,6 @@ import (
 	"github.com/kef1rch1k/task-3/internal/models"
 )
 
-
 func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -34,17 +33,17 @@ func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 		return nil, err
 	}
 
-	for i, v := range valCurs.Valutes {
+	for index, v := range valCurs.Valutes {
 		val := strings.Replace(v.ValueStr, ",", ".", 1)
 		floatVal, err := strconv.ParseFloat(strings.TrimSpace(val), 64)
 		if err != nil {
 			return nil, err
 		}
-		valCurs.Valutes[i].Value = floatVal
+		valCurs.Valutes[index].Value = floatVal
 	}
 
-	sort.Slice(valCurs.Valutes, func(i, j int) bool {
-		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
+	sort.Slice(valCurs.Valutes, func(index, j int) bool {
+		return valCurs.Valutes[index].Value > valCurs.Valutes[j].Value
 	})
 
 	output := make([]models.OutputValute, 0, len(valCurs.Valutes))

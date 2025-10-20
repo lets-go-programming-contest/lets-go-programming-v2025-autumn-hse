@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -8,5 +9,9 @@ import (
 func EnsureDir(filePath string) error {
 	dir := filepath.Dir(filePath)
 
-	return os.MkdirAll(dir, os.ModePerm)
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		return fmt.Errorf("creating directory %s: %w", dir, err)
+	}
+
+	return nil
 }

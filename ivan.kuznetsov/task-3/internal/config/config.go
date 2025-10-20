@@ -15,14 +15,13 @@ type Config struct {
 func Load(configFlag *string) *Config {
 	configFile, err := os.Open(*configFlag)
 	if err != nil {
-		fmt.Println(err.Error() + "A_!")
-		return nil
+		fmt.Println(err.Error())
 	}
 
 	defer func() {
 		err = configFile.Close()
 		if err != nil {
-			panic(err.Error())
+			panic(err.Error() + "AAA")
 		}
 	}()
 
@@ -32,7 +31,7 @@ func Load(configFlag *string) *Config {
 
 	err = decoder.Decode(&configData)
 	if err != nil {
-		fmt.Println(err.Error() + "B_!")
+		fmt.Println(err.Error())
 	}
 
 	return &configData

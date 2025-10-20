@@ -44,7 +44,7 @@ type ValCurs struct {
 func ParseXML(filename string) *ValCurs {
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		fmt.Println(err.Error() + "cc_!")
+		fmt.Println(err.Error())
 	}
 
 	decoder := xml.NewDecoder(bytes.NewReader(data))
@@ -54,7 +54,7 @@ func ParseXML(filename string) *ValCurs {
 
 	err = decoder.Decode(&valCurs)
 	if err != nil {
-		fmt.Println(err.Error() + "dd_!")
+		fmt.Println(err.Error())
 	}
 
 	return &valCurs

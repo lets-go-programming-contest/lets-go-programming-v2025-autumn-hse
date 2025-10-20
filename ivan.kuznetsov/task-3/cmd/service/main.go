@@ -17,7 +17,7 @@ func main() {
 
 	valCurs := xmlparser.ParseXML(config.InputFile)
 	if valCurs == nil {
-		panic("no such file or directory")
+		panic("did not find expected key")
 	}
 
 	sort.Slice(valCurs.Valutes, func(i, j int) bool {

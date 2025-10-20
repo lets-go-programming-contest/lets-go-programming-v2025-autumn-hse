@@ -16,7 +16,7 @@ func WriteJSON(filename string, valutes []xmlparser.OutputValute) {
 
 	err := os.MkdirAll(dir, mode)
 	if err != nil {
-		fmt.Println("failed to create directory")
+		panic("failed to create directory")
 	}
 
 	output := make([]xmlparser.OutputValute, 0, len(valutes))
@@ -31,7 +31,7 @@ func WriteJSON(filename string, valutes []xmlparser.OutputValute) {
 
 	file, err := os.Create(filename)
 	if err != nil {
-		fmt.Println("failed to create output file")
+		panic("failed to create output file")
 	}
 
 	defer func() {

@@ -15,7 +15,7 @@ type Config struct {
 func Load(configFlag *string) *Config {
 	configFile, err := os.Open(*configFlag)
 	if err != nil {
-		fmt.Println(err.Error())
+		panic(err.Error())
 	}
 
 	defer func() {

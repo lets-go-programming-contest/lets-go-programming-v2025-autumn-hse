@@ -8,9 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/net/html/charset"
-
 	"github.com/kef1rch1k/task-3/internal/models"
+	"golang.org/x/net/html/charset"
 )
 
 func ParseAndSortXML(path string) ([]models.OutputValute, error) {

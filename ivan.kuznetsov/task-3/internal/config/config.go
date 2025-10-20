@@ -13,19 +13,15 @@ type Config struct {
 }
 
 func Load(configFlag *string) *Config {
-	if *configFlag == "" {
-		panic("invalid config file path")
-	}
-
 	configFile, err := os.Open(*configFlag)
 	if err != nil {
-		panic(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	defer func() {
 		err = configFile.Close()
 		if err != nil {
-			panic(err.Error() + "AAA")
+			panic(err.Error())
 		}
 	}()
 

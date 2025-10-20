@@ -16,10 +16,15 @@ func main() {
 	config := config.Load(configFlag)
 
 	valCurs := xmlparser.ParseXML(config.InputFile)
+	if valCurs == nil {
+		panic("no such file or directory")
+	}
 
 	sort.Slice(valCurs.Valutes, func(i, j int) bool {
 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
 	})
 
-	jsonwriter.WriteJSON(config.OutputFile, valCurs.Valutes)
+	if jsonwriter.WriteJSON(config.OutputFile, valCurs.Valutes) == -1 {
+		panic("did not find expected key")
+	}
 }

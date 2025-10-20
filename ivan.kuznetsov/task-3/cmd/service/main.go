@@ -13,18 +13,22 @@ func main() {
 	configFlag := flag.String("config", "", "Config file path")
 	flag.Parse()
 
-	config := config.Load(configFlag)
+	config, err := config.Load(configFlag)
+	if err != nil {
+		panic(err.Error())
+	}
 
-	valCurs := xmlparser.ParseXML(config.InputFile)
-	if valCurs == nil {
-		panic("did not find expected key")
+	valCurs, err := xmlparser.ParseXML(config.InputFile)
+	if err != nil {
+		panic(err.Error())
 	}
 
 	sort.Slice(valCurs.Valutes, func(i, j int) bool {
 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
 	})
 
-	if jsonwriter.WriteJSON(config.OutputFile, valCurs.Valutes) == -1 {
-		panic("did not find expected key")
+	err = jsonwriter.WriteJSON(config.OutputFile, valCurs.Valutes)
+	if err != nil {
+		panic(err.Error())
 	}
 }

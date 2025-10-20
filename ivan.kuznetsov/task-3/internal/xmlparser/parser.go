@@ -41,10 +41,10 @@ type ValCurs struct {
 	Valutes []OutputValute `xml:"Valute"`
 }
 
-func ParseXML(filename string) *ValCurs {
+func ParseXML(filename string) (*ValCurs, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	decoder := xml.NewDecoder(bytes.NewReader(data))
@@ -54,8 +54,8 @@ func ParseXML(filename string) *ValCurs {
 
 	err = decoder.Decode(&valCurs)
 	if err != nil {
-		fmt.Println(err.Error())
+		return nil, err
 	}
 
-	return &valCurs
+	return &valCurs, nil
 }

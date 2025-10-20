@@ -2,6 +2,7 @@ package jsonwriter
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -15,7 +16,7 @@ func WriteJSON(filename string, valutes []xmlparser.OutputValute) error {
 
 	err := os.MkdirAll(dir, mode)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
 	output := make([]xmlparser.OutputValute, 0, len(valutes))
@@ -30,7 +31,7 @@ func WriteJSON(filename string, valutes []xmlparser.OutputValute) error {
 
 	file, err := os.Create(filename)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create output file: %w", err)
 	}
 
 	defer func() {
@@ -45,7 +46,7 @@ func WriteJSON(filename string, valutes []xmlparser.OutputValute) error {
 
 	err = encoder.Encode(output)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to encode JSON: %w", err)
 	}
 
 	return nil

@@ -1,7 +1,6 @@
 package config
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
@@ -13,23 +12,16 @@ type Config struct {
 	OutputFile string `yaml:"output-file"`
 }
 
-func Load() *Config {
-	configFlag := flag.String("config", "", "Config file path")
-	flag.Parse()
-
-	if *configFlag == "" {
-		panic("invalid config file path")
-	}
-
+func Load(configFlag *string) *Config {
 	configFile, err := os.Open(*configFlag)
 	if err != nil {
-		panic(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	defer func() {
 		err = configFile.Close()
 		if err != nil {
-			fmt.Println("error closing file", err)
+			panic("error closing file")
 		}
 	}()
 
@@ -39,7 +31,7 @@ func Load() *Config {
 
 	err = decoder.Decode(&configData)
 	if err != nil {
-		panic(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	return &configData

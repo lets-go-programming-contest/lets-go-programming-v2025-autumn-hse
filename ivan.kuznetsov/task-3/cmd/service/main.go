@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"sort"
 
 	"github.com/kuzid-17/task-3/internal/config"
@@ -9,7 +10,10 @@ import (
 )
 
 func main() {
-	config := config.Load()
+	configFlag := flag.String("config", "", "Config file path")
+	flag.Parse()
+	config := config.Load(configFlag)
+
 	valCurs := xmlparser.ParseXML(config.InputFile)
 
 	sort.Slice(valCurs.Valutes, func(i, j int) bool {

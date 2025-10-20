@@ -47,6 +47,7 @@ func main() {
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 	err = encoder.Encode(valutes)
+
 	if err != nil {
 		panic(fmt.Sprintf("Failed to encode JSON: %v", err))
 	}

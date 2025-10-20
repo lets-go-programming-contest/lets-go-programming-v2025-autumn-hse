@@ -13,6 +13,10 @@ type Config struct {
 }
 
 func Load(configFlag *string) *Config {
+	if *configFlag == "" {
+		panic("invalid config file path")
+	}
+
 	configFile, err := os.Open(*configFlag)
 	if err != nil {
 		panic(err.Error())

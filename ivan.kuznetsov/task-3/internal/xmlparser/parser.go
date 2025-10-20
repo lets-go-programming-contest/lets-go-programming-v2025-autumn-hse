@@ -32,9 +32,9 @@ func (cf *CommaFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 }
 
 type OutputValute struct {
-	NumCode  int        `json:"num_code" xml:"NumCode"`
+	NumCode  int        `json:"num_code"  xml:"NumCode"`
 	CharCode string     `json:"char_code" xml:"CharCode"`
-	Value    CommaFloat `json:"value" xml:"Value"`
+	Value    CommaFloat `json:"value"     xml:"Value"`
 }
 
 type ValCurs struct {

@@ -1,24 +1,31 @@
 package parser
 
 import (
-	"github.com/kef1rch1k/task-3/internal/models"
 	"encoding/xml"
-	"fmt"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/kef1rch1k/task-3/internal/models"
+
+	"golang.org/x/net/html/charset"
 )
 
+
 func ParseAndSortXML(path string) ([]models.OutputValute, error) {
-	data, err := os.ReadFile(path)
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
+
+	decoder := xml.NewDecoder(file)
+
+	decoder.CharsetReader = charset.NewReaderLabel
 
 	var valCurs models.ValCurs
-	err = xml.Unmarshal(data, &valCurs)
-	if err != nil {
+	if err := decoder.Decode(&valCurs); err != nil {
 		return nil, err
 	}
 
@@ -26,7 +33,7 @@ func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 		val := strings.Replace(v.ValueStr, ",", ".", 1)
 		floatVal, err := strconv.ParseFloat(strings.TrimSpace(val), 64)
 		if err != nil {
-			return nil, fmt.Errorf("invalid float in value: %s", v.ValueStr)
+			return nil, err
 		}
 		valCurs.Valutes[i].Value = floatVal
 	}

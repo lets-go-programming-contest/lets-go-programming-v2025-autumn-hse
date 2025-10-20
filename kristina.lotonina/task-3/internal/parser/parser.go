@@ -18,6 +18,7 @@ func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 	if err != nil {
 		return nil, fmt.Errorf("opening XML file: %w", err)
 	}
+
 	defer func() {
 		if err := file.Close(); err != nil {
 			panic(fmt.Sprintf("Failed to close file: %v", err))
@@ -39,6 +40,7 @@ func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 		if err != nil {
 			return nil, fmt.Errorf("parsing float: %w", err)
 		}
+
 		valCurs.Valutes[index].Value = floatVal
 	}
 

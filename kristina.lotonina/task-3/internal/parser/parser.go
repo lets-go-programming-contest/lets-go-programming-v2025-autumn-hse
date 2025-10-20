@@ -16,7 +16,7 @@ import (
 func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("opening XML file: %w", err)
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
@@ -30,14 +30,14 @@ func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 
 	var valCurs models.ValCurs
 	if err := decoder.Decode(&valCurs); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("decoding XML: %w", err)
 	}
 
 	for index, v := range valCurs.Valutes {
 		val := strings.Replace(v.ValueStr, ",", ".", 1)
 		floatVal, err := strconv.ParseFloat(strings.TrimSpace(val), 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("parsing float: %w", err)
 		}
 		valCurs.Valutes[index].Value = floatVal
 	}

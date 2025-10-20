@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kef1rch1k/task-3/internal/models"
-
 	"golang.org/x/net/html/charset"
+
+	"github.com/kef1rch1k/task-3/internal/models"
 )
 
 
@@ -18,7 +18,11 @@ func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			panic(fmt.Sprintf("Failed to close file: %v", err))
+		}
+	}()
 
 	decoder := xml.NewDecoder(file)
 

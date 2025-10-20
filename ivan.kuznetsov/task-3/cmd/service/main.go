@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	configFlag := flag.String("config", "", "Config file path")
+	configFlag := flag.String("config", "default", "Config file path")
 	flag.Parse()
 
 	config := config.Load(configFlag)

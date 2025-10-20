@@ -14,9 +14,6 @@ func main() {
 	flag.Parse()
 
 	config := config.Load(configFlag)
-	if config == nil {
-		panic("abc")
-	}
 
 	valCurs := xmlparser.ParseXML(config.InputFile)
 

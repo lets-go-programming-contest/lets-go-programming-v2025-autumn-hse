@@ -45,10 +45,11 @@ func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 		valCurs.Valutes[index].Value = floatVal
 	}
 
-	sort.Slice(valCurs.Valutes, func(index, j int) bool {
-		return valCurs.Valutes[index].Value > valCurs.Valutes[j].Value
+	sorted := valCurs.Valutes
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].Value > sorted[j].Value
 	})
-	output := make([]models.OutputValute, 0, len(valCurs.Valutes))
+	output := make([]models.OutputValute, 0, len(sorted))
 
 	for _, v := range valCurs.Valutes {
 		output = append(output, models.OutputValute{

@@ -44,8 +44,6 @@ func main() {
 		return
 	}
 
-	var result int
-
 	if neededPreference > dishesContainer.Len() {
 		fmt.Println("incorrect preference number")
 
@@ -65,7 +63,5 @@ func main() {
 		return
 	}
 
-	result = intValue
-
-	fmt.Println(result)
+	fmt.Println(intValue)
 }

@@ -9,29 +9,25 @@ import (
 	"github.com/Tapochek2894/task-3/internal/valute"
 )
 
-const mode = 0o755
+const (
+	dirMode  = 0o555
+	fileMode = 0o666
+)
 
 func WriteJSON(path string, valutes valute.Valutes) error {
-	err := os.MkdirAll(filepath.Dir(path), mode)
+	err := os.MkdirAll(filepath.Dir(path), dirMode)
 	if err != nil {
-		return fmt.Errorf("error creating directory %s with mode %o: %w", path, mode, err)
+		return fmt.Errorf("error creating directory %s: %w", path, err)
 	}
 
-	file, err := os.Create(path)
+	output, err := json.MarshalIndent(valutes, "", "  ")
 	if err != nil {
-		return fmt.Errorf("error creating file %s with mode %o: %w", path, mode, err)
+		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	defer func() {
-		err := file.Close()
-		if err != nil {
-			panic(fmt.Errorf("error closing file %s: %w", path, err))
-		}
-	}()
-
-	enc := json.NewEncoder(file)
-	if err := enc.Encode(&valutes); err != nil {
-		return fmt.Errorf("error encoding to file %s: %w", path, err)
+	err = os.WriteFile(path, output, fileMode)
+	if err != nil {
+		return fmt.Errorf("error writing %s file: %w", path, err)
 	}
 
 	return nil

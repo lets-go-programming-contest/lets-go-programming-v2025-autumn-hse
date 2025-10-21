@@ -53,7 +53,7 @@ func loadConfig(path string) Config {
 func ReadCurrencies(path string) []Currency {
 	file, err := os.Open(path)
 	if err != nil {
-		panic("Can not open XML file: " + path)
+		panic("Can not open XML file: " + path + " - " + err.Error())
 	}
 	defer file.Close()
 
@@ -69,8 +69,9 @@ func ReadCurrencies(path string) []Currency {
 
 	for _, val := range xmlData.Currencies {
 		codeStr := strings.TrimSpace(val.CodeNum)
+		num := 0
 		if codeStr == "" {
-			continue
+			num, _ = strconv.Atoi(codeStr)
 		}
 
 		num, err := strconv.Atoi(codeStr)

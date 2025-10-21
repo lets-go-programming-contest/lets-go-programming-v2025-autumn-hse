@@ -91,8 +91,7 @@ func SortCurrencies(currencies []ValuteOutput) {
 
 func WriteJSON(currencies []ValuteOutput, filePath string) {
 	dir := filepath.Dir(filePath)
-	err := os.MkdirAll(dir, 0755)
-
+	err := os.MkdirAll(dir, 0o755)
 	if err != nil {
 		panic(fmt.Sprintf("Error creating directory: %v", err))
 	}

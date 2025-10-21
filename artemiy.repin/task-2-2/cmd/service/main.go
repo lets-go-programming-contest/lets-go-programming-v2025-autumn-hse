@@ -25,10 +25,11 @@ func main() {
 	inputHeap := &myheap.MinHeap{}
 	stdheap.Init(inputHeap)
 
-	for index := 0; index < heapCount; index++ {
+	for range heapCount {
 		if _, err := fmt.Fscan(input, &preferenceScore); err != nil {
 			return
 		}
+
 		stdheap.Push(inputHeap, preferenceScore)
 	}
 
@@ -40,10 +41,14 @@ func main() {
 		return
 	}
 
-	for removedCount := 0; removedCount < heapCount-preferredRank; removedCount++ {
+	for range heapCount - preferredRank {
 		stdheap.Pop(inputHeap)
 	}
 
-	selectedScore := stdheap.Pop(inputHeap).(int)
-	fmt.Println(selectedScore)
+	val, ok := stdheap.Pop(inputHeap).(int)
+	if !ok {
+		return
+	}
+
+	fmt.Println(val)
 }

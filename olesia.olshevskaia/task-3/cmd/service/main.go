@@ -33,6 +33,7 @@ type Currency struct {
 	CodeNum   int     `json:"num_code"`
 	CodeChar  string  `json:"char_code"`
 	RateValue float64 `json:"value"`
+	HasValue  bool    `json:"-"`
 }
 
 func loadConfig(path string) Config {
@@ -61,38 +62,40 @@ func ReadCurrencies(path string) []Currency {
 
 	var xmlData CurrenciesXML
 	if err := decoder.Decode(&xmlData); err != nil {
-		panic("Error of parsing XML: " + err.Error())
+		panic("Error parsing XML: " + err.Error())
 	}
 
 	result := make([]Currency, 0, len(xmlData.Currencies))
 
 	for _, val := range xmlData.Currencies {
-		if strings.TrimSpace(val.CodeNum) == "" {
+		codeStr := strings.TrimSpace(val.CodeNum)
+		if codeStr == "" {
 			continue
 		}
 
-		num, err := strconv.Atoi(val.CodeNum)
-		if err != nil {
-			panic("NodeNum err: " + val.CodeNum)
-		}
-
-		valueString := strings.ReplaceAll(val.RateValue, ",", ".")
-		valueString = strings.TrimSpace(valueString)
-
-		if valueString == "" {
-			continue
-		}
-
-		value, err := strconv.ParseFloat(valueString, 64)
+		num, err := strconv.Atoi(codeStr)
 		if err != nil {
 			continue
 		}
 
-		result = append(result, Currency{
-			CodeNum:   num,
-			CodeChar:  val.CodeChar,
-			RateValue: value,
-		})
+		valueStr := strings.ReplaceAll(val.RateValue, ",", ".")
+		valueStr = strings.TrimSpace(valueStr)
+
+		c := Currency{
+			CodeNum:  num,
+			CodeChar: val.CodeChar,
+			HasValue: false,
+		}
+
+		if valueStr != "" {
+			value, err := strconv.ParseFloat(valueStr, 64)
+			if err == nil {
+				c.RateValue = value
+				c.HasValue = true
+			}
+		}
+
+		result = append(result, c)
 	}
 
 	return result

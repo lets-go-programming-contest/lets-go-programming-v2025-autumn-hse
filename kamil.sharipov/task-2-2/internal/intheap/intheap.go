@@ -2,13 +2,6 @@ package intheap
 
 import (
 	"container/heap"
-	"errors"
-)
-
-var (
-	ErrInvalidK          = errors.New("k must be positive")
-	ErrNotEnoughElements = errors.New("not enough elements to find k-th maximum")
-	ErrTypeAssertion     = errors.New("type assertion failed")
 )
 
 type IntHeap []int
@@ -60,36 +53,4 @@ func InitIntHeap() *IntHeap {
 	heap.Init(h)
 
 	return h
-}
-
-func KthMaximum(arr []int, kth int) (int, error) {
-	if kth <= 0 {
-		return 0, ErrInvalidK
-	}
-
-	if len(arr) < kth {
-		return 0, ErrNotEnoughElements
-	}
-
-	IntHeap := InitIntHeap()
-	for _, x := range arr {
-		heap.Push(IntHeap, x)
-	}
-
-	var result int
-
-	for i := range kth {
-		val := heap.Pop(IntHeap)
-
-		if i == kth-1 {
-			rating, ok := val.(int)
-			if !ok {
-				return 0, ErrTypeAssertion
-			}
-
-			result = rating
-		}
-	}
-
-	return result, nil
 }

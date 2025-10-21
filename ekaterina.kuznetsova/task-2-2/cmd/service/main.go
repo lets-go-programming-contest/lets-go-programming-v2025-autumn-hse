@@ -46,12 +46,12 @@ func main() {
 		return
 	}
 
-	for range sequenceNumber - 1 {
-		if nil == heap.Pop(&heapRatings) {
-			fmt.Println("heap is empty")
+	if heapRatings.Len() < sequenceNumber {
+		fmt.Println("Not enough elements in the heap")
+	}
 
-			return
-		}
+	for range sequenceNumber - 1 {
+		heap.Pop(&heapRatings)
 	}
 
 	fmt.Println(heap.Pop(&heapRatings))

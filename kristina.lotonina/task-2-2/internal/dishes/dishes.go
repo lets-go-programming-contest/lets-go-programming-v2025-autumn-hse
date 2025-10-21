@@ -20,7 +20,7 @@ func (dishes *Heap) Less(first int, second int) bool {
 func (dishes *Heap) Swap(first int, second int) {
 	length := len(*dishes)
 	if first < 0 || first >= length || second < 0 || second >= length {
-		return
+		panic(fmt.Sprintf("index is out of range, expected [0, %d]", length-1))
 	}
 
 	(*dishes)[first], (*dishes)[second] = (*dishes)[second], (*dishes)[first]

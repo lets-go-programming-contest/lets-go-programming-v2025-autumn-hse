@@ -1,19 +1,20 @@
 package main
 
 import (
-	"cmp"
-	"slices"
+	"flag"
 
 	"github.com/Tapochek2894/task-3/internal/config"
 	"github.com/Tapochek2894/task-3/internal/jsonoutput"
-	"github.com/Tapochek2894/task-3/internal/valute"
 	"github.com/Tapochek2894/task-3/internal/xmlinput"
 )
 
 func main() {
-	cfg, err := config.Load()
+	configPath := flag.String("config", "local.yaml", "path to config file")
+	flag.Parse()
+
+	cfg, err := config.Load(*configPath)
 	if err != nil {
-		panic("Config error: " + err.Error())
+		panic("Config read error: " + err.Error())
 	}
 
 	input, err := xmlinput.ReadXML(cfg.InputFile)
@@ -21,11 +22,9 @@ func main() {
 		panic("XML read error: " + err.Error())
 	}
 
-	slices.SortFunc(input, func(a, b valute.ValuteInfo) int {
-		return -cmp.Compare(a.Value, b.Value)
-	})
+	input.Sort(true)
 
-	err = jsonoutput.WriteJSON(cfg.OutputFile, input)
+	err = jsonoutput.CreateValuteCursJSON(cfg.OutputFile, input)
 	if err != nil {
 		panic("JSON write error: " + err.Error())
 	}

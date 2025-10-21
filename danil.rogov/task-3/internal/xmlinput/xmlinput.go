@@ -1,53 +1,78 @@
 package xmlinput
 
 import (
+	"bytes"
+	"cmp"
 	"encoding/xml"
 	"fmt"
-	"io"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
-	"github.com/Tapochek2894/task-3/internal/valute"
-	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/net/html/charset"
 )
 
-func ReadXML(path string) ([]valute.ValuteInfo, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("open file: %w", err)
-	}
-	defer file.Close()
+type Value float64
 
-	decoder := xml.NewDecoder(file)
-	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
-		switch strings.ToLower(charset) {
-		case "windows-1251":
-			return charmap.Windows1251.NewDecoder().Reader(input), nil
-		default:
-			return input, nil
-		}
-	}
+type Valute struct {
+	NumCode  int
+	CharCode string
+	Value    Value
+}
 
-	var valCurs valute.ValCurs
-	if err := decoder.Decode(&valCurs); err != nil {
-		return nil, fmt.Errorf("decode XML: %w", err)
-	}
+type ValuteCurs struct {
+	Valutes []Valute `xml:"Valute"`
+}
 
-	result := make([]valute.ValuteInfo, 0, len(valCurs.Valutes))
-	for _, v := range valCurs.Valutes {
-		valueStr := strings.ReplaceAll(v.Value, ",", ".")
-		value, err := strconv.ParseFloat(valueStr, 64)
-		if err != nil {
-			return nil, fmt.Errorf("parse value %s: %w", v.Value, err)
-		}
-		numcode, _ := strconv.Atoi(v.NumCode)
-		result = append(result, valute.ValuteInfo{
-			NumCode:  numcode,
-			CharCode: v.CharCode,
-			Value:    value,
+func (v *ValuteCurs) Sort(reverse bool) {
+	switch reverse {
+	case true:
+		slices.SortFunc(v.Valutes, func(a, b Valute) int {
+			return cmp.Compare(b.Value, a.Value)
+		})
+	case false:
+		slices.SortFunc(v.Valutes, func(a, b Valute) int {
+			return -cmp.Compare(b.Value, a.Value)
 		})
 	}
+}
 
-	return result, nil
+func (v *Value) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var str string
+
+	err := d.DecodeElement(&str, &start)
+	if err != nil {
+		return fmt.Errorf("error decoding xml: %w", err)
+	}
+
+	str = strings.ReplaceAll(str, ",", ".")
+
+	value, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		return fmt.Errorf("error parsing float %w", err)
+	}
+
+	*v = Value(value)
+
+	return nil
+}
+
+func ReadXML(path string) (ValuteCurs, error) {
+	var valCurs ValuteCurs
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return valCurs, fmt.Errorf("error read %s file: %w", path, err)
+	}
+
+	decoder := xml.NewDecoder(bytes.NewReader(data))
+	decoder.CharsetReader = charset.NewReaderLabel
+
+	err = decoder.Decode(&valCurs)
+	if err != nil {
+		return valCurs, fmt.Errorf("error parsing %s: %w", path, err)
+	}
+
+	return valCurs, nil
 }

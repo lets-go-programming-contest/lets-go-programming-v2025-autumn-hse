@@ -2,7 +2,6 @@ package temperature
 
 import (
 	"errors"
-	"fmt"
 )
 
 var ErrUndefinedOperation = errors.New("undefined operation")
@@ -42,7 +41,7 @@ func (v *Value) UpdateValues(operation string, temp int) error {
 			v.Higher = temp
 		}
 	default:
-		return fmt.Errorf("%w: %s", ErrUndefinedOperation, operation)
+		return ErrUndefinedOperation
 	}
 
 	return nil

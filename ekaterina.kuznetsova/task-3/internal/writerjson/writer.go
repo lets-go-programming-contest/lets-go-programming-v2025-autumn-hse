@@ -15,17 +15,17 @@ const (
 )
 
 func CreateValuteCursJSON(valCurs parsexml.ValuteCurs) ([]byte, error) {
-	valutesOutput := make([]parsexml.Valute, 0, len(valCurs.Valutes))
+	// valutesOutput := make([]parsexml.Valute, 0, len(valCurs.Valutes))
 
-	for _, valute := range valCurs.Valutes {
-		valutesOutput = append(valutesOutput, parsexml.Valute{
-			NumCode:  valute.NumCode,
-			CharCode: valute.CharCode,
-			Value:    parsexml.ValueFloat(valute.Value),
-		})
-	}
+	// for _, valute := range valCurs.Valutes {
+	// 	valutesOutput = append(valutesOutput, parsexml.Valute{
+	// 		NumCode:  valute.NumCode,
+	// 		CharCode: valute.CharCode,
+	// 		Value:    parsexml.ValueFloat(valute.Value),
+	// 	})
+	// }
 
-	outputJSON, err := json.MarshalIndent(valutesOutput, "", "  ")
+	outputJSON, err := json.MarshalIndent(valCurs.Valutes, "", "  ")
 	if err != nil {
 		return nil, fmt.Errorf("error marshaling JSON: %w", err)
 	}

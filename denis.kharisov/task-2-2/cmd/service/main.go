@@ -26,7 +26,7 @@ func main() {
 	heapOfDishes := &maxheap.Maxheap{}
 	heap.Init(heapOfDishes)
 
-	for i := 0; i < numberOfDishes; i++ {
+	for range numberOfDishes {
 		var dish int
 		if _, err := fmt.Scan(&dish); err != nil {
 			fmt.Println("Invalid dish number")
@@ -37,17 +37,20 @@ func main() {
 		heap.Push(heapOfDishes, dish)
 	}
 
-	var result int
+	if _, err := fmt.Scan(&preferredDishNumber); err != nil {
+		fmt.Println("Invalid preferred dish number")
+		return
+	}
 
 	for range preferredDishNumber - 1 {
 		heap.Pop(heapOfDishes)
 	}
 
 	val := heap.Pop(heapOfDishes)
-	if val == nil {
+
+	if result, ok := val.(int); ok {
+		fmt.Println(result)
+	} else {
 		fmt.Println("Favorite dish not found")
 	}
-
-	result = val.(int)
-	fmt.Println(result)
 }

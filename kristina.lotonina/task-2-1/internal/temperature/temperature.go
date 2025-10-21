@@ -19,17 +19,15 @@ func NewValues(higher, lower int) Value {
 	}
 }
 
-func (v *Value) FindTemp(operation string, temp int) (int, error) {
-	err := v.UpdateValues(operation, temp)
-	if err != nil {
-		return 0, fmt.Errorf("failed to update temperature values: %w", err)
-	}
+func (v *Value) UpdateTemp(operation string, temp int) error {
+    return v.UpdateValues(operation, temp)
+}
 
-	if v.Lower <= v.Higher {
-		return v.Lower, nil
-	}
-
-	return -1, nil
+func (v *Value) GetCurrentTemp() int {
+    if v.Lower <= v.Higher {
+        return v.Lower
+    }
+    return -1
 }
 
 func (v *Value) UpdateValues(operation string, temp int) error {

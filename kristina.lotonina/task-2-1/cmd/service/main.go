@@ -16,7 +16,7 @@ func main() {
 
 	_, err := fmt.Scan(&number)
 	if err != nil {
-		fmt.Println("unable to read:", err)
+		fmt.Println("unable to read the number of departments:", err)
 
 		return
 	}
@@ -26,7 +26,7 @@ func main() {
 
 		_, err = fmt.Scan(&count)
 		if err != nil {
-			fmt.Println("unable to read:", err)
+			fmt.Println("unable to read the number of employees:", err)
 
 			return
 		}
@@ -41,17 +41,18 @@ func main() {
 
 			_, err := fmt.Scanln(&operation, &temp)
 			if err != nil {
-				fmt.Println("unable to read:", err)
+				fmt.Println("unable to read the preferred temperature:", err)
 
 				return
 			}
 
-			result, err := values.FindTemp(operation, temp)
+			err = values.UpdateTemp(operation, temp)
 			if err != nil {
-				fmt.Println("error:", err)
-
+				fmt.Println("error updating temperature:", err)
 				return
 			}
+
+			result := values.GetCurrentTemp()
 
 			fmt.Println(result)
 		}

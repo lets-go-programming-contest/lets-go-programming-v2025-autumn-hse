@@ -5,43 +5,12 @@ import (
 	"encoding/xml"
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
 
+	"github.com/kuzid-17/task-3/internal/models"
 	"golang.org/x/net/html/charset"
 )
 
-type CommaFloat float64
-
-func (cf *CommaFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var str string
-	if err := d.DecodeElement(&str, &start); err != nil {
-		return fmt.Errorf("decode element failed: %w", err)
-	}
-
-	str = strings.Replace(str, ",", ".", 1)
-
-	value, err := strconv.ParseFloat(str, 64)
-	if err != nil {
-		return fmt.Errorf("parse float failed: %w", err)
-	}
-
-	*cf = CommaFloat(value)
-
-	return nil
-}
-
-type OutputValute struct {
-	NumCode  int        `json:"num_code"  xml:"NumCode"`
-	CharCode string     `json:"char_code" xml:"CharCode"`
-	Value    CommaFloat `json:"value"     xml:"Value"`
-}
-
-type ValCurs struct {
-	Valutes []OutputValute `xml:"Valute"`
-}
-
-func ParseXML(filename string) (*ValCurs, error) {
+func ParseXML(filename string) (*models.ValCurs, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read input config file: %w", err)
@@ -50,7 +19,7 @@ func ParseXML(filename string) (*ValCurs, error) {
 	decoder := xml.NewDecoder(bytes.NewReader(data))
 	decoder.CharsetReader = charset.NewReaderLabel
 
-	var valCurs ValCurs
+	var valCurs models.ValCurs
 
 	err = decoder.Decode(&valCurs)
 	if err != nil {

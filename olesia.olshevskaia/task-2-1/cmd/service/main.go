@@ -85,7 +85,7 @@ func main() {
 			if err := temperatureRange.Update(sign, temperature); err != nil {
 				fmt.Println("incorrect temperature sign", err)
 
-				continue
+				return
 			}
 
 			fmt.Println(temperatureRange.Optimum())

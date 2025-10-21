@@ -2,18 +2,27 @@ package main
 
 import (
 	"container/heap"
+	"errors"
 	"fmt"
 
 	"github.com/kamilSharipov/task-2-2/internal/intheap"
 )
 
+var (
+	errKPositive        error = errors.New("k must be positive")
+	errNotEnoughEls     error = errors.New("not enough elements to find k-th maximum")
+	errHeapBecameEmpty  error = errors.New("heap became empty before k-th element")
+	errHeapReturnedNill error = errors.New("heap returned nil")
+	errTypeAssertFailed error = errors.New("type assertion failed")
+)
+
 func KthMaximum(arr []int, kth int) (int, error) {
 	if kth <= 0 {
-		return 0, fmt.Errorf("k must be positive")
+		return 0, errKPositive
 	}
 
 	if len(arr) < kth {
-		return 0, fmt.Errorf("not enough elements to find k-th maximum")
+		return 0, errNotEnoughEls
 	}
 
 	IntHeap := intheap.InitIntHeap()
@@ -23,21 +32,21 @@ func KthMaximum(arr []int, kth int) (int, error) {
 
 	var result int
 
-	for i := 0; i < kth-1; i++ {
+	for range kth - 1 {
 		val := heap.Pop(IntHeap)
 		if val == nil {
-			return 0, fmt.Errorf("heap became empty before k-th element")
+			return 0, errHeapBecameEmpty
 		}
 	}
 
 	val := heap.Pop(IntHeap)
 	if val == nil {
-		return 0, fmt.Errorf("heap returned nil")
+		return 0, errHeapReturnedNill
 	}
 
 	result, ok := val.(int)
 	if !ok {
-		return 0, fmt.Errorf("type assertion failed")
+		return 0, errTypeAssertFailed
 	}
 
 	return result, nil

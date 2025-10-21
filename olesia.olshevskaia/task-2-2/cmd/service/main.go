@@ -15,7 +15,7 @@ var (
 )
 
 func popDesiredDish(heapInt intheap.IntHeap, desired int) (int, error) {
-	if desired > (&heapInt).Len() {
+	if desired > heapInt.Len() {
 		return 0, ErrDesiredDishTooBig
 	}
 
@@ -53,7 +53,7 @@ func main() {
 	var dish int
 	for range numberDishes {
 		if _, err := fmt.Scan(&dish); err != nil {
-			fmt.Println("error reading dishf", err)
+			fmt.Println("error reading dish", err)
 
 			return
 		}

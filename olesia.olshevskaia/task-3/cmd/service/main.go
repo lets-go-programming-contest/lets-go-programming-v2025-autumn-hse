@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/net/html/charset"
 	"gopkg.in/yaml.v3"
 )
 
@@ -51,42 +50,37 @@ func loadConfig(path string) Config {
 }
 
 func ReadCurrencies(path string) []Currency {
-	file, err := os.Open(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
-		panic("Can not parse XML: " + path + ": " + err.Error())
+		panic("Can not parse XML: " + path)
 	}
-	defer file.Close()
-
-	decoder := xml.NewDecoder(file)
-	decoder.CharsetReader = charset.NewReaderLabel
 
 	var xmlData CurrenciesXML
-	if err := decoder.Decode(&xmlData); err != nil {
+	if err := xml.Unmarshal(data, &xmlData); err != nil {
 		panic("Error of parsing XML: " + err.Error())
 	}
 
 	result := make([]Currency, 0, len(xmlData.Currencies))
 
 	for _, val := range xmlData.Currencies {
-		if strings.TrimSpace(val.CodeNum) == "" {
-			continue
+		num := 0
+		if strings.TrimSpace(val.CodeNum) != "" {
+			n, err := strconv.Atoi(val.CodeNum)
+			if err != nil {
+				panic("NodeNum err: " + val.CodeNum)
+			}
+			num = n
 		}
 
-		num, err := strconv.Atoi(val.CodeNum)
-		if err != nil {
-			panic("NodeNum err: " + val.CodeNum)
-		}
-
+		value := 0.0
 		valueString := strings.ReplaceAll(val.RateValue, ",", ".")
 		valueString = strings.TrimSpace(valueString)
-
-		if valueString == "" {
-			continue
-		}
-
-		value, err := strconv.ParseFloat(valueString, 64)
-		if err != nil {
-			panic("Incorrect exchange rate value: " + val.RateValue)
+		if valueString != "" {
+			v, err := strconv.ParseFloat(valueString, 64)
+			if err != nil {
+				panic("Incorrect exchange rate value: " + val.RateValue)
+			}
+			value = v
 		}
 
 		result = append(result, Currency{

@@ -37,7 +37,10 @@ type ValuteOutput struct {
 
 var errCharset = errors.New("unknown charset")
 
-const maxValuteCount = 70
+const (
+	maxValuteCount = 70
+	filePermission = 0o755
+)
 
 func DecodeValuteXML(filepath string) []ValuteOutput {
 	file, err := os.ReadFile(filepath)
@@ -91,7 +94,8 @@ func SortCurrencies(currencies []ValuteOutput) {
 
 func WriteJSON(currencies []ValuteOutput, filePath string) {
 	dir := filepath.Dir(filePath)
-	err := os.MkdirAll(dir, 0o755)
+
+	err := os.MkdirAll(dir, filePermission)
 	if err != nil {
 		panic(fmt.Sprintf("Error creating directory: %v", err))
 	}

@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Tapochek2894/task-3/internal/xmlinput"
+	"github.com/Tapochek2894/task-3/internal/valute"
 )
 
 const (
@@ -14,27 +14,18 @@ const (
 	fileMode = 0o666
 )
 
-func CreateValuteCursJSON(path string, valCurs xmlinput.ValuteCurs) error {
-	outputJSON, err := json.MarshalIndent(valCurs, "", "  ")
+func WriteJSON(path string, valutes valute.Valutes) error {
+	err := os.MkdirAll(filepath.Dir(path), dirMode)
 	if err != nil {
-		return fmt.Errorf("error marshaling %s: %w", path, err)
+		return fmt.Errorf("error creating directory %s: %w", path, err)
 	}
 
-	err = WriteJSON(path, outputJSON)
+	outputBytes, err := json.MarshalIndent(valutes, "", "  ")
 	if err != nil {
-		return fmt.Errorf("error writing %s: %w", path, err)
+		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	return nil
-}
-
-func WriteJSON(outputFile string, outputJSON []byte) error {
-	err := os.MkdirAll(filepath.Dir(outputFile), dirMode)
-	if err != nil {
-		return fmt.Errorf("error creating directory: %w", err)
-	}
-
-	err = os.WriteFile(outputFile, outputJSON, fileMode)
+	err = os.WriteFile(path, outputBytes, fileMode)
 	if err != nil {
 		return fmt.Errorf("error writing output file: %w", err)
 	}

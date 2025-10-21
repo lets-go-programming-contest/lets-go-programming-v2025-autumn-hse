@@ -8,6 +8,12 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Runtime error:", r)
+		}
+	}()
+
 	var numberOfDishes, preferredDishNumber int
 
 	_, err := fmt.Scan(&numberOfDishes)
@@ -17,40 +23,31 @@ func main() {
 		return
 	}
 
-	dishes := make([]int, numberOfDishes)
+	heapOfDishes := &maxheap.Maxheap{}
+	heap.Init(heapOfDishes)
 
-	for i := range dishes {
-		_, err = fmt.Scan(&dishes[i])
-		if err != nil {
+	for i := 0; i < numberOfDishes; i++ {
+		var dish int
+		if _, err := fmt.Scan(&dish); err != nil {
 			fmt.Println("Invalid dish number")
 
 			return
 		}
-	}
 
-	_, err = fmt.Scan(&preferredDishNumber)
-	if err != nil {
-		fmt.Println("Invalid preferred dish number")
-
-		return
-	}
-
-	heapOfDishes := &maxheap.Maxheap{}
-	heap.Init(heapOfDishes)
-
-	for _, dish := range dishes {
 		heap.Push(heapOfDishes, dish)
 	}
 
 	var result int
 
-	for range preferredDishNumber {
-		if res, flag := heap.Pop(heapOfDishes).(int); flag {
-			result = res
-		} else {
-			panic("unexpected type from heap")
-		}
+	for range preferredDishNumber - 1 {
+		heap.Pop(heapOfDishes)
 	}
 
+	val := heap.Pop(heapOfDishes)
+	if val == nil {
+		fmt.Println("Favorite dish not found")
+	}
+
+	result = val.(int)
 	fmt.Println(result)
 }

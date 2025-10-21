@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/net/html/charset"
 	"gopkg.in/yaml.v3"
 )
 
@@ -41,7 +42,6 @@ func loadConfig(path string) Config {
 	}
 
 	var cfg Config
-
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		panic("Can not parse YAML: " + err.Error())
 	}
@@ -50,13 +50,17 @@ func loadConfig(path string) Config {
 }
 
 func ReadCurrencies(path string) []Currency {
-	data, err := os.ReadFile(path)
+	file, err := os.Open(path)
 	if err != nil {
-		panic("Can not parse XML: " + path)
+		panic("Can not open XML file: " + path)
 	}
+	defer file.Close()
+
+	decoder := xml.NewDecoder(file)
+	decoder.CharsetReader = charset.NewReaderLabel
 
 	var xmlData CurrenciesXML
-	if err := xml.Unmarshal(data, &xmlData); err != nil {
+	if err := decoder.Decode(&xmlData); err != nil {
 		panic("Error of parsing XML: " + err.Error())
 	}
 
@@ -74,13 +78,14 @@ func ReadCurrencies(path string) []Currency {
 
 		valueString := strings.ReplaceAll(val.RateValue, ",", ".")
 		valueString = strings.TrimSpace(valueString)
+
 		if valueString == "" {
 			continue
 		}
 
 		value, err := strconv.ParseFloat(valueString, 64)
 		if err != nil {
-			panic("Incorrect exchange rate value: " + val.RateValue)
+			continue
 		}
 
 		result = append(result, Currency{

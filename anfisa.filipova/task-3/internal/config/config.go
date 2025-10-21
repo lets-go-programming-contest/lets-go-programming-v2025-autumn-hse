@@ -12,7 +12,7 @@ type Config struct {
 	OutputFile string `yaml:"output-file"`
 }
 
-func LoadConfig(configPath string) *Config {
+func LoadConfigYAML(configPath string) *Config {
 	file, err := os.ReadFile(configPath)
 	if err != nil {
 		panic(fmt.Sprintf("Error reading file: %v", err))

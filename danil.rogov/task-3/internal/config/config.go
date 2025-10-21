@@ -1,7 +1,6 @@
 package config
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
@@ -13,21 +12,16 @@ type Config struct {
 	OutputFile string `yaml:"output_file"`
 }
 
-func Load() (Config, error) {
-	configPath := flag.String("config", "", "config file path")
-	flag.Parse()
-
-	dataConfig, err := os.ReadFile(*configPath)
+func Load(path string) (Config, error) {
+	data, err := os.ReadFile(path)
 	if err != nil {
-		return Config{}, fmt.Errorf("error read config: %w", err)
+		return Config{}, fmt.Errorf("read file %q: %w", path, err)
 	}
 
-	var config Config
-
-	err = yaml.Unmarshal(dataConfig, &config)
-	if err != nil {
-		return Config{}, fmt.Errorf("error parsing yaml: %w", err)
+	var cfg Config
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return cfg, fmt.Errorf("unmarshal from %q: %w", path, err)
 	}
 
-	return config, nil
+	return cfg, nil
 }

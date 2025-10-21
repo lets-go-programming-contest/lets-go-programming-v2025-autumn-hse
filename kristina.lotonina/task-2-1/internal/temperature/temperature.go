@@ -20,7 +20,7 @@ func NewValues(higher, lower int) Value {
 }
 
 func (v *Value) UpdateTemp(operation string, temp int) error {
-    return v.UpdateValues(operation, temp)
+	return v.UpdateValues(operation, temp)
 }
 
 func (v *Value) GetCurrentTemp() int {
@@ -28,7 +28,7 @@ func (v *Value) GetCurrentTemp() int {
         return v.Lower
     }
 
-    return -1
+	return -1
 }
 
 func (v *Value) UpdateValues(operation string, temp int) error {

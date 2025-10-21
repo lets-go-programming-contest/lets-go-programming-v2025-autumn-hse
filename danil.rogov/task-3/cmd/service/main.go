@@ -12,19 +12,19 @@ func main() {
 	configPath := flag.String("config", "local.yaml", "path to config file")
 	flag.Parse()
 
-	cfg, err := config.Load(*configPath)
+	config, err := config.Load(*configPath)
 	if err != nil {
 		panic("Config read error: " + err.Error())
 	}
 
-	data, err := xmlinput.ReadXML(cfg.InputFile)
+	data, err := xmlinput.ReadXML(config.InputFile)
 	if err != nil {
 		panic("XML read error: " + err.Error())
 	}
 
 	data.Sort(true)
 
-	err = jsonoutput.WriteJSON(cfg.OutputFile, data)
+	err = jsonoutput.WriteJSON(config.OutputFile, data)
 	if err != nil {
 		panic("JSON write error: " + err.Error())
 	}

@@ -16,7 +16,7 @@ func (h *MinHeap) Swap(i, j int) {
 
 func (h *MinHeap) Push(value any) {
 	value_, ok := value.(int)
-	
+
 	if !ok {
 		panic("Need to push int")
 	}

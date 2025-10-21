@@ -26,7 +26,7 @@ func (v *Value) UpdateTemp(operation string, temp int) error {
 func (v *Value) GetCurrentTemp() int {
 	if v.Lower <= v.Higher {
 		return v.Lower
-    }
+	}
 
 	return -1
 }

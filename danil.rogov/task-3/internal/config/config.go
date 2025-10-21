@@ -8,8 +8,8 @@ import (
 )
 
 type Config struct {
-	InputFile  string `yaml:"input_file"`
-	OutputFile string `yaml:"output_file"`
+	InputFile  string `yaml:"input-file"`
+	OutputFile string `yaml:"output-file"`
 }
 
 func Load(path string) (Config, error) {

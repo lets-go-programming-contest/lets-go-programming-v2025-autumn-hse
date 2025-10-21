@@ -25,11 +25,11 @@ func (v *Valutes) Sort(reverse bool) {
 	switch reverse {
 	case true:
 		slices.SortFunc(v.Valutes, func(a, b Valute) int {
-			return cmp.Compare(b.Value, a.Value)
+			return -cmp.Compare(a.Value, b.Value)
 		})
 	case false:
 		slices.SortFunc(v.Valutes, func(a, b Valute) int {
-			return -cmp.Compare(b.Value, a.Value)
+			return cmp.Compare(a.Value, b.Value)
 		})
 	}
 }

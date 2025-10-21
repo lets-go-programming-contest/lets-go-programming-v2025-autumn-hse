@@ -27,19 +27,20 @@ func main() {
 			return
 		}
 
-		temperatureRange := temperature.TemperatureRangeInit()
-
-		var limitSign string
+		temperatureRange := temperature.NewTemperatureRange(temperature.MinTemperature, temperature.MaxTemperature)
 
 		for range employeesCount {
+			var (
+				limitSign             string
+				temperatureLimitValue int
+			)
+
 			_, err = fmt.Scan(&limitSign)
 			if err != nil {
 				fmt.Printf("Invalid limit format: %v\n", err)
 
 				return
 			}
-
-			var temperatureLimitValue int
 
 			_, err = fmt.Scan(&temperatureLimitValue)
 			if err != nil {

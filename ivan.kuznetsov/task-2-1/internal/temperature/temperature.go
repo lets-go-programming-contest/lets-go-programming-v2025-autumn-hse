@@ -4,18 +4,21 @@ import "errors"
 
 var ErrInvalidSign = errors.New("invalid comparison sign")
 
-type TemperatureRange struct {
-	Min int
-	Max int
-}
-
 const (
 	MinTemperature = 15
 	MaxTemperature = 30
 )
 
-func TemperatureRangeInit() *TemperatureRange {
-	return &TemperatureRange{Min: MinTemperature, Max: MaxTemperature}
+type TemperatureRange struct {
+	Min int
+	Max int
+}
+
+func NewTemperatureRange(min int, max int) *TemperatureRange {
+	return &TemperatureRange{
+		Min: min,
+		Max: max,
+	}
 }
 
 func (temperature *TemperatureRange) OptimalTemperature(sign string, value int) error {

@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"os"
-	"sort"
 
 	"github.com/JingolBong/task-3/internal/valuteinfo"
 	"golang.org/x/net/html/charset"
@@ -31,11 +30,6 @@ func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {
 
 		return valuteinfo.ValuteCurs{}, fmt.Errorf("while decoding: %w", err)
 	}
-
-	sort.Slice(valuteCurs.Valutes, func(i, j int) bool {
-
-		return valuteCurs.Valutes[i].Value < valuteCurs.Valutes[j].Value
-	})
 
 	return valuteCurs, nil
 }

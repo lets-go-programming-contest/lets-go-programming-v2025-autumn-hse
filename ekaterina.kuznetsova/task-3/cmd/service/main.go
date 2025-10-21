@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/Ekaterina-101/task-3/internal/parsexml"
 	"github.com/Ekaterina-101/task-3/internal/writerjson"
@@ -44,6 +45,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	sort.Slice(valCurs.Valutes, func(i, j int) bool {
+		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
+	})
 
 	outputJSON, err := writerjson.CreateValuteCursJSON(valCurs)
 	if err != nil {

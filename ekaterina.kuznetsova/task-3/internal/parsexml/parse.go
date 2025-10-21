@@ -11,19 +11,19 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-type Value float64
+type ValueFloat float64
 
-type ValuteXML struct {
-	NumCode  int    `xml:"NumCode"`
-	CharCode string `xml:"CharCode"`
-	Value    Value  `xml:"Value"`
+type Valute struct {
+	NumCode  int        `json:"num_code"  xml:"NumCode"`
+	CharCode string     `json:"char_code" xml:"CharCode"`
+	Value    ValueFloat `json:"value"     xml:"Value"`
 }
 
 type ValuteCurs struct {
-	Valutes []ValuteXML `xml:"Valute"`
+	Valutes []Valute `xml:"Valute"`
 }
 
-func (v *Value) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+func (v *ValueFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var str string
 	if err := d.DecodeElement(&str, &start); err != nil {
 		return fmt.Errorf("error decode xml: %w", err)
@@ -36,7 +36,7 @@ func (v *Value) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return fmt.Errorf("error parse float  %w", err)
 	}
 
-	*v = Value(value)
+	*v = ValueFloat(value)
 
 	return nil
 }

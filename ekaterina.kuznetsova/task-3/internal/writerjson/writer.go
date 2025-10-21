@@ -5,35 +5,25 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 
 	"github.com/Ekaterina-101/task-3/internal/parsexml"
 )
 
-const dirMode = 0o755
-
-const fileMode = 0o600
-
-type Valute struct {
-	NumCode  int     `json:"num_code"`
-	CharCode string  `json:"char_code"`
-	Value    float64 `json:"value"`
-}
+const (
+	dirMode  = 0o755
+	fileMode = 0o600
+)
 
 func CreateValuteCursJSON(valCurs parsexml.ValuteCurs) ([]byte, error) {
-	valutesOutput := make([]Valute, 0, len(valCurs.Valutes))
+	valutesOutput := make([]parsexml.Valute, 0, len(valCurs.Valutes))
 
 	for _, valute := range valCurs.Valutes {
-		valutesOutput = append(valutesOutput, Valute{
+		valutesOutput = append(valutesOutput, parsexml.Valute{
 			NumCode:  valute.NumCode,
 			CharCode: valute.CharCode,
-			Value:    float64(valute.Value),
+			Value:    parsexml.ValueFloat(valute.Value),
 		})
 	}
-
-	sort.Slice(valutesOutput, func(i, j int) bool {
-		return valutesOutput[i].Value > valutesOutput[j].Value
-	})
 
 	outputJSON, err := json.MarshalIndent(valutesOutput, "", "  ")
 	if err != nil {

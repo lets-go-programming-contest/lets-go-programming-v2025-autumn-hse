@@ -24,7 +24,7 @@ func main() {
 
 	data.Sort(true)
 
-	err = jsonoutput.WriteJSON(config.OutputFile, data)
+	err = jsonoutput.WriteJSON(config.OutputFile, data.Valutes)
 	if err != nil {
 		panic("JSON write error: " + err.Error())
 	}

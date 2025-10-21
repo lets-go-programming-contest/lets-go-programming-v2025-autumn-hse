@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	errReading          = errors.New("error reading")
 	errTypeAssertion    = errors.New("error type assertion")
 	errInvalidChoiceIdx = errors.New("error invalid choiceIdx")
 )
@@ -16,7 +17,7 @@ var (
 func readIndex() (int, error) {
 	var choiceIdx int
 	if _, err := fmt.Scan(&choiceIdx); err != nil {
-		return 0, fmt.Errorf("cannot read choiceIdx: %v", err)
+		return 0, fmt.Errorf("%w: %v", errReading, err)
 	}
 
 	return choiceIdx, nil
@@ -25,7 +26,7 @@ func readIndex() (int, error) {
 func readDishes() (intheap.IntHeap, error) {
 	var dishCount int
 	if _, err := fmt.Scan(&dishCount); err != nil {
-		return nil, fmt.Errorf("cannot read dishCount: %v", err)
+		return nil, fmt.Errorf("%w: %v", errReading, err)
 	}
 
 	heapint := &intheap.IntHeap{}
@@ -35,7 +36,7 @@ func readDishes() (intheap.IntHeap, error) {
 	for range dishCount {
 		var priority int
 		if _, err := fmt.Scan(&priority); err != nil {
-			return nil, fmt.Errorf("cannot read priority: %v", err)
+			return nil, fmt.Errorf("%w: %v", errReading, err)
 		}
 
 		heap.Push(heapint, priority)

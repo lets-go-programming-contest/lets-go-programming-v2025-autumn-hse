@@ -49,6 +49,7 @@ func main() {
 			err = values.UpdateTemp(operation, temp)
 			if err != nil {
 				fmt.Println("error updating temperature:", err)
+
 				return
 			}
 

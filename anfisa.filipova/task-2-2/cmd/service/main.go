@@ -17,7 +17,7 @@ var (
 func readIndex() (int, error) {
 	var choiceIdx int
 	if _, err := fmt.Scan(&choiceIdx); err != nil {
-		return 0, fmt.Errorf("%w: %v", errReading, err)
+		return 0, fmt.Errorf("%w: %w", errReading, err)
 	}
 
 	return choiceIdx, nil
@@ -26,7 +26,7 @@ func readIndex() (int, error) {
 func readDishes() (intheap.IntHeap, error) {
 	var dishCount int
 	if _, err := fmt.Scan(&dishCount); err != nil {
-		return nil, fmt.Errorf("%w: %v", errReading, err)
+		return nil, fmt.Errorf("%w: %w", errReading, err)
 	}
 
 	heapint := &intheap.IntHeap{}
@@ -36,7 +36,7 @@ func readDishes() (intheap.IntHeap, error) {
 	for range dishCount {
 		var priority int
 		if _, err := fmt.Scan(&priority); err != nil {
-			return nil, fmt.Errorf("%w: %v", errReading, err)
+			return nil, fmt.Errorf("%w: %w", errReading, err)
 		}
 
 		heap.Push(heapint, priority)

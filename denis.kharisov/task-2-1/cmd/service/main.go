@@ -18,8 +18,8 @@ const (
 )
 
 var (
-	errInvalidRange         = errors.New("max temperature < min temperature")
-	errUnknownOperation     = errors.New("unknown operation")
+	errInvalidRange     = errors.New("max temperature < min temperature")
+	errUnknownOperation = errors.New("unknown operation")
 )
 
 type temperatureRange struct {

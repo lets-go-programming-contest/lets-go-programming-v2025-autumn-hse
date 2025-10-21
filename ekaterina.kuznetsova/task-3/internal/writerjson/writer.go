@@ -14,27 +14,13 @@ const (
 	fileMode = 0o600
 )
 
-func CreateValuteCursJSON(valCurs parsexml.ValuteCurs) ([]byte, error) {
-	// valutesOutput := make([]parsexml.Valute, 0, len(valCurs.Valutes))
-
-	// for _, valute := range valCurs.Valutes {
-	// 	valutesOutput = append(valutesOutput, parsexml.Valute{
-	// 		NumCode:  valute.NumCode,
-	// 		CharCode: valute.CharCode,
-	// 		Value:    parsexml.ValueFloat(valute.Value),
-	// 	})
-	// }
-
+func WriteFileJSON(outputFile string, valCurs parsexml.ValuteCurs) error {
 	outputJSON, err := json.MarshalIndent(valCurs.Valutes, "", "  ")
 	if err != nil {
-		return nil, fmt.Errorf("error marshaling JSON: %w", err)
+		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	return outputJSON, nil
-}
-
-func WriteFileJSON(outputFile string, outputJSON []byte) error {
-	err := os.MkdirAll(filepath.Dir(outputFile), dirMode)
+	err = os.MkdirAll(filepath.Dir(outputFile), dirMode)
 	if err != nil {
 		return fmt.Errorf("error creating directory: %w", err)
 	}

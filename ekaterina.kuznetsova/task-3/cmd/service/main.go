@@ -50,12 +50,7 @@ func main() {
 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
 	})
 
-	outputJSON, err := writerjson.CreateValuteCursJSON(valCurs)
-	if err != nil {
-		panic(err)
-	}
-
-	err = writerjson.WriteFileJSON(config.OutputFile, outputJSON)
+	err = writerjson.WriteFileJSON(config.OutputFile, valCurs)
 	if err != nil {
 		panic(err)
 	}

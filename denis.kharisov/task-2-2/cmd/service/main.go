@@ -39,6 +39,7 @@ func main() {
 
 	if _, err := fmt.Scan(&preferredDishNumber); err != nil {
 		fmt.Println("Invalid preferred dish number")
+
 		return
 	}
 

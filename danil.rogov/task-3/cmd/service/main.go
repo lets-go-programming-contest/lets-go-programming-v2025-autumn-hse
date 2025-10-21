@@ -17,14 +17,14 @@ func main() {
 		panic("Config read error: " + err.Error())
 	}
 
-	input, err := xmlinput.ReadXML(cfg.InputFile)
+	data, err := xmlinput.ReadXML(cfg.InputFile)
 	if err != nil {
 		panic("XML read error: " + err.Error())
 	}
 
-	input.Sort(true)
+	data.Sort(true)
 
-	err = jsonoutput.CreateValuteCursJSON(cfg.OutputFile, input)
+	err = jsonoutput.WriteJSON(cfg.OutputFile, data)
 	if err != nil {
 		panic("JSON write error: " + err.Error())
 	}

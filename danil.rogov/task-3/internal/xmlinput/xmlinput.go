@@ -38,19 +38,19 @@ func (v *ValuteCurs) Sort(reverse bool) {
 	}
 }
 
-func (v *Value) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var str string
+func (v *Value) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
+	var stringValue string
 
-	err := d.DecodeElement(&str, &start)
+	err := decoder.DecodeElement(&stringValue, &start)
 	if err != nil {
 		return fmt.Errorf("error decoding xml: %w", err)
 	}
 
-	str = strings.ReplaceAll(str, ",", ".")
+	stringValue = strings.ReplaceAll(stringValue, ",", ".")
 
-	value, err := strconv.ParseFloat(str, 64)
+	value, err := strconv.ParseFloat(stringValue, 64)
 	if err != nil {
-		return fmt.Errorf("error parsing float %w", err)
+		return fmt.Errorf("error parsing float: %w", err)
 	}
 
 	*v = Value(value)
@@ -63,7 +63,7 @@ func ReadXML(path string) (ValuteCurs, error) {
 
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return valCurs, fmt.Errorf("error read %s file: %w", path, err)
+		return ValuteCurs{}, fmt.Errorf("error reading %s file: %w", path, err)
 	}
 
 	decoder := xml.NewDecoder(bytes.NewReader(data))
@@ -71,7 +71,7 @@ func ReadXML(path string) (ValuteCurs, error) {
 
 	err = decoder.Decode(&valCurs)
 	if err != nil {
-		return valCurs, fmt.Errorf("error parsing %s: %w", path, err)
+		return ValuteCurs{}, fmt.Errorf("error decoding %s: %w", path, err)
 	}
 
 	return valCurs, nil

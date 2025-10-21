@@ -15,13 +15,14 @@ type Config struct {
 func Load(path string) (Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return Config{}, fmt.Errorf("read file %q: %w", path, err)
+		return Config{}, fmt.Errorf("error reading file %s: %w", path, err)
 	}
 
-	var cfg Config
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return cfg, fmt.Errorf("unmarshal from %q: %w", path, err)
+	var config Config
+	err = yaml.Unmarshal(data, &config)
+	if err != nil {
+		return Config{}, fmt.Errorf("error unmarshalling from %s: %w", path, err)
 	}
 
-	return cfg, nil
+	return config, nil
 }

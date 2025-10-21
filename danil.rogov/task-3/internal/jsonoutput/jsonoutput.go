@@ -10,20 +10,21 @@ import (
 )
 
 const (
-	dirMode  = 0o755
-	fileMode = 0o600
+	dirMode  = 0o555
+	fileMode = 0o666
 )
 
 func CreateValuteCursJSON(path string, valCurs xmlinput.ValuteCurs) error {
 	outputJSON, err := json.MarshalIndent(valCurs, "", "  ")
 	if err != nil {
-		return fmt.Errorf("error marshaling JSON: %w", err)
+		return fmt.Errorf("error marshaling %s: %w", path, err)
 	}
 
 	err = WriteJSON(path, outputJSON)
 	if err != nil {
-		return err
+		return fmt.Errorf("error writing %s: %w", path, err)
 	}
+
 	return nil
 }
 

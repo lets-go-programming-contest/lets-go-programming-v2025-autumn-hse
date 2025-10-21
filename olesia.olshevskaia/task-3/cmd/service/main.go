@@ -68,12 +68,22 @@ func ReadCurrencies(path string) []Currency {
 	result := make([]Currency, 0, len(xmlData.Currencies))
 
 	for _, val := range xmlData.Currencies {
+		if strings.TrimSpace(val.CodeNum) == "" {
+			continue
+		}
+
 		num, err := strconv.Atoi(val.CodeNum)
 		if err != nil {
 			panic("NodeNum err: " + val.CodeNum)
 		}
 
 		valueString := strings.ReplaceAll(val.RateValue, ",", ".")
+		valueString = strings.TrimSpace(valueString)
+
+		if valueString == "" {
+			continue
+		}
+
 		value, err := strconv.ParseFloat(valueString, 64)
 		if err != nil {
 			panic("Incorrect exchange rate value: " + val.RateValue)

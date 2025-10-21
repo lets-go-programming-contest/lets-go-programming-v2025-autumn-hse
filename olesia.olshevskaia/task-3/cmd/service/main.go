@@ -55,7 +55,12 @@ func ReadCurrencies(path string) []Currency {
 	if err != nil {
 		panic("Can not open XML file: " + path + " - " + err.Error())
 	}
-	defer file.Close()
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			panic("Error closing XML file: " + err.Error())
+		}
+	}()
 
 	decoder := xml.NewDecoder(file)
 	decoder.CharsetReader = charset.NewReaderLabel

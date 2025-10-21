@@ -68,36 +68,33 @@ func ReadCurrencies(path string) []Currency {
 	result := make([]Currency, 0, len(xmlData.Currencies))
 
 	for _, val := range xmlData.Currencies {
-		codeStr := strings.TrimSpace(val.CodeNum)
 		num := 0
-		if codeStr == "" {
-			num, _ = strconv.Atoi(codeStr)
-		}
+		value := 0.0
 
-		num, err := strconv.Atoi(codeStr)
-		if err != nil {
-			continue
-		}
-
-		valueStr := strings.ReplaceAll(val.RateValue, ",", ".")
-		valueStr = strings.TrimSpace(valueStr)
-
-		c := Currency{
-			CodeNum:  num,
-			CodeChar: val.CodeChar,
-			HasValue: false,
-		}
-
-		if valueStr != "" {
-			value, err := strconv.ParseFloat(valueStr, 64)
-			if err == nil {
-				c.RateValue = value
-				c.HasValue = true
+		if strings.TrimSpace(val.CodeNum) != "" {
+			if n, err := strconv.Atoi(val.CodeNum); err == nil {
+				num = n
 			}
 		}
 
-		result = append(result, c)
+		if strings.TrimSpace(val.RateValue) != "" {
+			str := strings.ReplaceAll(val.RateValue, ",", ".")
+			if v, err := strconv.ParseFloat(str, 64); err == nil {
+				value = v
+			}
+		}
+
+		result = append(result, Currency{
+			CodeNum:   num,
+			CodeChar:  val.CodeChar,
+			RateValue: value,
+			HasValue:  strings.TrimSpace(val.RateValue) != "",
+		})
 	}
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].RateValue > result[j].RateValue
+	})
 
 	return result
 }

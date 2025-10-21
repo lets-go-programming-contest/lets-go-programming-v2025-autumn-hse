@@ -21,7 +21,7 @@ func Load(configFlag *string) (*Config, error) {
 	defer func() {
 		err = configFile.Close()
 		if err != nil {
-			panic(err.Error())
+			panic(err)
 		}
 	}()
 

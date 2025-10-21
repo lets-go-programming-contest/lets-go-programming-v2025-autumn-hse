@@ -10,17 +10,17 @@ import (
 )
 
 func main() {
-	configFlag := flag.String("config", "", "Config file path")
+	configFlag := flag.String("config", "config.yaml", "Config file path")
 	flag.Parse()
 
 	config, err := config.Load(configFlag)
 	if err != nil {
-		panic(err.Error())
+		panic(err)
 	}
 
 	valCurs, err := xmlparser.ParseXML(config.InputFile)
 	if err != nil {
-		panic(err.Error())
+		panic(err)
 	}
 
 	sort.Slice(valCurs.Valutes, func(i, j int) bool {
@@ -29,6 +29,6 @@ func main() {
 
 	err = jsonwriter.WriteJSON(config.OutputFile, valCurs.Valutes)
 	if err != nil {
-		panic(err.Error())
+		panic(err)
 	}
 }

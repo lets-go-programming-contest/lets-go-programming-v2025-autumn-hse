@@ -75,6 +75,7 @@ func ReadCurrencies(path string) []Currency {
 		value := 0.0
 		valueString := strings.ReplaceAll(val.RateValue, ",", ".")
 		valueString = strings.TrimSpace(valueString)
+
 		if valueString != "" {
 			v, err := strconv.ParseFloat(valueString, 64)
 			if err != nil {

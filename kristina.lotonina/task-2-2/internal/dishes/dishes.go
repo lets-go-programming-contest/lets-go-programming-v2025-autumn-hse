@@ -11,7 +11,7 @@ func (dishes *Heap) Len() int {
 func (dishes *Heap) Less(first int, second int) bool {
 	length := len(*dishes)
 	if first < 0 || first >= length || second < 0 || second >= length {
-		return false
+		panic(fmt.Sprintf("index is out of range, expected [0, %d]", length-1))
 	}
 
 	return (*dishes)[first] > (*dishes)[second]

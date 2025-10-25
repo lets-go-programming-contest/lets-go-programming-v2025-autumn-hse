@@ -16,15 +16,34 @@ import (
 	"golang.org/x/text/encoding/charmap"
 )
 
-const (
-	maxValuteCount = 70
-	filePermission = 0o755
-)
+const filePermission = 0o755
+
+type FloatValue struct {
+	Value float64
+}
+
+func (value *FloatValue) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
+	var strValue string
+	err := decoder.DecodeElement(&strValue, &start)
+	if err != nil {
+		return fmt.Errorf("error decoding string: %w", err)
+	}
+
+	strValue = strings.ReplaceAll(strValue, ",", ".")
+
+	floatValue, err := strconv.ParseFloat(strValue, 64)
+	if err != nil {
+		return fmt.Errorf("error converting string to float: %w", err)
+	}
+
+	value.Value = floatValue
+	return nil
+}
 
 type Valute struct {
-	NumCode  int    `xml:"NumCode"`
-	CharCode string `xml:"CharCode"`
-	ValueStr string `xml:"Value"`
+	NumCode  int        `xml:"NumCode" json:"num_code"`
+	CharCode string     `xml:"CharCode" json:"char_code"`
+	Value    FloatValue `xml:"Value" json:"value"`
 }
 
 type ValCurs struct {
@@ -32,21 +51,13 @@ type ValCurs struct {
 	Valutes []Valute `xml:"Valute"`
 }
 
-type ValuteOutput struct {
-	NumCode  int     `json:"num_code"`
-	CharCode string  `json:"char_code"`
-	Value    float64 `json:"value"`
-}
-
 var errCharset = errors.New("unknown charset")
 
-func readValCurs(filepath string) ValCurs {
+func readFileXML(filepath string, value any) error {
 	file, err := os.ReadFile(filepath)
 	if err != nil {
-		panic(fmt.Sprintf("Error opening file: %v", err))
+		return fmt.Errorf("error opening file: %w", err)
 	}
-
-	var valCurs ValCurs
 
 	decoder := xml.NewDecoder(bytes.NewReader(file))
 	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
@@ -59,53 +70,41 @@ func readValCurs(filepath string) ValCurs {
 		}
 	}
 
-	err = decoder.Decode(&valCurs)
+	err = decoder.Decode(value)
 	if err != nil {
-		panic(fmt.Sprintf("Error decoding file: %v", err))
+		return fmt.Errorf("error decoding file: %w", err)
 	}
 
-	return valCurs
+	return nil
 }
 
-func DecodeValuteXML(filepath string) []ValuteOutput {
-	valCurs := readValCurs(filepath)
-	currencies := make([]ValuteOutput, 0, maxValuteCount)
-
-	for _, valute := range valCurs.Valutes {
-		valueStr := strings.ReplaceAll(valute.ValueStr, ",", ".")
-
-		value, err := strconv.ParseFloat(valueStr, 64)
-		if err != nil {
-			panic(fmt.Sprintf("Error type converting: %v", err))
-		}
-
-		currencies = append(currencies, ValuteOutput{
-			NumCode:  valute.NumCode,
-			CharCode: valute.CharCode,
-			Value:    value,
-		})
+func DecodeValuteXML(filepath string) ([]Valute, error) {
+	var valCurs ValCurs
+	err := readFileXML(filepath, &valCurs)
+	if err != nil {
+		return nil, fmt.Errorf("error reading XML file: %w", err)
 	}
 
-	return currencies
+	return valCurs.Valutes, nil
 }
 
-func SortCurrencies(currencies []ValuteOutput) {
+func SortCurrencies(currencies []Valute) {
 	sort.Slice(currencies, func(i, j int) bool {
-		return currencies[i].Value > currencies[j].Value
+		return currencies[i].Value.Value > currencies[j].Value.Value
 	})
 }
 
-func WriteCurrenciesJSON(currencies []ValuteOutput, filePath string) {
+func WriteCurrenciesJSON(currencies []Valute, filePath string) error {
 	dir := filepath.Dir(filePath)
 
 	err := os.MkdirAll(dir, filePermission)
 	if err != nil {
-		panic(fmt.Sprintf("Error creating directory: %v", err))
+		return fmt.Errorf("error creating directory: %w", err)
 	}
 
 	file, err := os.Create(filePath)
 	if err != nil {
-		panic(fmt.Sprintf("Error creating file: %v", err))
+		return fmt.Errorf("error creating file: %w", err)
 	}
 
 	defer func() {
@@ -119,6 +118,8 @@ func WriteCurrenciesJSON(currencies []ValuteOutput, filePath string) {
 
 	err = encoder.Encode(currencies)
 	if err != nil {
-		panic(fmt.Sprintf("Error encoding file: %v", err))
+		return fmt.Errorf("error encoding file: %w", err)
 	}
+
+	return nil
 }

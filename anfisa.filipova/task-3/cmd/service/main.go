@@ -19,12 +19,23 @@ func main() {
 	configPath := flag.String("config", "", "Path to configuration file")
 	flag.Parse()
 
-	config := config.LoadConfigYAML(*configPath)
+	config, err := config.LoadConfigYAML(*configPath)
+	if err != nil {
+		panic(fmt.Sprintf("Cannot load config yaml: %v", err))
+	}
 	if _, err := os.Stat(config.InputFile); os.IsNotExist(err) {
 		panic(fmt.Sprintf("Inputfile is not existing: %v", err))
 	}
 
-	currencies := valutes.DecodeValuteXML(config.InputFile)
+	currencies, err := valutes.DecodeValuteXML(config.InputFile)
+	if err != nil {
+		panic(fmt.Sprintf("Cannot decode valute XML: %v", err))
+	}
+
 	valutes.SortCurrencies(currencies)
-	valutes.WriteCurrenciesJSON(currencies, config.OutputFile)
+
+	err = valutes.WriteCurrenciesJSON(currencies, config.OutputFile)
+	if err != nil {
+		panic(fmt.Sprintf("Cannot write currencies to JSON: %v", err))
+	}
 }

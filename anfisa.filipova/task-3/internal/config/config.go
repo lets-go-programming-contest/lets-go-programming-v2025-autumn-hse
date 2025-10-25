@@ -12,18 +12,18 @@ type Config struct {
 	OutputFile string `yaml:"output-file"`
 }
 
-func LoadConfigYAML(configPath string) *Config {
+func LoadConfigYAML(configPath string) (*Config, error) {
 	file, err := os.ReadFile(configPath)
 	if err != nil {
-		panic(fmt.Sprintf("Error reading file: %v", err))
+		return nil, fmt.Errorf("error reading file: %w", err)
 	}
 
 	var config Config
 
 	err = yaml.Unmarshal(file, &config)
 	if err != nil {
-		panic(fmt.Sprintf("Error unmarshaling file: %v", err))
+		return nil, fmt.Errorf("error unmarshaling file: %w", err)
 	}
 
-	return &config
+	return &config, nil
 }

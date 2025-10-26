@@ -22,6 +22,13 @@ type FloatValue struct {
 	Value float64
 }
 
+//type FloatValue = float64
+
+func (value *FloatValue) MarshalJSON() ([]byte, error) {
+	floatValue := value.Value
+	return json.Marshal(floatValue)
+}
+
 func (value *FloatValue) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
 	var strValue string
 	err := decoder.DecodeElement(&strValue, &start)

@@ -6,6 +6,7 @@ import (
 
 	"github.com/kuzid-17/task-3/internal/config"
 	"github.com/kuzid-17/task-3/internal/jsonwriter"
+	"github.com/kuzid-17/task-3/internal/models"
 	"github.com/kuzid-17/task-3/internal/xmlparser"
 )
 
@@ -18,7 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	valCurs, err := xmlparser.ParseXML(config.InputFile)
+	valCurs, err := xmlparser.ParseXML[models.ValCurs](config.InputFile)
 	if err != nil {
 		panic(err)
 	}
@@ -27,7 +28,7 @@ func main() {
 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
 	})
 
-	err = jsonwriter.WriteJSON(config.OutputFile, valCurs.Valutes)
+	err = jsonwriter.WriteJSON(config.OutputFile, 0755, valCurs.Valutes)
 	if err != nil {
 		panic(err)
 	}

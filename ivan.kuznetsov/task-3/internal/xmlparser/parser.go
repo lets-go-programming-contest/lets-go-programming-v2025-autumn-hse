@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kuzid-17/task-3/internal/models"
 	"golang.org/x/net/html/charset"
 )
 
-func ParseXML(filename string) (*models.ValCurs, error) {
+func ParseXML[T any](filename string) (*T, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read input config file: %w", err)
@@ -19,12 +18,12 @@ func ParseXML(filename string) (*models.ValCurs, error) {
 	decoder := xml.NewDecoder(bytes.NewReader(data))
 	decoder.CharsetReader = charset.NewReaderLabel
 
-	var valCurs models.ValCurs
+	var result T
 
-	err = decoder.Decode(&valCurs)
+	err = decoder.Decode(&result)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode XML: %w", err)
 	}
 
-	return &valCurs, nil
+	return &result, nil
 }

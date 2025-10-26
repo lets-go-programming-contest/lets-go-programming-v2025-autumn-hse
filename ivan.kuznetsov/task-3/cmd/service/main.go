@@ -10,6 +10,8 @@ import (
 	"github.com/kuzid-17/task-3/internal/xmlparser"
 )
 
+const mkdirMode = 0o755
+
 func main() {
 	configFlag := flag.String("config", "config.yaml", "Config file path")
 	flag.Parse()
@@ -28,7 +30,7 @@ func main() {
 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
 	})
 
-	err = jsonwriter.WriteJSON(config.OutputFile, 0o755, valCurs.Valutes)
+	err = jsonwriter.WriteJSON(config.OutputFile, mkdirMode, valCurs.Valutes)
 	if err != nil {
 		panic(err)
 	}

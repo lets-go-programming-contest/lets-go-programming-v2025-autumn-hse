@@ -6,7 +6,9 @@ import (
 	"os"
 
 	"github.com/Anfisa111/task-3/internal/config"
+	"github.com/Anfisa111/task-3/internal/jsonwriter"
 	"github.com/Anfisa111/task-3/internal/valutes"
+	"github.com/Anfisa111/task-3/internal/xmlreader"
 )
 
 func main() {
@@ -27,14 +29,14 @@ func main() {
 		panic(fmt.Sprintf("Inputfile is not existing: %v", err))
 	}
 
-	currencies, err := valutes.DecodeValuteXML(config.InputFile)
+	currencies, err := xmlreader.DecodeValuteXML(config.InputFile)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot decode valute XML: %v", err))
 	}
 
-	valutes.SortCurrencies(currencies)
+	valutes.SortValutes(currencies)
 
-	err = valutes.WriteCurrenciesJSON(currencies, config.OutputFile)
+	err = jsonwriter.WriteCurrenciesJSON(currencies, config.OutputFile)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot write currencies to JSON: %v", err))
 	}

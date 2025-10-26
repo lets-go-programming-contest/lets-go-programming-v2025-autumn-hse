@@ -25,6 +25,7 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("Cannot load config yaml: %v", err))
 	}
+
 	if _, err := os.Stat(config.InputFile); os.IsNotExist(err) {
 		panic(fmt.Sprintf("Inputfile is not existing: %v", err))
 	}

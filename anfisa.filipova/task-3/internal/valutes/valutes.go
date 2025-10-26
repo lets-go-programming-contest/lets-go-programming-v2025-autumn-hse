@@ -15,6 +15,7 @@ type FloatValue struct {
 
 func (value *FloatValue) MarshalJSON() ([]byte, error) {
 	floatValue := value.Value
+
 	return json.Marshal(floatValue)
 }
 
@@ -34,13 +35,14 @@ func (value *FloatValue) UnmarshalXML(decoder *xml.Decoder, start xml.StartEleme
 	}
 
 	value.Value = floatValue
+
 	return nil
 }
 
 type Valute struct {
-	NumCode  int        `xml:"NumCode" json:"num_code"`
+	NumCode  int        `xml:"NumCode"  json:"num_code"`
 	CharCode string     `xml:"CharCode" json:"char_code"`
-	Value    FloatValue `xml:"Value" json:"value"`
+	Value    FloatValue `xml:"Value"    json:"value"`
 }
 
 type ValCurs struct {

@@ -36,6 +36,7 @@ func Read(path string) ([]model.Currency, error) {
 	}
 
 	result := make([]model.Currency, 0, len(xmlData.Currencies))
+
 	for _, val := range xmlData.Currencies {
 		num := parseCodeNum(val.RawNum)
 		value, hasValue := parseValue(val.RawValue)
@@ -57,10 +58,13 @@ func Read(path string) ([]model.Currency, error) {
 
 func parseCodeNum(raw string) int {
 	raw = strings.TrimSpace(raw)
+
 	if raw == "" {
 		return 0
 	}
+
 	n, err := strconv.Atoi(raw)
+
 	if err != nil {
 		return 0
 	}
@@ -70,11 +74,15 @@ func parseCodeNum(raw string) int {
 
 func parseValue(raw string) (float64, bool) {
 	raw = strings.TrimSpace(raw)
+
 	if raw == "" {
 		return 0, false
 	}
+
 	raw = strings.ReplaceAll(raw, ",", ".")
+
 	v, err := strconv.ParseFloat(raw, 64)
+
 	if err != nil {
 		return 0, false
 	}

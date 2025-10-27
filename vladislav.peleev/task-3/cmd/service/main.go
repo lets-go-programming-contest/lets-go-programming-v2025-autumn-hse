@@ -1,148 +1,129 @@
 package main
 
 import (
-	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"flag"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	InputFile  string `yaml:"input"`
-	OutputFile string `yaml:"output"`
+	InputFile  string `yaml:"input_file"`
+	OutputFile string `yaml:"output_file"`
 }
 
-type ValCurs struct {
-	Currencies []Valute `xml:"Valute"`
-}
-
-type Valute struct {
+type CurrencyXML struct {
 	CharCode string `xml:"CharCode"`
+	Nominal  string `xml:"Nominal"`
 	Value    string `xml:"Value"`
 }
 
-type CurrencyJSON struct {
-	CharCode string  `json:"char_code"`
-	Value    float64 `json:"value"`
+type ValCurs struct {
+	Currencies []CurrencyXML `xml:"Currency"`
 }
 
-var (
-	errFileNotFound = errors.New("no such file or directory")
-	errParseXML     = errors.New("error parsing XML")
-)
-
-func main() {
-	configPath := flag.String("config", "config.yaml", "path to config file")
-	flag.Parse()
-
-	config, err := readConfig(*configPath)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	data, err := parseXML(config.InputFile)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	if err := writeJSON(config.OutputFile, data); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+type CurrencyJSON struct {
+	Code   string  `json:"code"`
+	Amount int     `json:"amount"`
+	Value  float64 `json:"value"`
 }
 
 func readConfig(configPath string) (*Config, error) {
-	f, err := os.Open(configPath)
+	if configPath == "" {
+		return nil, errors.New("config path is empty")
+	}
+
+	data, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("open %s: %w", configPath, errFileNotFound)
-		}
-		return nil, fmt.Errorf("open %s: %w", configPath, err)
-	}
-	defer f.Close()
-
-	data, err := io.ReadAll(f)
-	if err != nil {
-		return nil, fmt.Errorf("read config: %w", err)
+		return nil, fmt.Errorf("open %s: no such file or directory", configPath)
 	}
 
-	var cfg Config
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil, fmt.Errorf("unmarshal config: %w", err)
+	var config Config
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		return nil, fmt.Errorf("cannot parse config: %w", err)
 	}
 
-	return &cfg, nil
+	return &config, nil
 }
 
 func parseXML(filePath string) ([]CurrencyJSON, error) {
-	cleanPath := filepath.Clean(filePath)
-	if strings.TrimSpace(cleanPath) == "" || cleanPath == "." {
-		return nil, fmt.Errorf("open %s: %w", cleanPath, errFileNotFound)
-	}
-
-	file, err := os.Open(cleanPath)
+	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("open %s: %w", cleanPath, errFileNotFound)
-		}
-		return nil, fmt.Errorf("open %s: %w", cleanPath, err)
-	}
-	defer file.Close()
-
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return nil, fmt.Errorf("read xml: %w", err)
+		return nil, fmt.Errorf("open %s: no such file or directory", filePath)
 	}
 
 	var valCurs ValCurs
 	if err := xml.Unmarshal(data, &valCurs); err != nil {
-		return nil, fmt.Errorf("%w: %v", errParseXML, err)
+		return nil, fmt.Errorf("error parsing XML: %w", err)
 	}
 
 	result := make([]CurrencyJSON, 0, len(valCurs.Currencies))
-
 	for _, currency := range valCurs.Currencies {
-		valStr := strings.TrimSpace(strings.ReplaceAll(currency.Value, ",", "."))
-		if valStr == "" {
-			continue
+		amount := 1
+		if currency.Nominal != "" {
+			fmt.Sscanf(currency.Nominal, "%d", &amount)
 		}
 
-		var num float64
-		if _, err := fmt.Sscanf(valStr, "%f", &num); err != nil {
-			continue
+		var value float64
+		if currency.Value != "" {
+			fmt.Sscanf(currency.Value, "%f", &value)
 		}
 
 		result = append(result, CurrencyJSON{
-			CharCode: currency.CharCode,
-			Value:    num,
+			Code:   currency.CharCode,
+			Amount: amount,
+			Value:  value,
 		})
 	}
 
 	return result, nil
 }
 
-func writeJSON(filePath string, data []CurrencyJSON) error {
-	f, err := os.Create(filePath)
+func writeJSON(outputPath string, data []CurrencyJSON) error {
+	file, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("create %s: %w", filePath, err)
+		return fmt.Errorf("cannot create file %s: %w", outputPath, err)
 	}
-	defer f.Close()
+	defer file.Close()
 
-	enc := json.NewEncoder(f)
-	enc.SetIndent("", "  ")
-
-	if err := enc.Encode(data); err != nil {
-		return fmt.Errorf("encode json: %w", err)
+	for _, c := range data {
+		_, err := fmt.Fprintf(file, "%s %d %.2f\n", c.Code, c.Amount, c.Value)
+		if err != nil {
+			return fmt.Errorf("cannot write to file: %w", err)
+		}
 	}
 
 	return nil
+}
+
+func run() error {
+	configPath := flag.String("config", "config.yaml", "path to config file")
+	flag.Parse()
+
+	config, err := readConfig(*configPath)
+	if err != nil {
+		return err
+	}
+
+	data, err := parseXML(config.InputFile)
+	if err != nil {
+		return err
+	}
+
+	if err := writeJSON(config.OutputFile, data); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func main() {
+	if err := run(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

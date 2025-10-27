@@ -33,7 +33,7 @@ type ValCurs struct {
 }
 
 type CurrencyJSON struct {
-	NumCode  string  `json:"num_code"`
+	NumCode  int     `json:"num_code"`
 	CharCode string  `json:"char_code"`
 	Value    float64 `json:"value"`
 }
@@ -120,8 +120,13 @@ func decodeXML(filePath string) ([]CurrencyJSON, error) {
 			return nil, fmt.Errorf("cannot parse value '%s': %w", currency.Value, err)
 		}
 
+		numCode, err := strconv.Atoi(strings.TrimSpace(currency.NumCode))
+		if err != nil {
+			return nil, fmt.Errorf("cannot parse NumCode '%s': %w", currency.NumCode, err)
+		}
+
 		result[i] = CurrencyJSON{
-			NumCode:  strings.TrimSpace(currency.NumCode),
+			NumCode:  numCode,
 			CharCode: strings.TrimSpace(currency.CharCode),
 			Value:    value,
 		}

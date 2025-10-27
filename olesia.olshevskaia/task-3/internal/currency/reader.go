@@ -32,14 +32,13 @@ func Read(path string) ([]model.Currency, error) {
 	result := make([]model.Currency, 0, len(xmlData.Currencies))
 	for _, val := range xmlData.Currencies {
 		num := 0
-		value := 0.0
-
 		if strings.TrimSpace(val.RawNum) != "" {
 			if n, err := strconv.Atoi(val.RawNum); err == nil {
 				num = n
 			}
 		}
 
+		value := 0.0
 		hasValue := false
 		if strings.TrimSpace(val.RawValue) != "" {
 			str := strings.ReplaceAll(val.RawValue, ",", ".")

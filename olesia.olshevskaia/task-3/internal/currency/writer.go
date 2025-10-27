@@ -19,7 +19,7 @@ func WriteJSON(currencies interface{}, outputPath string) error {
 
 	defer func() {
 		if err := file.Close(); err != nil {
-			panic("Error closing XML file: " + err.Error())
+			panic("Error closing file: " + err.Error())
 		}
 	}()
 

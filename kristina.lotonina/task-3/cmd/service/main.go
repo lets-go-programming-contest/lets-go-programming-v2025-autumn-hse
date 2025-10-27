@@ -8,7 +8,7 @@ import (
 
 	"github.com/kef1rch1k/task-3/internal/config"
 	"github.com/kef1rch1k/task-3/internal/parser"
-	"github.com/kef1rch1k/task-3/internal/utils"
+	"github.com/kef1rch1k/task-3/internal/checkdir"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 		panic(fmt.Sprintf("Failed to parse XML: %v", err))
 	}
 
-	err = utils.EnsureDir(cfg.OutputFile)
+	err = checkdir.EnsureDir(cfg.OutputFile)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to create directory: %v", err))
 	}

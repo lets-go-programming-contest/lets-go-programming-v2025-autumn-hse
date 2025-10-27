@@ -9,6 +9,11 @@ import (
 	"github.com/Ekaterina-101/task-3/internal/writerjson"
 )
 
+const (
+	dirMode  = 0o755
+	fileMode = 0o600
+)
+
 func main() {
 	configPath := flag.String("config", "config.yaml", "path of config file")
 	flag.Parse()
@@ -27,7 +32,7 @@ func main() {
 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
 	})
 
-	err = writerjson.WriteFileJSON(config.OutputFile, valCurs)
+	err = writerjson.WriteFileJSON(config.OutputFile, valCurs, dirMode, fileMode)
 	if err != nil {
 		panic(err)
 	}

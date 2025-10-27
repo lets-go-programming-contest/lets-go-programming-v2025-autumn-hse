@@ -11,6 +11,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
@@ -21,7 +23,7 @@ type Config struct {
 type Currency struct {
 	NumCode  string  `xml:"NumCode"`
 	CharCode string  `xml:"CharCode"`
-	Value    float64 `xml:"Value"`
+	Value    string  `xml:"Value"`
 }
 
 type ValCurs struct {
@@ -88,7 +90,7 @@ func loadConfig(configPath string) (*Config, error) {
 	return &config, nil
 }
 
-func decodeXML(filePath string) ([]Currency, error) {
+func decodeXML(filePath string) ([]CurrencyJSON, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("open %s: no such file or directory", filePath)
@@ -111,16 +113,22 @@ func decodeXML(filePath string) ([]Currency, error) {
 		}
 	}
 
-	for i := range valCurs.Currencies {
-		valStr := strings.Replace(valCurs.Currencies[i].Value, ",", ".", -1)
-		val, err := strconv.ParseFloat(valStr, 64)
+	result := make([]CurrencyJSON, len(valCurs.Currencies))
+	for i, currency := range valCurs.Currencies {
+		valStr := strings.Replace(currency.Value, ",", ".", -1)
+		value, err := strconv.ParseFloat(valStr, 64)
 		if err != nil {
-			return nil, fmt.Errorf("cannot parse value: %w", err)
+			return nil, fmt.Errorf("cannot parse value '%s': %w", currency.Value, err)
 		}
-		valCurs.Currencies[i].Value = val
+
+		result[i] = CurrencyJSON{
+			NumCode:  strings.TrimSpace(currency.NumCode),
+			CharCode: strings.TrimSpace(currency.CharCode),
+			Value:    value,
+		}
 	}
 
-	return valCurs.Currencies, nil
+	return result, nil
 }
 
 func convertWindows1251ToUTF8(data []byte) []byte {
@@ -147,26 +155,17 @@ func convertWindows1251ToUTF8(data []byte) []byte {
 	return []byte(result.String())
 }
 
-func sortCurrencies(currencies []Currency) {
+func sortCurrencies(currencies []CurrencyJSON) {
 	sort.Slice(currencies, func(i, j int) bool {
 		return currencies[i].Value > currencies[j].Value
 	})
 }
 
-func saveJSON(outputPath string, currencies []Currency) error {
+func saveJSON(outputPath string, currencies []CurrencyJSON) error {
 	dir := filepath.Dir(outputPath)
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		return fmt.Errorf("cannot create directory: %w", err)
-	}
-
-	jsonCurrencies := make([]CurrencyJSON, len(currencies))
-	for i, currency := range currencies {
-		jsonCurrencies[i] = CurrencyJSON{
-			NumCode:  strings.TrimSpace(currency.NumCode),
-			CharCode: strings.TrimSpace(currency.CharCode),
-			Value:    currency.Value,
-		}
 	}
 
 	file, err := os.Create(outputPath)
@@ -177,7 +176,7 @@ func saveJSON(outputPath string, currencies []Currency) error {
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "    ")
-	err = encoder.Encode(jsonCurrencies)
+	err = encoder.Encode(currencies)
 	if err != nil {
 		return fmt.Errorf("cannot encode JSON: %w", err)
 	}

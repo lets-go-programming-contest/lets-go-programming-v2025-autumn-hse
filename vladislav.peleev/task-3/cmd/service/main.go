@@ -9,10 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
-
-	"golang.org/x/text/encoding/charmap"
-	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
@@ -102,11 +100,7 @@ func decodeXML(filePath string) ([]Currency, error) {
 		return nil, fmt.Errorf("cannot read XML file: %w", err)
 	}
 
-	decoder := charmap.Windows1251.NewDecoder()
-	utf8Data, err := decoder.Bytes(data)
-	if err != nil {
-		return nil, fmt.Errorf("cannot convert encoding: %w", err)
-	}
+	utf8Data := convertWindows1251ToUTF8(data)
 
 	var valCurs ValCurs
 	err = xml.Unmarshal(utf8Data, &valCurs)
@@ -117,7 +111,40 @@ func decodeXML(filePath string) ([]Currency, error) {
 		}
 	}
 
+	for i := range valCurs.Currencies {
+		valStr := strings.Replace(valCurs.Currencies[i].Value, ",", ".", -1)
+		val, err := strconv.ParseFloat(valStr, 64)
+		if err != nil {
+			return nil, fmt.Errorf("cannot parse value: %w", err)
+		}
+		valCurs.Currencies[i].Value = val
+	}
+
 	return valCurs.Currencies, nil
+}
+
+func convertWindows1251ToUTF8(data []byte) []byte {
+	windows1251ToUTF8 := map[byte]string{
+		0xC0: "А", 0xC1: "Б", 0xC2: "В", 0xC3: "Г", 0xC4: "Д", 0xC5: "Е", 0xC6: "Ж", 0xC7: "З",
+		0xC8: "И", 0xC9: "Й", 0xCA: "К", 0xCB: "Л", 0xCC: "М", 0xCD: "Н", 0xCE: "О", 0xCF: "П",
+		0xD0: "Р", 0xD1: "С", 0xD2: "Т", 0xD3: "У", 0xD4: "Ф", 0xD5: "Х", 0xD6: "Ц", 0xD7: "Ч",
+		0xD8: "Ш", 0xD9: "Щ", 0xDA: "Ъ", 0xDB: "Ы", 0xDC: "Ь", 0xDD: "Э", 0xDE: "Ю", 0xDF: "Я",
+		0xE0: "а", 0xE1: "б", 0xE2: "в", 0xE3: "г", 0xE4: "д", 0xE5: "е", 0xE6: "ж", 0xE7: "з",
+		0xE8: "и", 0xE9: "й", 0xEA: "к", 0xEB: "л", 0xEC: "м", 0xED: "н", 0xEE: "о", 0xEF: "п",
+		0xF0: "р", 0xF1: "с", 0xF2: "т", 0xF3: "у", 0xF4: "ф", 0xF5: "х", 0xF6: "ц", 0xF7: "ч",
+		0xF8: "ш", 0xF9: "щ", 0xFA: "ъ", 0xFB: "ы", 0xFC: "ь", 0xFD: "э", 0xFE: "ю", 0xFF: "я",
+	}
+
+	var result strings.Builder
+	for _, b := range data {
+		if utf8Char, exists := windows1251ToUTF8[b]; exists {
+			result.WriteString(utf8Char)
+		} else {
+			result.WriteByte(b)
+		}
+	}
+
+	return []byte(result.String())
 }
 
 func sortCurrencies(currencies []Currency) {

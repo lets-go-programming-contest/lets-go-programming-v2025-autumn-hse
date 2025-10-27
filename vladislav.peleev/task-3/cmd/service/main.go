@@ -41,6 +41,7 @@ type CurrencyJSON struct {
 func main() {
 	configPath := flag.String("config", "", "Path to configuration file")
 	flag.Parse()
+
 	if *configPath == "" {
 		panic("Config file path is required")
 	}
@@ -61,8 +62,7 @@ func main() {
 
 	sortCurrencies(currencies)
 
-	err = saveJSON(config.OutputFile, currencies)
-	if err != nil {
+	if err := saveJSON(config.OutputFile, currencies); err != nil {
 		panic(fmt.Sprintf("Error saving JSON: %v", err))
 	}
 
@@ -72,13 +72,11 @@ func main() {
 func loadConfig(configPath string) (*Config, error) {
 	file, err := os.Open(configPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open config file: %w", err)
+		return nil, fmt.Errorf("open %s: no such file or directory", configPath)
 	}
 
 	defer func() {
-		if cerr := file.Close(); cerr != nil {
-			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", configPath, cerr)
-		}
+		_ = file.Close()
 	}()
 
 	data, err := io.ReadAll(file)
@@ -87,7 +85,6 @@ func loadConfig(configPath string) (*Config, error) {
 	}
 
 	var config Config
-
 	if err := yaml.Unmarshal(data, &config); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal YAML: %w", err)
 	}
@@ -98,13 +95,11 @@ func loadConfig(configPath string) (*Config, error) {
 func decodeXML(filePath string) ([]CurrencyJSON, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open XML file: %w", err)
+		return nil, fmt.Errorf("open %s: no such file or directory", filePath)
 	}
 
 	defer func() {
-		if cerr := file.Close(); cerr != nil {
-			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", filePath, cerr)
-		}
+		_ = file.Close()
 	}()
 
 	decoder := xml.NewDecoder(file)
@@ -117,13 +112,11 @@ func decodeXML(filePath string) ([]CurrencyJSON, error) {
 	}
 
 	var valCurs ValCurs
-
 	if err := decoder.Decode(&valCurs); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal XML: %w", err)
 	}
 
-	result := make([]CurrencyJSON, 0, len(valCurs.Currencies))
-
+	var result []CurrencyJSON
 	for _, currency := range valCurs.Currencies {
 		valStr := strings.ReplaceAll(currency.Value, ",", ".")
 		value, err := strconv.ParseFloat(valStr, 64)
@@ -133,11 +126,8 @@ func decodeXML(filePath string) ([]CurrencyJSON, error) {
 
 		numStr := strings.TrimSpace(currency.NumCode)
 		numCode := 0
-
 		if numStr != "" {
-			if n, err := strconv.Atoi(numStr); err == nil {
-				numCode = n
-			}
+			numCode, _ = strconv.Atoi(numStr)
 		}
 
 		result = append(result, CurrencyJSON{
@@ -157,9 +147,9 @@ func sortCurrencies(currencies []CurrencyJSON) {
 }
 
 func saveJSON(outputPath string, currencies []CurrencyJSON) error {
-	dir := filepath.Dir(outputPath)
 	const dirPerm = 0o755
 
+	dir := filepath.Dir(outputPath)
 	if err := os.MkdirAll(dir, dirPerm); err != nil {
 		return fmt.Errorf("cannot create directory: %w", err)
 	}
@@ -170,9 +160,7 @@ func saveJSON(outputPath string, currencies []CurrencyJSON) error {
 	}
 
 	defer func() {
-		if cerr := file.Close(); cerr != nil {
-			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", outputPath, cerr)
-		}
+		_ = file.Close()
 	}()
 
 	encoder := json.NewEncoder(file)
@@ -184,3 +172,4 @@ func saveJSON(outputPath string, currencies []CurrencyJSON) error {
 
 	return nil
 }
+

@@ -32,5 +32,6 @@ func (cf *CommaFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 	}
 
 	*cf = CommaFloat(f)
+
 	return nil
 }

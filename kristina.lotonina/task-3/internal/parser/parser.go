@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"strconv"
-	"strings"
 
 	"github.com/kef1rch1k/task-3/internal/models"
 	"golang.org/x/net/html/charset"
 )
 
-func ParseAndSortXML(path string) ([]models.OutputValute, error) {
+func ParseAndSortXML(path string) ([]models.Valute, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("opening XML file: %w", err)
@@ -33,31 +31,18 @@ func ParseAndSortXML(path string) ([]models.OutputValute, error) {
 		return nil, fmt.Errorf("decoding XML: %w", err)
 	}
 
-	for index, v := range valCurs.Valutes {
-		val := strings.Replace(v.ValueStr, ",", ".", 1)
+	sortedValutes := sortValutesByValueDesc(valCurs.Valutes)
 
-		floatVal, err := strconv.ParseFloat(strings.TrimSpace(val), 64)
-		if err != nil {
-			return nil, fmt.Errorf("parsing float: %w", err)
-		}
+	return sortedValutes, nil
+}
 
-		valCurs.Valutes[index].Value = floatVal
-	}
-
-	sorted := valCurs.Valutes
+func sortValutesByValueDesc(valutes []models.Valute) []models.Valute {
+	sorted := make([]models.Valute, len(valutes))
+	copy(sorted, valutes)
+	
 	sort.Slice(sorted, func(i, j int) bool {
 		return sorted[i].Value > sorted[j].Value
 	})
-
-	output := make([]models.OutputValute, 0, len(sorted))
-
-	for _, v := range sorted {
-		output = append(output, models.OutputValute{
-			NumCode:  v.NumCode,
-			CharCode: v.CharCode,
-			Value:    v.Value,
-		})
-	}
-
-	return output, nil
+	
+	return sorted
 }

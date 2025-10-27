@@ -30,5 +30,6 @@ func ParseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) 
 
 func WriteFileJSON(outputFile string, valCurs parsexml.ValuteCurs, dirmode, filemode os.FileMode) error {
 	err := ParseJSON(outputFile, valCurs.Valutes, dirmode, filemode)
+
 	return err
 }

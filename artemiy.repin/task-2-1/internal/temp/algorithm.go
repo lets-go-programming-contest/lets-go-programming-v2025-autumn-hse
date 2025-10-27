@@ -32,14 +32,12 @@ func (t *Temperature) UpdateInterval(operator string, value int) {
 		}
 
 	default:
-
 		return
 	}
 }
 
 func (t *Temperature) GetOptimal() int {
 	if t.LeftBound <= t.RightBound {
-
 		return t.LeftBound
 	}
 

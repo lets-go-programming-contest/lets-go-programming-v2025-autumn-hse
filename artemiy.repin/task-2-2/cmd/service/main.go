@@ -26,7 +26,7 @@ func main() {
 	stdheap.Init(inputHeap)
 
 	for range heapCount {
-		if _, err := fmt.Fscan(input, &preferenceScore); err != nil {
+		if _, err := fmt.Scan(input, &preferenceScore); err != nil {
 			return
 		}
 
@@ -47,6 +47,8 @@ func main() {
 
 	val, ok := stdheap.Pop(inputHeap).(int)
 	if !ok {
+		fmt.Println("error: ", ok)
+
 		return
 	}
 

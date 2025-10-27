@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kef1rch1k/task-3/internal/checkdir"
 	"github.com/kef1rch1k/task-3/internal/config"
 	"github.com/kef1rch1k/task-3/internal/parser"
-	"github.com/kef1rch1k/task-3/internal/checkdir"
 )
 
 func main() {

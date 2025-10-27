@@ -1,10 +1,13 @@
 package xmlparser
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
 	"io"
 	"os"
+
+	"golang.org/x/text/encoding/charmap"
 
 	"github.com/JingolBong/task-3/internal/valuteinfo"
 )
@@ -27,6 +30,13 @@ func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {
 
 	if err != nil {
 		panic(err)
+	}
+	if bytes.Contains(data, []byte("windows-1251")) {
+		decoder := charmap.Windows1251.NewDecoder()
+		data, err = decoder.Bytes(data)
+		if err != nil {
+			return valuteinfo.ValuteCurs{}, fmt.Errorf("cannot decode windows-1251: %w", err)
+		}
 	}
 	if err := xml.Unmarshal(data, &valuteCurs); err != nil {
 		panic(err)

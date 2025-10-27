@@ -16,7 +16,12 @@ func WriteJSON(currencies interface{}, outputPath string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			panic("Error closing XML file: " + err.Error())
+		}
+	}()
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")

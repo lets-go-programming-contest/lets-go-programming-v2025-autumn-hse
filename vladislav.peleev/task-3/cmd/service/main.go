@@ -15,13 +15,8 @@ import (
 )
 
 type Config struct {
-	InputPath  string `yaml:"input_path"`
-	OutputPath string `yaml:"output_path"`
-}
-
-type ValCurs struct {
-	XMLName    xml.Name   `xml:"ValCurs"`
-	Currencies []Currency `xml:"Valute"`
+	InputFile  string `yaml:"input_file"`
+	OutputFile string `yaml:"output_file"`
 }
 
 type Currency struct {
@@ -29,46 +24,58 @@ type Currency struct {
 	Value    string `xml:"Value"`
 }
 
+type ValCurs struct {
+	Currencies []Currency `xml:"Valute"`
+}
+
 type CurrencyJSON struct {
-	Code  string  `json:"code"`
-	Value float64 `json:"value"`
+	CharCode string  `json:"char_code"`
+	Value    float64 `json:"value"`
 }
 
 var (
-	errNoConfigFile = errors.New("no such file or directory")
-	errNoXMLFile    = errors.New("no such XML file or directory")
+	errConfigNotFound = errors.New("no such config file")
+	errFileNotFound   = errors.New("no such data file")
 )
 
 func loadConfig(configPath string) (*Config, error) {
 	file, err := os.Open(configPath)
 	if err != nil {
-		return nil, fmt.Errorf("open %s: %w", configPath, errNoConfigFile)
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("open %s: %w", configPath, errConfigNotFound)
+		}
+
+		return nil, fmt.Errorf("open %s: %w", configPath, err)
 	}
 	defer file.Close()
 
 	data, err := io.ReadAll(file)
 	if err != nil {
-		return nil, fmt.Errorf("read config file: %w", err)
+		return nil, fmt.Errorf("read config: %w", err)
 	}
 
-	var cfg Config
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil, fmt.Errorf("unmarshal yaml: %w", err)
+	var config Config
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		return nil, fmt.Errorf("unmarshal config: %w", err)
 	}
 
-	return &cfg, nil
+	return &config, nil
 }
 
 func parseXML(filePath string) ([]CurrencyJSON, error) {
-	xmlFile, err := os.Open(filePath)
+	file, err := os.Open(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("open %s: %w", filePath, errNoXMLFile)
-	}
-	defer xmlFile.Close()
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("open %s: %w", filePath, errFileNotFound)
+		}
 
-	data, err := io.ReadAll(xmlFile)
+		return nil, fmt.Errorf("open %s: %w", filePath, err)
+	}
+	defer file.Close()
+
+	data, err := io.ReadAll(file)
 	if err != nil {
-		return nil, fmt.Errorf("read xml file: %w", err)
+		return nil, fmt.Errorf("read xml: %w", err)
 	}
 
 	var valCurs ValCurs
@@ -79,41 +86,41 @@ func parseXML(filePath string) ([]CurrencyJSON, error) {
 	result := make([]CurrencyJSON, 0, len(valCurs.Currencies))
 
 	for _, currency := range valCurs.Currencies {
-		valStr := strings.Replace(currency.Value, ",", ".", -1)
-		numStr := strings.TrimSpace(valStr)
 
-		if numStr == "" {
+		valStr := strings.Replace(currency.Value, ",", ".", -1)
+		valStr = strings.TrimSpace(valStr)
+
+		if valStr == "" {
 			continue
 		}
 
-		var value float64
-		if _, err := fmt.Sscanf(numStr, "%f", &value); err != nil {
+		var num float64
+		_, err = fmt.Sscanf(valStr, "%f", &num)
+		if err != nil {
 			continue
 		}
 
 		result = append(result, CurrencyJSON{
-			Code:  currency.CharCode,
-			Value: value,
+			CharCode: currency.CharCode,
+			Value:    num,
 		})
 	}
 
 	return result, nil
 }
 
-func saveJSON(path string, data []CurrencyJSON) error {
-	jsonData, err := json.MarshalIndent(data, "", "  ")
+func saveJSON(data []CurrencyJSON, outputPath string) error {
+	file, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("marshal json: %w", err)
+		return fmt.Errorf("create json: %w", err)
 	}
+	defer file.Close()
 
-	const dirPerm = 0o755
+	enc := json.NewEncoder(file)
+	enc.SetIndent("", "  ")
 
-	if err := os.MkdirAll(filepath.Dir(path), dirPerm); err != nil {
-		return fmt.Errorf("create dir: %w", err)
-	}
-
-	if err := os.WriteFile(path, jsonData, 0o644); err != nil {
-		return fmt.Errorf("write json: %w", err)
+	if err := enc.Encode(data); err != nil {
+		return fmt.Errorf("encode json: %w", err)
 	}
 
 	return nil
@@ -123,27 +130,25 @@ func main() {
 	configPath := flag.String("config", "config.yaml", "path to config file")
 	flag.Parse()
 
-	if *configPath == "" {
-		fmt.Println("Config path is required")
-		os.Exit(1)
-	}
-
-	cfg, err := loadConfig(*configPath)
+	config, err := loadConfig(*configPath)
 	if err != nil {
-		fmt.Println("Error loading config:", err)
+		fmt.Fprintln(os.Stderr, "error loading config:", err)
 		os.Exit(1)
 	}
 
-	data, err := parseXML(cfg.InputPath)
+	xmlPath := filepath.Clean(config.InputFile)
+	jsonPath := filepath.Clean(config.OutputFile)
+
+	data, err := parseXML(xmlPath)
 	if err != nil {
-		fmt.Println("Error parsing XML:", err)
+		fmt.Fprintln(os.Stderr, "error parsing XML:", err)
 		os.Exit(1)
 	}
 
-	if err := saveJSON(cfg.OutputPath, data); err != nil {
-		fmt.Println("Error saving JSON:", err)
+	if err := saveJSON(data, jsonPath); err != nil {
+		fmt.Fprintln(os.Stderr, "error saving JSON:", err)
 		os.Exit(1)
 	}
 
-	fmt.Println("Conversion completed successfully.")
+	fmt.Println("Conversion completed successfully!")
 }

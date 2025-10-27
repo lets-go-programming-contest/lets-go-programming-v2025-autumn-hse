@@ -12,9 +12,17 @@ func main() {
 	configPath := flag.String("config", "config.yaml", "Path to YAML config file")
 	flag.Parse()
 
-	cfg := config.Load(*configPath)
+	cfg, err := config.Load(*configPath)
+	if err != nil {
+		panic("Cannot load config: " + err.Error())
+	}
 
-	currencies := currency.Read(cfg.InputFile)
+	currencies, err := currency.Read(cfg.InputFile)
+	if err != nil {
+		panic("Cannot read currencies: " + err.Error())
+	}
 	currency.Sort(currencies)
-	currency.WriteJSON(currencies, cfg.OutputFile)
+	if err := currency.WriteJSON(currencies, cfg.OutputFile); err != nil {
+		panic("Cannot write JSON file: " + err.Error())
+	}
 }

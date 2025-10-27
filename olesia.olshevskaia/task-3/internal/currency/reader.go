@@ -11,10 +11,10 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-func Read(path string) []model.Currency {
+func Read(path string) ([]model.Currency, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		panic("Cannot open XML file: " + err.Error())
+		return nil, err
 	}
 	defer file.Close()
 
@@ -26,7 +26,7 @@ func Read(path string) []model.Currency {
 	}
 
 	if err := decoder.Decode(&xmlData); err != nil {
-		panic("Error parsing XML: " + err.Error())
+		return nil, err
 	}
 
 	result := make([]model.Currency, 0, len(xmlData.Currencies))
@@ -62,5 +62,5 @@ func Read(path string) []model.Currency {
 		return result[i].RateValue > result[j].RateValue
 	})
 
-	return result
+	return result, nil
 }

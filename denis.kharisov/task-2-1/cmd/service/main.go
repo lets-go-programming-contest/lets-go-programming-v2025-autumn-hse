@@ -27,10 +27,10 @@ type temperatureRange struct {
 	minTemperature int
 }
 
-func NewTemperatureRange() *temperatureRange {
+func NewTemperatureRange(maxTemp int, minTemp int) *temperatureRange {
 	return &temperatureRange{
-		maxTemperature: defaultMaxTemperature,
-		minTemperature: defaultMinTemperature,
+		maxTemperature: maxTemp,
+		minTemperature: minTemp,
 	}
 }
 
@@ -47,7 +47,7 @@ func (tempRange *temperatureRange) optimalTemperature(operType operation, temper
 		}
 
 	default:
-		return -1, errUnknownOperation
+		return 0, errUnknownOperation
 	}
 
 	if tempRange.maxTemperature >= tempRange.minTemperature {
@@ -80,7 +80,7 @@ func main() {
 			temperature   int
 			operationType operation
 
-			tempRange = NewTemperatureRange()
+			tempRange = NewTemperatureRange(defaultMaxTemperature, defaultMinTemperature)
 		)
 
 		for range numberOfEmployees {

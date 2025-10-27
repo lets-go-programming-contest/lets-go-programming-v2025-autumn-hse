@@ -73,9 +73,13 @@ func main() {
 func loadConfig(configPath string) (*Config, error) {
 	file, err := os.Open(configPath)
 	if err != nil {
-		return nil, fmt.Errorf("open %s: no such file or directory", configPath)
+		return nil, fmt.Errorf("failed to open config file: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", configPath, cerr)
+		}
+	}()
 
 	data, err := io.ReadAll(file)
 	if err != nil {
@@ -83,8 +87,7 @@ func loadConfig(configPath string) (*Config, error) {
 	}
 
 	var config Config
-	err = yaml.Unmarshal(data, &config)
-	if err != nil {
+	if err := yaml.Unmarshal(data, &config); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal YAML: %w", err)
 	}
 
@@ -94,9 +97,13 @@ func loadConfig(configPath string) (*Config, error) {
 func decodeXML(filePath string) ([]CurrencyJSON, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("open %s: no such file or directory", filePath)
+		return nil, fmt.Errorf("failed to open XML file: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", filePath, cerr)
+		}
+	}()
 
 	decoder := xml.NewDecoder(file)
 	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
@@ -107,14 +114,13 @@ func decodeXML(filePath string) ([]CurrencyJSON, error) {
 	}
 
 	var valCurs ValCurs
-	err = decoder.Decode(&valCurs)
-	if err != nil {
+	if err := decoder.Decode(&valCurs); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal XML: %w", err)
 	}
 
 	result := make([]CurrencyJSON, 0, len(valCurs.Currencies))
 	for _, currency := range valCurs.Currencies {
-		valStr := strings.Replace(currency.Value, ",", ".", -1)
+		valStr := strings.ReplaceAll(currency.Value, ",", ".")
 		value, err := strconv.ParseFloat(valStr, 64)
 		if err != nil {
 			return nil, fmt.Errorf("cannot parse value '%s': %w", currency.Value, err)
@@ -146,8 +152,7 @@ func sortCurrencies(currencies []CurrencyJSON) {
 
 func saveJSON(outputPath string, currencies []CurrencyJSON) error {
 	dir := filepath.Dir(outputPath)
-	err := os.MkdirAll(dir, 0755)
-	if err != nil {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("cannot create directory: %w", err)
 	}
 
@@ -155,12 +160,15 @@ func saveJSON(outputPath string, currencies []CurrencyJSON) error {
 	if err != nil {
 		return fmt.Errorf("cannot create output file: %w", err)
 	}
-	defer file.Close()
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", outputPath, cerr)
+		}
+	}()
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "    ")
-	err = encoder.Encode(currencies)
-	if err != nil {
+	if err := encoder.Encode(currencies); err != nil {
 		return fmt.Errorf("cannot encode JSON: %w", err)
 	}
 

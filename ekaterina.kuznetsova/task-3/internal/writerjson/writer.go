@@ -9,11 +9,6 @@ import (
 	"github.com/Ekaterina-101/task-3/internal/parsexml"
 )
 
-const (
-	dirMode  = 0o755
-	fileMode = 0o600
-)
-
 func ParseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) error {
 	outputJSON, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
@@ -34,6 +29,6 @@ func ParseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) 
 }
 
 func WriteFileJSON(outputFile string, valCurs parsexml.ValuteCurs, dirmode, filemode os.FileMode) error {
-	err := ParseJSON(outputFile, valCurs, os.FileMode(dirMode), os.FileMode(fileMode))
+	err := ParseJSON(outputFile, valCurs, dirmode, filemode)
 	return err
 }

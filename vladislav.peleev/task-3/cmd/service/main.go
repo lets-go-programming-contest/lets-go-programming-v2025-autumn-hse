@@ -172,4 +172,3 @@ func saveJSON(outputPath string, currencies []CurrencyJSON) error {
 
 	return nil
 }
-

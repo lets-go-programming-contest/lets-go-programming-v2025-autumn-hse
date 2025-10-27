@@ -6,25 +6,28 @@ import (
 	"path/filepath"
 )
 
-func WriteJSON(currencies interface{}, outputPath string) {
+func WriteJSON(currencies interface{}, outputPath string) error {
 	dir := filepath.Dir(outputPath)
 	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
-		panic("Cannot create directory: " + err.Error())
+		return err
 	}
 
 	file, err := os.Create(outputPath)
 	if err != nil {
-		panic("Cannot create JSON file: " + err.Error())
+		return err
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
-			panic("Error closing JSON file: " + err.Error())
+			panic("Error closing XML file: " + err.Error())
 		}
 	}()
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
+
 	if err := encoder.Encode(currencies); err != nil {
-		panic("Cannot encode JSON: " + err.Error())
+		return err
 	}
+
+	return nil
 }

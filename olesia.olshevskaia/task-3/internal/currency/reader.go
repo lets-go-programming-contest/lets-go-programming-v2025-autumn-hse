@@ -30,17 +30,14 @@ func Read(path string) ([]model.Currency, error) {
 	}
 
 	result := make([]model.Currency, 0, len(xmlData.Currencies))
-
 	for _, val := range xmlData.Currencies {
 		num := 0
 		value := 0.0
-
 		if strings.TrimSpace(val.RawNum) != "" {
 			if n, err := strconv.Atoi(val.RawNum); err == nil {
 				num = n
 			}
 		}
-
 		hasValue := false
 		if strings.TrimSpace(val.RawValue) != "" {
 			str := strings.ReplaceAll(val.RawValue, ",", ".")
@@ -49,7 +46,6 @@ func Read(path string) ([]model.Currency, error) {
 				hasValue = true
 			}
 		}
-
 		result = append(result, model.Currency{
 			CodeNum:   num,
 			CodeChar:  val.CodeChar,
@@ -57,7 +53,6 @@ func Read(path string) ([]model.Currency, error) {
 			HasValue:  hasValue,
 		})
 	}
-
 	sort.Slice(result, func(i, j int) bool {
 		return result[i].RateValue > result[j].RateValue
 	})

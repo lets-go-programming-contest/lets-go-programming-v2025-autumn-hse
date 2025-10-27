@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-
 	configPath := flag.String("config", "config.yaml", "Path to YAML config file")
 	flag.Parse()
 
@@ -21,6 +20,10 @@ func main() {
 	if err != nil {
 		panic("Cannot read currencies: " + err.Error())
 	}
+
 	currency.Sort(currencies)
-	currency.WriteJSON(currencies, cfg.OutputFile)
+
+	if err := currency.WriteJSON(currencies, cfg.OutputFile); err != nil {
+		panic("Cannot write JSON file: " + err.Error())
+	}
 }

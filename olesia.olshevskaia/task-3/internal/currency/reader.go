@@ -16,12 +16,7 @@ func Read(path string) []model.Currency {
 	if err != nil {
 		panic("Cannot open XML file: " + err.Error())
 	}
-
-	defer func() {
-		if err := file.Close(); err != nil {
-			panic("Error closing XML file: " + err.Error())
-		}
-	}()
+	defer file.Close()
 
 	decoder := xml.NewDecoder(file)
 	decoder.CharsetReader = charset.NewReaderLabel
@@ -33,23 +28,38 @@ func Read(path string) []model.Currency {
 		panic("Error parsing XML: " + err.Error())
 	}
 
-	for i := range xmlData.Currencies {
-		cur := &xmlData.Currencies[i]
+	result := make([]model.Currency, 0, len(xmlData.Currencies))
 
-		if n, err := strconv.Atoi(strings.TrimSpace(cur.CodeChar)); err == nil {
-			cur.CodeNum = n
+	for _, val := range xmlData.Currencies {
+		num := 0
+		value := 0.0
+
+		if strings.TrimSpace(val.RawNum) != "" {
+			if n, err := strconv.Atoi(val.RawNum); err == nil {
+				num = n
+			}
 		}
 
-		str := strings.ReplaceAll(strings.TrimSpace(cur.CodeChar), ",", ".")
-		if v, err := strconv.ParseFloat(str, 64); err == nil {
-			cur.RateValue = v
-			cur.HasValue = true
+		hasValue := false
+		if strings.TrimSpace(val.RawValue) != "" {
+			str := strings.ReplaceAll(val.RawValue, ",", ".")
+			if v, err := strconv.ParseFloat(str, 64); err == nil {
+				value = v
+				hasValue = true
+			}
 		}
+
+		result = append(result, model.Currency{
+			CodeNum:   num,
+			CodeChar:  val.CodeChar,
+			RateValue: value,
+			HasValue:  hasValue,
+		})
 	}
 
-	sort.Slice(xmlData.Currencies, func(i, j int) bool {
-		return xmlData.Currencies[i].RateValue > xmlData.Currencies[j].RateValue
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].RateValue > result[j].RateValue
 	})
 
-	return xmlData.Currencies
+	return result
 }

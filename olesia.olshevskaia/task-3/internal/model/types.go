@@ -10,4 +10,6 @@ type Currency struct {
 	CodeChar  string  `json:"char_code"`
 	RateValue float64 `json:"value"`
 	HasValue  bool    `json:"-"`
+	RawNum    string  `xml:"NumCode"`
+	RawValue  string  `xml:"Value"`
 }

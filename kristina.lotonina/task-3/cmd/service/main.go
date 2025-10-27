@@ -1,12 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"os"
 
-	"github.com/kef1rch1k/task-3/internal/checkdir"
 	"github.com/kef1rch1k/task-3/internal/config"
 	"github.com/kef1rch1k/task-3/internal/jsonwriter"
 	"github.com/kef1rch1k/task-3/internal/parser"

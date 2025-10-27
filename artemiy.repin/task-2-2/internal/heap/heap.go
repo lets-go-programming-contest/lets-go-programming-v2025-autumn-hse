@@ -6,44 +6,43 @@ func (h *MinHeap) Len() int {
 	return len(*h)
 }
 
-func (h *MinHeap) Less(i, j int) bool {
-	length := len(*h)
+func (h *MinHeap) Less(idxI, idxJ int) bool {
+	n := len(*h)
 
-	if i < 0 || j < 0 || i >= length || j >= length {
+	if idxI < 0 || idxJ < 0 || idxI >= n || idxJ >= n {
 		return false
 	}
 
-	return (*h)[i] < (*h)[j]
+	return (*h)[idxI] < (*h)[idxJ]
 }
 
-func (h *MinHeap) Swap(i, j int) {
-	length := len(*h)
+func (h *MinHeap) Swap(idxI, idxJ int) {
+	n := len(*h)
 
-	if i < 0 || j < 0 || i >= length || j >= length || i == j {
+	if idxI < 0 || idxJ < 0 || idxI >= n || idxJ >= n || idxI == idxJ {
 		return
 	}
-	(*h)[i], (*h)[j] = (*h)[j], (*h)[i]
+
+	(*h)[idxI], (*h)[idxJ] = (*h)[idxJ], (*h)[idxI]
 }
 
 func (h *MinHeap) Push(value any) {
-	value_, ok := value.(int)
-
+	v, ok := value.(int)
 	if !ok {
-		panic("Need to push int")
+		return
 	}
 
-	*h = append(*h, value_)
+	*h = append(*h, v)
 }
 
 func (h *MinHeap) Pop() any {
-	length := len(*h)
-
-	if length == 0 {
+	n := len(*h)
+	if n == 0 {
 		return nil
 	}
 
-	x := (*h)[length-1]
-	*h = (*h)[:length-1]
+	x := (*h)[n-1]
+	*h = (*h)[:n-1]
 
 	return x
 }

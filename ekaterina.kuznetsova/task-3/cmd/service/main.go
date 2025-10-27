@@ -2,41 +2,18 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"os"
 	"sort"
 
+	"github.com/Ekaterina-101/task-3/internal/config"
 	"github.com/Ekaterina-101/task-3/internal/parsexml"
 	"github.com/Ekaterina-101/task-3/internal/writerjson"
-	"gopkg.in/yaml.v3"
 )
 
-type Config struct {
-	InputFile  string `yaml:"input-file"`
-	OutputFile string `yaml:"output-file"`
-}
-
-func LoadConfigYaml() (Config, error) {
-	configPath := flag.String("config", "", "path of config file")
+func main() {
+	configPath := flag.String("config", "config.yaml", "path of config file")
 	flag.Parse()
 
-	dataConfig, err := os.ReadFile(*configPath)
-	if err != nil {
-		return Config{}, fmt.Errorf("error read config: %w", err)
-	}
-
-	var config Config
-
-	err = yaml.Unmarshal(dataConfig, &config)
-	if err != nil {
-		return Config{}, fmt.Errorf("error parsing yaml: %w", err)
-	}
-
-	return config, nil
-}
-
-func main() {
-	config, err := LoadConfigYaml()
+	config, err := config.LoadConfigYaml(configPath)
 	if err != nil {
 		panic(err)
 	}

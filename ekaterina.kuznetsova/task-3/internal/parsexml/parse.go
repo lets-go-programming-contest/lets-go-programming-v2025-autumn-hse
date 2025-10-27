@@ -41,20 +41,29 @@ func (v *ValueFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 	return nil
 }
 
-func ParseValuteCursXML(inputFile string) (ValuteCurs, error) {
-	var valCurs ValuteCurs
+func ParseXML[T any](inputFile string) (T, error) {
+	var result T
 
 	dataXML, err := os.ReadFile(inputFile)
 	if err != nil {
-		return valCurs, fmt.Errorf("error read input file: %w", err)
+		return result, fmt.Errorf("failed to read XML: %w", err)
 	}
 
 	decoder := xml.NewDecoder(bytes.NewReader(dataXML))
 	decoder.CharsetReader = charset.NewReaderLabel
 
-	err = decoder.Decode(&valCurs)
+	err = decoder.Decode(&result)
 	if err != nil {
-		return valCurs, fmt.Errorf("error parsing XML: %w", err)
+		return result, fmt.Errorf("error parsing XML: %w", err)
+	}
+
+	return result, nil
+}
+
+func ParseValuteCursXML(inputFile string) (ValuteCurs, error) {
+	valCurs, err := ParseXML[ValuteCurs](inputFile)
+	if err != nil {
+		return ValuteCurs{}, err
 	}
 
 	return valCurs, nil

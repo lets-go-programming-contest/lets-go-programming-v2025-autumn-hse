@@ -9,7 +9,9 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
+	"golang.org/x/text/encoding/charmap"
 	"gopkg.in/yaml.v3"
 )
 
@@ -25,7 +27,7 @@ type Currency struct {
 }
 
 type ValCurs struct {
-	XMLName   xml.Name   `xml:"ValCurs"`
+	XMLName    xml.Name   `xml:"ValCurs"`
 	Currencies []Currency `xml:"Valute"`
 }
 
@@ -49,7 +51,7 @@ func main() {
 	}
 
 	if _, err := os.Stat(config.InputFile); os.IsNotExist(err) {
-		panic("Input file does not exist")
+		panic(fmt.Sprintf("open %s: no such file or directory", config.InputFile))
 	}
 
 	currencies, err := decodeXML(config.InputFile)
@@ -70,7 +72,7 @@ func main() {
 func loadConfig(configPath string) (*Config, error) {
 	file, err := os.Open(configPath)
 	if err != nil {
-		return nil, fmt.Errorf("cannot open config file: %w", err)
+		return nil, fmt.Errorf("open %s: no such file or directory", configPath)
 	}
 	defer file.Close()
 
@@ -91,7 +93,7 @@ func loadConfig(configPath string) (*Config, error) {
 func decodeXML(filePath string) ([]Currency, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("cannot open XML file: %w", err)
+		return nil, fmt.Errorf("open %s: no such file or directory", filePath)
 	}
 	defer file.Close()
 
@@ -100,10 +102,19 @@ func decodeXML(filePath string) ([]Currency, error) {
 		return nil, fmt.Errorf("cannot read XML file: %w", err)
 	}
 
-	var valCurs ValCurs
-	err = xml.Unmarshal(data, &valCurs)
+	decoder := charmap.Windows1251.NewDecoder()
+	utf8Data, err := decoder.Bytes(data)
 	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal XML: %w", err)
+		return nil, fmt.Errorf("cannot convert encoding: %w", err)
+	}
+
+	var valCurs ValCurs
+	err = xml.Unmarshal(utf8Data, &valCurs)
+	if err != nil {
+		err2 := xml.Unmarshal(data, &valCurs)
+		if err2 != nil {
+			return nil, fmt.Errorf("cannot unmarshal XML: %w", err)
+		}
 	}
 
 	return valCurs.Currencies, nil
@@ -125,8 +136,8 @@ func saveJSON(outputPath string, currencies []Currency) error {
 	jsonCurrencies := make([]CurrencyJSON, len(currencies))
 	for i, currency := range currencies {
 		jsonCurrencies[i] = CurrencyJSON{
-			NumCode:  currency.NumCode,
-			CharCode: currency.CharCode,
+			NumCode:  strings.TrimSpace(currency.NumCode),
+			CharCode: strings.TrimSpace(currency.CharCode),
 			Value:    currency.Value,
 		}
 	}

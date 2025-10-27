@@ -23,7 +23,7 @@ func main() {
 
 	currency.Sort(currencies)
 
-	if err := currency.WriteJSON(currencies, cfg.OutputFile); err != nil {
+	if err := currency.WriteJSON(cfg.OutputFile, currencies); err != nil {
 		panic("Cannot write JSON file: " + err.Error())
 	}
 }

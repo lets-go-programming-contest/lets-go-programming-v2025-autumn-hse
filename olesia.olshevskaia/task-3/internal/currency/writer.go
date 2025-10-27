@@ -2,33 +2,30 @@ package currency
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/Olesia.Ol/task-3/internal/model"
 )
 
-func WriteJSON(currencies interface{}, outputPath string) error {
-	dir := filepath.Dir(outputPath)
-	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
-		return err
-	}
-
-	file, err := os.Create(outputPath)
+func parseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) error {
+	outputJSON, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		return err
+		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	defer func() {
-		if err := file.Close(); err != nil {
-			panic("Error closing file: " + err.Error())
-		}
-	}()
+	if err := os.MkdirAll(filepath.Dir(outputFile), dirmode); err != nil {
+		return fmt.Errorf("error creating directory: %w", err)
+	}
 
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-
-	if err := encoder.Encode(currencies); err != nil {
-		return err
+	if err := os.WriteFile(outputFile, outputJSON, filemode); err != nil {
+		return fmt.Errorf("error writing output file: %w", err)
 	}
 
 	return nil
+}
+
+func WriteJSON(outputFile string, currencies []model.Currency) error {
+	return parseJSON(outputFile, currencies, os.ModePerm, 0644)
 }

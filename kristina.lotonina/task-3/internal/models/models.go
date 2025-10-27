@@ -20,15 +20,15 @@ type Valute struct {
 type CommaFloat float64
 
 func (cf *CommaFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var s string
-	if err := d.DecodeElement(&s, &start); err != nil {
+	var str string
+	if err := d.DecodeElement(&str, &start); err != nil {
 		return err
 	}
 
-	val := strings.Replace(s, ",", ".", 1)
+	val := strings.Replace(str, ",", ".", 1)
 	f, err := strconv.ParseFloat(strings.TrimSpace(val), 64)
 	if err != nil {
-		return fmt.Errorf("parsing CommaFloat '%s': %w", s, err)
+		return fmt.Errorf("parsing CommaFloat '%s': %w", str, err)
 	}
 
 	*cf = CommaFloat(f)

@@ -126,8 +126,7 @@ func decodeXML(filePath string) ([]CurrencyJSON, error) {
 	result := make([]CurrencyJSON, 0, len(valCurs.Currencies))
 
 	for _, currency := range valCurs.Currencies {
-		valStr := strings.ReplaceAll(currency.Value, ",", ".")
-		value, err := strconv.ParseFloat(valStr, 64)
+		value, err := strconv.ParseFloat(strings.ReplaceAll(currency.Value, ",", "."), 64)
 		if err != nil {
 			return nil, fmt.Errorf("cannot parse value '%s': %w", currency.Value, err)
 		}

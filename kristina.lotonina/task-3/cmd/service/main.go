@@ -8,6 +8,7 @@ import (
 
 	"github.com/kef1rch1k/task-3/internal/checkdir"
 	"github.com/kef1rch1k/task-3/internal/config"
+	"github.com/kef1rch1k/task-3/internal/jsonwriter"
 	"github.com/kef1rch1k/task-3/internal/parser"
 )
 
@@ -29,27 +30,9 @@ func main() {
 		panic(fmt.Sprintf("Failed to parse XML: %v", err))
 	}
 
-	err = checkdir.EnsureDir(cfg.OutputFile)
+	err = jsonwriter.WriteToFile(valutes, cfg.OutputFile)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to create directory: %v", err))
-	}
-
-	file, err := os.Create(cfg.OutputFile)
-	if err != nil {
-		panic(fmt.Sprintf("Failed to create output file: %v", err))
-	}
-
-	defer func() {
-		if err := file.Close(); err != nil {
-			panic(fmt.Sprintf("Failed to close file: %v", err))
-		}
-	}()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-
-	if err = encoder.Encode(valutes); err != nil {
-		panic(fmt.Sprintf("Failed to encode JSON: %v", err))
+		panic(fmt.Sprintf("Failed to write JSON: %v", err))
 	}
 
 	fmt.Println("Output written to", cfg.OutputFile)

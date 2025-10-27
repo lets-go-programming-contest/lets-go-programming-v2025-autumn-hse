@@ -9,7 +9,7 @@ import (
 
 	"golang.org/x/net/html/charset"
 
-	"currency_converter/internal/model"
+	"github.com/Olesia.Ol/task-3/internal/model"
 )
 
 func Read(path string) []model.Currency {

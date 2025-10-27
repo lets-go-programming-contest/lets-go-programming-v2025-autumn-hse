@@ -14,21 +14,26 @@ const (
 	fileMode = 0o600
 )
 
-func WriteFileJSON(outputFile string, valCurs parsexml.ValuteCurs) error {
-	outputJSON, err := json.MarshalIndent(valCurs.Valutes, "", "  ")
+func ParseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) error {
+	outputJSON, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	err = os.MkdirAll(filepath.Dir(outputFile), dirMode)
+	err = os.MkdirAll(filepath.Dir(outputFile), dirmode)
 	if err != nil {
 		return fmt.Errorf("error creating directory: %w", err)
 	}
 
-	err = os.WriteFile(outputFile, outputJSON, fileMode)
+	err = os.WriteFile(outputFile, outputJSON, filemode)
 	if err != nil {
 		return fmt.Errorf("error writing output file: %w", err)
 	}
 
 	return nil
+}
+
+func WriteFileJSON(outputFile string, valCurs parsexml.ValuteCurs, dirmode, filemode os.FileMode) error {
+	err := ParseJSON(outputFile, valCurs, os.FileMode(dirMode), os.FileMode(fileMode))
+	return err
 }

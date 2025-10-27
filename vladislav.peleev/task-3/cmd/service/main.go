@@ -41,6 +41,7 @@ type CurrencyJSON struct {
 func main() {
 	configPath := flag.String("config", "", "Path to configuration file")
 	flag.Parse()
+
 	if *configPath == "" {
 		panic("Config file path is required")
 	}
@@ -158,6 +159,7 @@ func sortCurrencies(currencies []CurrencyJSON) {
 
 func saveJSON(outputPath string, currencies []CurrencyJSON) error {
 	dir := filepath.Dir(outputPath)
+
 	const dirPerm = 0o755
 
 	if err := os.MkdirAll(dir, dirPerm); err != nil {
@@ -177,6 +179,7 @@ func saveJSON(outputPath string, currencies []CurrencyJSON) error {
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "    ")
+
 	if err := encoder.Encode(currencies); err != nil {
 		return fmt.Errorf("cannot encode JSON: %w", err)
 	}

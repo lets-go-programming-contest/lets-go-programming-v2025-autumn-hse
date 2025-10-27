@@ -7,54 +7,49 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/net/html/charset"
-
 	"github.com/Olesia.Ol/task-3/internal/model"
+	"golang.org/x/net/html/charset"
 )
 
 func Read(path string) []model.Currency {
 	file, err := os.Open(path)
 	if err != nil {
-		panic("Can not open XML file: " + path + " - " + err.Error())
+		panic("Cannot open XML file: " + err.Error())
 	}
-	defer file.Close()
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			panic("Error closing XML file: " + err.Error())
+		}
+	}()
 
 	decoder := xml.NewDecoder(file)
 	decoder.CharsetReader = charset.NewReaderLabel
 
-	var xmlData model.CurrenciesXML
+	var xmlData struct {
+		Currencies []model.Currency `xml:"Valute"`
+	}
 	if err := decoder.Decode(&xmlData); err != nil {
 		panic("Error parsing XML: " + err.Error())
 	}
 
-	result := make([]model.Currency, 0, len(xmlData.Currencies))
+	for i := range xmlData.Currencies {
+		cur := &xmlData.Currencies[i]
 
-	for _, val := range xmlData.Currencies {
-		num := 0
-		value := 0.0
-
-		if n, err := strconv.Atoi(strings.TrimSpace(val.CodeNum)); err == nil {
-			num = n
+		if n, err := strconv.Atoi(strings.TrimSpace(cur.CodeChar)); err == nil {
+			cur.CodeNum = n
 		}
 
-		if strings.TrimSpace(val.RateValue) != "" {
-			str := strings.ReplaceAll(val.RateValue, ",", ".")
-			if v, err := strconv.ParseFloat(str, 64); err == nil {
-				value = v
-			}
+		str := strings.ReplaceAll(strings.TrimSpace(cur.CodeChar), ",", ".")
+		if v, err := strconv.ParseFloat(str, 64); err == nil {
+			cur.RateValue = v
+			cur.HasValue = true
 		}
-
-		result = append(result, model.Currency{
-			CodeNum:   num,
-			CodeChar:  val.CodeChar,
-			RateValue: value,
-			HasValue:  strings.TrimSpace(val.RateValue) != "",
-		})
 	}
 
-	sort.Slice(result, func(i, j int) bool {
-		return result[i].RateValue > result[j].RateValue
+	sort.Slice(xmlData.Currencies, func(i, j int) bool {
+		return xmlData.Currencies[i].RateValue > xmlData.Currencies[j].RateValue
 	})
 
-	return result
+	return xmlData.Currencies
 }

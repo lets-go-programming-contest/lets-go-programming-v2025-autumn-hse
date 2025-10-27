@@ -17,7 +17,12 @@ func WriteToFile(data interface{}, filePath string) error {
 	if err != nil {
 		return fmt.Errorf("creating output file: %w", err)
 	}
-	defer file.Close()
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			panic(fmt.Sprintf("Failed to close file: %v", err))
+		}
+	}()
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")

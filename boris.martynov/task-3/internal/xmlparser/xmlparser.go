@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"golang.org/x/text/encoding/charmap"
 
@@ -38,6 +39,9 @@ func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {
 			return valuteinfo.ValuteCurs{}, fmt.Errorf("cannot decode windows-1251: %w", err)
 		}
 	}
+
+	dataStr := strings.ReplaceAll(string(data), `encoding="windows-1251"`, `encoding="utf-8"`)
+	data = []byte(dataStr)
 	if err := xml.Unmarshal(data, &valuteCurs); err != nil {
 		panic(err)
 	}

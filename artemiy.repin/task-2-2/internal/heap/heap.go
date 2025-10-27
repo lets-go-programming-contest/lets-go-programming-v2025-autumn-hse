@@ -36,13 +36,13 @@ func (h *MinHeap) Push(value any) {
 }
 
 func (h *MinHeap) Pop() any {
-	n := len(*h)
-	if n == 0 {
+	length := len(*h)
+	if length == 0 {
 		return nil
 	}
 
-	x := (*h)[n-1]
-	*h = (*h)[:n-1]
+	x := (*h)[length-1]
+	*h = (*h)[:length-1]
 
 	return x
 }

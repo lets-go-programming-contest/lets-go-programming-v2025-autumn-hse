@@ -22,11 +22,12 @@ type CommaFloat float64
 func (cf *CommaFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var str string
 	if err := d.DecodeElement(&str, &start); err != nil {
-		return err
+		return fmt.Errorf("decoding XML element: %w", err)
 	}
 
 	val := strings.Replace(str, ",", ".", 1)
 	f, err := strconv.ParseFloat(strings.TrimSpace(val), 64)
+
 	if err != nil {
 		return fmt.Errorf("parsing CommaFloat '%s': %w", str, err)
 	}

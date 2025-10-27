@@ -39,10 +39,10 @@ func ParseAndSortXML(path string) ([]models.Valute, error) {
 func sortValutesByValueDesc(valutes []models.Valute) []models.Valute {
 	sorted := make([]models.Valute, len(valutes))
 	copy(sorted, valutes)
-	
+
 	sort.Slice(sorted, func(i, j int) bool {
 		return sorted[i].Value > sorted[j].Value
 	})
-	
+
 	return sorted
 }

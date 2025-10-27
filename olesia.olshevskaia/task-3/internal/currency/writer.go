@@ -2,7 +2,6 @@ package currency
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -10,17 +9,25 @@ import (
 )
 
 func ParseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) error {
-	outputJSON, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return fmt.Errorf("error marshaling JSON: %w", err)
-	}
-
 	if err := os.MkdirAll(filepath.Dir(outputFile), dirmode); err != nil {
-		return fmt.Errorf("error creating directory: %w", err)
+		return err
 	}
 
-	if err := os.WriteFile(outputFile, outputJSON, filemode); err != nil {
-		return fmt.Errorf("error writing JSON file: %w", err)
+	file, err := os.Create(outputFile)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			panic("Error closing JSON file: " + cerr.Error())
+		}
+	}()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(data); err != nil {
+		return err
 	}
 
 	return nil

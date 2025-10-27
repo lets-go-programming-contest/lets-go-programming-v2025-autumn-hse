@@ -3,10 +3,10 @@ package xmlparser
 import (
 	"encoding/xml"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/JingolBong/task-3/internal/valuteinfo"
-	"golang.org/x/net/html/charset"
 )
 
 func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {
@@ -23,12 +23,13 @@ func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {
 		}
 	}()
 
-	decoder := xml.NewDecoder(xmlFile)
-	decoder.CharsetReader = charset.NewReaderLabel
+	data, err := io.ReadAll(xmlFile)
 
-	if err := decoder.Decode(&valuteCurs); err != nil {
-
-		return valuteinfo.ValuteCurs{}, fmt.Errorf("while decoding: %w", err)
+	if err != nil {
+		panic(err)
+	}
+	if err := xml.Unmarshal(data, &valuteCurs); err != nil {
+		panic(err)
 	}
 
 	return valuteCurs, nil

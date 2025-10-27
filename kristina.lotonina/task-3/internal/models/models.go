@@ -26,13 +26,13 @@ func (cf *CommaFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 	}
 
 	val := strings.Replace(str, ",", ".", 1)
-	f, err := strconv.ParseFloat(strings.TrimSpace(val), 64)
 
+	float, err := strconv.ParseFloat(strings.TrimSpace(val), 64)
 	if err != nil {
 		return fmt.Errorf("parsing CommaFloat '%s': %w", str, err)
 	}
 
-	*cf = CommaFloat(f)
+	*cf = CommaFloat(float)
 
 	return nil
 }

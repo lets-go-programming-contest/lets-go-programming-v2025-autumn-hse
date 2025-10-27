@@ -21,16 +21,17 @@ func main() {
 		return
 	}
 
-	h := &myheap.MinHeap{}
-	stdheap.Init(h)
+	minHeap := &myheap.MinHeap{}
+	stdheap.Init(minHeap)
 
-	for i := 0; i < heapCount; i++ {
+	for range heapCount {
 		var preferenceScore int
 
 		if _, err := fmt.Fscan(input, &preferenceScore); err != nil {
 			return
 		}
-		stdheap.Push(h, preferenceScore)
+
+		stdheap.Push(minHeap, preferenceScore)
 	}
 
 	if _, err := fmt.Fscan(input, &preferredRank); err != nil {
@@ -41,17 +42,17 @@ func main() {
 		return
 	}
 
-	for i := 0; i < heapCount-preferredRank; i++ {
-		stdheap.Pop(h)
+	for range heapCount - preferredRank {
+		stdheap.Pop(minHeap)
 	}
 
-	v := stdheap.Pop(h)
+	value := stdheap.Pop(minHeap)
 
-	if v == nil {
+	if value == nil {
 		return
 	}
-	val, ok := v.(int)
 
+	val, ok := value.(int)
 	if !ok {
 		return
 	}

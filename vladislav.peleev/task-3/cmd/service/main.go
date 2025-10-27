@@ -1,129 +1,185 @@
 package main
 
 import (
+	"encoding/json"
 	"encoding/xml"
-	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
+	"path/filepath"
+	"sort"
+	"strconv"
+	"strings"
 
+	"golang.org/x/text/encoding/charmap"
 	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	InputFile  string `yaml:"input_file"`
-	OutputFile string `yaml:"output_file"`
+	InputFile  string `yaml:"input-file"`
+	OutputFile string `yaml:"output-file"`
 }
 
-type CurrencyXML struct {
+type Currency struct {
+	NumCode  string `xml:"NumCode"`
 	CharCode string `xml:"CharCode"`
-	Nominal  string `xml:"Nominal"`
 	Value    string `xml:"Value"`
 }
 
 type ValCurs struct {
-	Currencies []CurrencyXML `xml:"Currency"`
+	XMLName    xml.Name   `xml:"ValCurs"`
+	Currencies []Currency `xml:"Valute"`
 }
 
 type CurrencyJSON struct {
-	Code   string  `json:"code"`
-	Amount int     `json:"amount"`
-	Value  float64 `json:"value"`
+	NumCode  int     `json:"num_code"`
+	CharCode string  `json:"char_code"`
+	Value    float64 `json:"value"`
 }
 
-func readConfig(configPath string) (*Config, error) {
-	if configPath == "" {
-		return nil, errors.New("config path is empty")
+func main() {
+	configPath := flag.String("config", "", "Path to configuration file")
+	flag.Parse()
+	if *configPath == "" {
+		panic("Config file path is required")
 	}
 
-	data, err := ioutil.ReadFile(configPath)
+	config, err := loadConfig(*configPath)
 	if err != nil {
-		return nil, fmt.Errorf("open %s: no such file or directory", configPath)
+		panic(fmt.Sprintf("Error loading config: %v", err))
+	}
+
+	if _, err := os.Stat(config.InputFile); os.IsNotExist(err) {
+		panic(fmt.Sprintf("open %s: no such file or directory", config.InputFile))
+	}
+
+	currencies, err := decodeXML(config.InputFile)
+	if err != nil {
+		panic(fmt.Sprintf("Error decoding XML: %v", err))
+	}
+
+	sortCurrencies(currencies)
+
+	err = saveJSON(config.OutputFile, currencies)
+	if err != nil {
+		panic(fmt.Sprintf("Error saving JSON: %v", err))
+	}
+
+	fmt.Println("Successfully processed currencies data")
+}
+
+func loadConfig(configPath string) (*Config, error) {
+	file, err := os.Open(configPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open config file: %w", err)
+	}
+
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", configPath, cerr)
+		}
+	}()
+
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return nil, fmt.Errorf("cannot read config file: %w", err)
 	}
 
 	var config Config
+
 	if err := yaml.Unmarshal(data, &config); err != nil {
-		return nil, fmt.Errorf("cannot parse config: %w", err)
+		return nil, fmt.Errorf("cannot unmarshal YAML: %w", err)
 	}
 
 	return &config, nil
 }
 
-func parseXML(filePath string) ([]CurrencyJSON, error) {
-	data, err := ioutil.ReadFile(filePath)
+func decodeXML(filePath string) ([]CurrencyJSON, error) {
+	file, err := os.Open(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("open %s: no such file or directory", filePath)
+		return nil, fmt.Errorf("failed to open XML file: %w", err)
+	}
+
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", filePath, cerr)
+		}
+	}()
+
+	decoder := xml.NewDecoder(file)
+	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
+		if charset == "windows-1251" {
+			return charmap.Windows1251.NewDecoder().Reader(input), nil
+		}
+
+		return input, nil
 	}
 
 	var valCurs ValCurs
-	if err := xml.Unmarshal(data, &valCurs); err != nil {
-		return nil, fmt.Errorf("error parsing XML: %w", err)
+
+	if err := decoder.Decode(&valCurs); err != nil {
+		return nil, fmt.Errorf("cannot unmarshal XML: %w", err)
 	}
 
 	result := make([]CurrencyJSON, 0, len(valCurs.Currencies))
+
 	for _, currency := range valCurs.Currencies {
-		amount := 1
-		if currency.Nominal != "" {
-			fmt.Sscanf(currency.Nominal, "%d", &amount)
+		valStr := strings.ReplaceAll(currency.Value, ",", ".")
+		value, err := strconv.ParseFloat(valStr, 64)
+		if err != nil {
+			return nil, fmt.Errorf("cannot parse value '%s': %w", currency.Value, err)
 		}
 
-		var value float64
-		if currency.Value != "" {
-			fmt.Sscanf(currency.Value, "%f", &value)
+		numStr := strings.TrimSpace(currency.NumCode)
+		numCode := 0
+
+		if numStr != "" {
+			if n, err := strconv.Atoi(numStr); err == nil {
+				numCode = n
+			}
 		}
 
 		result = append(result, CurrencyJSON{
-			Code:   currency.CharCode,
-			Amount: amount,
-			Value:  value,
+			NumCode:  numCode,
+			CharCode: strings.TrimSpace(currency.CharCode),
+			Value:    value,
 		})
 	}
 
 	return result, nil
 }
 
-func writeJSON(outputPath string, data []CurrencyJSON) error {
+func sortCurrencies(currencies []CurrencyJSON) {
+	sort.Slice(currencies, func(i, j int) bool {
+		return currencies[i].Value > currencies[j].Value
+	})
+}
+
+func saveJSON(outputPath string, currencies []CurrencyJSON) error {
+	dir := filepath.Dir(outputPath)
+	const dirPerm = 0o755
+
+	if err := os.MkdirAll(dir, dirPerm); err != nil {
+		return fmt.Errorf("cannot create directory: %w", err)
+	}
+
 	file, err := os.Create(outputPath)
 	if err != nil {
-		return fmt.Errorf("cannot create file %s: %w", outputPath, err)
+		return fmt.Errorf("cannot create output file: %w", err)
 	}
-	defer file.Close()
 
-	for _, c := range data {
-		_, err := fmt.Fprintf(file, "%s %d %.2f\n", c.Code, c.Amount, c.Value)
-		if err != nil {
-			return fmt.Errorf("cannot write to file: %w", err)
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", outputPath, cerr)
 		}
+	}()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "    ")
+	if err := encoder.Encode(currencies); err != nil {
+		return fmt.Errorf("cannot encode JSON: %w", err)
 	}
 
 	return nil
-}
-
-func run() error {
-	configPath := flag.String("config", "config.yaml", "path to config file")
-	flag.Parse()
-
-	config, err := readConfig(*configPath)
-	if err != nil {
-		return err
-	}
-
-	data, err := parseXML(config.InputFile)
-	if err != nil {
-		return err
-	}
-
-	if err := writeJSON(config.OutputFile, data); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func main() {
-	if err := run(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 }

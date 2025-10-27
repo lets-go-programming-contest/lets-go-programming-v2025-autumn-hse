@@ -2,6 +2,7 @@ package currency
 
 import (
 	"encoding/xml"
+	"fmt"
 	"os"
 	"sort"
 	"strconv"
@@ -16,7 +17,12 @@ func Read(path string) ([]model.Currency, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			panic(fmt.Sprintf("failed to close file: %v", cerr))
+		}
+	}()
 
 	decoder := xml.NewDecoder(file)
 	decoder.CharsetReader = charset.NewReaderLabel
@@ -58,6 +64,7 @@ func parseCodeNum(raw string) int {
 	if err != nil {
 		return 0
 	}
+
 	return n
 }
 
@@ -71,5 +78,6 @@ func parseValue(raw string) (float64, bool) {
 	if err != nil {
 		return 0, false
 	}
+
 	return v, true
 }

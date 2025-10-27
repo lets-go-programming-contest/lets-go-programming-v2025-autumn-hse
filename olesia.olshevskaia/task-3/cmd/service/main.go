@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"os"
 
 	"github.com/Olesia.Ol/task-3/internal/config"
 	"github.com/Olesia.Ol/task-3/internal/currency"
@@ -23,7 +22,5 @@ func main() {
 		panic("Cannot read currencies: " + err.Error())
 	}
 	currency.Sort(currencies)
-	if err := currency.WriteJSON(cfg.OutputFile, currencies, os.ModePerm, 0644); err != nil {
-		panic("Cannot write JSON: " + err.Error())
-	}
+	currency.WriteJSON(currencies, cfg.OutputFile)
 }

@@ -32,30 +32,16 @@ func (t *Temperature) UpdateInterval(operator string, value int) {
 		}
 
 	default:
-		t.LeftBound = MinBound
-		t.RightBound = MaxBound
+
+		return
 	}
 }
 
 func (t *Temperature) GetOptimal() int {
-	left := t.LeftBound
-	right := t.RightBound
+	if t.LeftBound <= t.RightBound {
 
-	if left > right {
-		return -1
+		return t.LeftBound
 	}
 
-	if left < MinBound {
-		left = MinBound
-	}
-
-	if right > MaxBound {
-		right = MaxBound
-	}
-
-	if left > right {
-		return -1
-	}
-
-	return left
+	return -1
 }

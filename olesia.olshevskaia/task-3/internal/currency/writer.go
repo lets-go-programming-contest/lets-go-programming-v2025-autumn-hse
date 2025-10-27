@@ -4,36 +4,27 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-
-	"github.com/Olesia.Ol/task-3/internal/model"
 )
 
-func ParseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) error {
-
-	if err := os.MkdirAll(filepath.Dir(outputFile), dirmode); err != nil {
-		return err
+func WriteJSON(currencies interface{}, outputPath string) {
+	dir := filepath.Dir(outputPath)
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		panic("Cannot create directory: " + err.Error())
 	}
 
-	file, err := os.Create(outputFile)
+	file, err := os.Create(outputPath)
 	if err != nil {
-		return err
+		panic("Cannot create JSON file: " + err.Error())
 	}
-
 	defer func() {
-		if cerr := file.Close(); cerr != nil {
-			panic("Error closing JSON file: " + cerr.Error())
+		if err := file.Close(); err != nil {
+			panic("Error closing JSON file: " + err.Error())
 		}
 	}()
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
-	if err := encoder.Encode(data); err != nil {
-		return err
+	if err := encoder.Encode(currencies); err != nil {
+		panic("Cannot encode JSON: " + err.Error())
 	}
-
-	return nil
-}
-
-func WriteJSON(outputFile string, currencies []model.Currency, dirmode, filemode os.FileMode) error {
-	return ParseJSON(outputFile, currencies, dirmode, filemode)
 }

@@ -112,22 +112,20 @@ func decodeXML(filePath string) ([]CurrencyJSON, error) {
 		return nil, fmt.Errorf("cannot unmarshal XML: %w", err)
 	}
 
-	var result []CurrencyJSON
+	result := make([]CurrencyJSON, 0, len(valCurs.Currencies))
 	for _, currency := range valCurs.Currencies {
-		numStr := strings.TrimSpace(currency.NumCode)
-		if numStr == "" {
-			continue
-		}
-
-		numCode, err := strconv.Atoi(numStr)
-		if err != nil {
-			continue
-		}
-
 		valStr := strings.Replace(currency.Value, ",", ".", -1)
 		value, err := strconv.ParseFloat(valStr, 64)
 		if err != nil {
 			return nil, fmt.Errorf("cannot parse value '%s': %w", currency.Value, err)
+		}
+
+		numStr := strings.TrimSpace(currency.NumCode)
+		numCode := 0
+		if numStr != "" {
+			if n, err := strconv.Atoi(numStr); err == nil {
+				numCode = n
+			}
 		}
 
 		result = append(result, CurrencyJSON{

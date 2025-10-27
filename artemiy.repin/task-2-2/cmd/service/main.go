@@ -13,24 +13,24 @@ func main() {
 	input := bufio.NewReader(os.Stdin)
 
 	var (
-		heapCount       int
-		preferenceScore int
-		preferredRank   int
+		heapCount     int
+		preferredRank int
 	)
 
 	if _, err := fmt.Fscan(input, &heapCount); err != nil {
 		return
 	}
 
-	inputHeap := &myheap.MinHeap{}
-	stdheap.Init(inputHeap)
+	h := &myheap.MinHeap{}
+	stdheap.Init(h)
 
-	for range heapCount {
-		if _, err := fmt.Scan(input, &preferenceScore); err != nil {
+	for i := 0; i < heapCount; i++ {
+		var preferenceScore int
+
+		if _, err := fmt.Fscan(input, &preferenceScore); err != nil {
 			return
 		}
-
-		stdheap.Push(inputHeap, preferenceScore)
+		stdheap.Push(h, preferenceScore)
 	}
 
 	if _, err := fmt.Fscan(input, &preferredRank); err != nil {
@@ -41,14 +41,18 @@ func main() {
 		return
 	}
 
-	for range heapCount - preferredRank {
-		stdheap.Pop(inputHeap)
+	for i := 0; i < heapCount-preferredRank; i++ {
+		stdheap.Pop(h)
 	}
 
-	val, ok := stdheap.Pop(inputHeap).(int)
-	if !ok {
-		fmt.Println("error: ", ok)
+	v := stdheap.Pop(h)
 
+	if v == nil {
+		return
+	}
+	val, ok := v.(int)
+
+	if !ok {
 		return
 	}
 

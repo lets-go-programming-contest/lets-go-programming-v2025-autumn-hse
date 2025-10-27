@@ -24,6 +24,7 @@ func Read(path string) []model.Currency {
 	var xmlData struct {
 		Currencies []model.Currency `xml:"Valute"`
 	}
+
 	if err := decoder.Decode(&xmlData); err != nil {
 		panic("Error parsing XML: " + err.Error())
 	}

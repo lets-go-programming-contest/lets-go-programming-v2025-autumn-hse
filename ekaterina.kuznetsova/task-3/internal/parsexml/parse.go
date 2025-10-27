@@ -5,40 +5,19 @@ import (
 	"encoding/xml"
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
 
+	"github.com/Ekaterina-101/task-3/internal/castomparsexml"
 	"golang.org/x/net/html/charset"
 )
 
-type ValueFloat float64
-
 type Valute struct {
-	NumCode  int        `json:"num_code"  xml:"NumCode"`
-	CharCode string     `json:"char_code" xml:"CharCode"`
-	Value    ValueFloat `json:"value"     xml:"Value"`
+	NumCode  int                       `json:"num_code"  xml:"NumCode"`
+	CharCode string                    `json:"char_code" xml:"CharCode"`
+	Value    castomparsexml.ValueFloat `json:"value"     xml:"Value"`
 }
 
 type ValuteCurs struct {
 	Valutes []Valute `xml:"Valute"`
-}
-
-func (v *ValueFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var str string
-	if err := d.DecodeElement(&str, &start); err != nil {
-		return fmt.Errorf("error decode xml: %w", err)
-	}
-
-	str = strings.ReplaceAll(str, ",", ".")
-
-	value, err := strconv.ParseFloat(str, 64)
-	if err != nil {
-		return fmt.Errorf("error parse float  %w", err)
-	}
-
-	*v = ValueFloat(value)
-
-	return nil
 }
 
 func ParseXML[T any](inputFile string) (T, error) {

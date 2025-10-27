@@ -7,7 +7,7 @@ func (heap *Maxheap) Len() int {
 }
 
 func (heap *Maxheap) Less(i, j int) bool {
-	if i >= len(*heap) || j >= len(*heap) {
+	if i >= len(*heap) || j >= len(*heap) || i < 0 || j < 0 {
 		panic("Index out of range")
 	}
 
@@ -15,7 +15,7 @@ func (heap *Maxheap) Less(i, j int) bool {
 }
 
 func (heap *Maxheap) Swap(i, j int) {
-	if i >= len(*heap) || j >= len(*heap) {
+	if i >= len(*heap) || j >= len(*heap) || i < 0 || j < 0 {
 		panic("Index out of range")
 	}
 

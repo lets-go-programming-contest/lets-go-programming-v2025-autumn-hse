@@ -64,7 +64,6 @@ func parseCodeNum(raw string) int {
 	}
 
 	n, err := strconv.Atoi(raw)
-
 	if err != nil {
 		return 0
 	}
@@ -80,7 +79,6 @@ func parseValue(raw string) (float64, bool) {
 	}
 
 	raw = strings.ReplaceAll(raw, ",", ".")
-
 	v, err := strconv.ParseFloat(raw, 64)
 
 	if err != nil {

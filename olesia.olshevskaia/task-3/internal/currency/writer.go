@@ -27,5 +27,5 @@ func parseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) 
 }
 
 func WriteJSON(outputFile string, currencies []model.Currency) error {
-	return parseJSON(outputFile, currencies, os.ModePerm, 0644)
+	return parseJSON(outputFile, currencies, os.ModePerm, 0o644)
 }

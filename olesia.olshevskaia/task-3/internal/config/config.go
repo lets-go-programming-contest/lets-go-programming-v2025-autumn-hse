@@ -3,9 +3,8 @@ package config
 import (
 	"os"
 
-	"gopkg.in/yaml.v3"
-
 	"github.com/Olesia.Ol/task-3/internal/model"
+	"gopkg.in/yaml.v3"
 )
 
 func Load(path string) (model.Config, error) {

@@ -9,7 +9,7 @@ import (
 	"github.com/JingolBong/task-3/internal/valuteinfo"
 )
 
-const dirPerm = 0755
+const dirPerm = 0o755
 
 func Jsonwrite(valuteCurs valuteinfo.ValuteCurs, outputFile string) error {
 	directory := filepath.Dir(outputFile)

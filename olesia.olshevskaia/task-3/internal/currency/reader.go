@@ -77,10 +77,9 @@ func parseValue(raw string) (float64, bool) {
 	}
 
 	raw = strings.ReplaceAll(raw, ",", ".")
-	value, err := strconv.ParseFloat(raw, 64)
-	if err != nil {
+	if value, err := strconv.ParseFloat(raw, 64); err != nil {
 		return 0, false
+	} else {
+		return value, true
 	}
-
-	return value, true
 }

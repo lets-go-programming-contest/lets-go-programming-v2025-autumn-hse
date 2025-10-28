@@ -9,6 +9,11 @@ import (
 	"github.com/Olesia.Ol/task-3/internal/model"
 )
 
+const (
+	dirPerm  = os.ModePerm
+	filePerm = 0o644
+)
+
 func parseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) error {
 	outputJSON, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
@@ -27,5 +32,5 @@ func parseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) 
 }
 
 func WriteJSON(outputFile string, currencies []model.Currency) error {
-	return parseJSON(outputFile, currencies, os.ModePerm, 0o644)
+	return parseJSON(outputFile, currencies, dirPerm, filePerm)
 }

@@ -30,14 +30,13 @@ func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {
 
 	data, err := io.ReadAll(xmlFile)
 	if err != nil {
-
 		return valuteinfo.ValuteCurs{}, fmt.Errorf("reading file: %w", err)
 	}
+
 	if bytes.Contains(data, []byte("windows-1251")) {
 		decoder := charmap.Windows1251.NewDecoder()
 		data, err = decoder.Bytes(data)
 		if err != nil {
-
 			return valuteinfo.ValuteCurs{}, fmt.Errorf("cannot decode windows-1251: %w", err)
 		}
 	}
@@ -47,8 +46,7 @@ func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {
 	data = []byte(dataStr)
 
 	if err := xml.Unmarshal(data, &valuteCur); err != nil {
-
-		return valuteinfo.ValuteCurs{}, fmt.Errorf("Unmarshal xml: %w", err)
+		return valuteinfo.ValuteCurs{}, fmt.Errorf("unmarshal xml: %w", err)
 	}
 
 	return valuteCur, nil

@@ -12,11 +12,6 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-type xmlDataStruct struct {
-	XMLName    xml.Name         `xml:"ValCurs"`
-	Currencies []model.Currency `xml:"Valute"`
-}
-
 func Read(path string) ([]model.Currency, error) {
 	file, err := os.Open(path)
 	if err != nil {

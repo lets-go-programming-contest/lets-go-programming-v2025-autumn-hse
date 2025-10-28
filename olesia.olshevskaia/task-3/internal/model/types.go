@@ -6,10 +6,10 @@ type Config struct {
 }
 
 type Currency struct {
-	CodeNum   int     `json:"num_code"`
+	CodeNum   int     `xml:"NumCode"   json:"num_code"`
 	CodeChar  string  `xml:"CharCode"  json:"char_code"`
-	RateValue float64 `json:"value"`
+	RateValue float64 `xml:"Value"     json:"value"`
 	HasValue  bool    `json:"-"`
-	RawNum    string  `xml:"NumCode"`
-	RawValue  string  `xml:"Value"`
+	RawNum    string  `xml:"-"`
+	RawValue  string  `xml:"-"`
 }

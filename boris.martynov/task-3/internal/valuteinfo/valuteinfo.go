@@ -10,9 +10,9 @@ import (
 type Value float64
 
 type Valute struct {
-	NumCode  int    `json:"num_code" xml:"NumCode"`
+	NumCode  int    `json:"num_code"  xml:"NumCode"`
 	CharCode string `json:"char_code" xml:"CharCode"`
-	Value    Value  `json:"value" xml:"Value"`
+	Value    Value  `json:"value"     xml:"Value"`
 }
 
 type ValuteCurs struct {
@@ -22,7 +22,6 @@ type ValuteCurs struct {
 func (v *Value) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var str string
 	if err := d.DecodeElement(&str, &start); err != nil {
-
 		return fmt.Errorf("while decoding: %w", err)
 	}
 
@@ -30,7 +29,6 @@ func (v *Value) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 	value, err := strconv.ParseFloat(strings.ReplaceAll(str, ",", "."), 64)
 	if err != nil {
-
 		return fmt.Errorf("while replacing dots: %w", err)
 	}
 

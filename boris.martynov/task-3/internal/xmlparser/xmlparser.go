@@ -45,6 +45,7 @@ func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {
 	dataStr := strings.ReplaceAll(string(data), `encoding="windows-1251"`, `encoding="utf-8"`)
 
 	data = []byte(dataStr)
+
 	if err := xml.Unmarshal(data, &valuteCur); err != nil {
 
 		return valuteinfo.ValuteCurs{}, fmt.Errorf("Unmarshal xml: %w", err)

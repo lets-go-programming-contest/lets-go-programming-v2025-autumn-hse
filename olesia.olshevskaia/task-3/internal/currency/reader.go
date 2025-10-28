@@ -12,6 +12,11 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
+type xmlDataStruct struct {
+	XMLName    xml.Name         `xml:"ValCurs"`
+	Currencies []model.Currency `xml:"Valute"`
+}
+
 func Read(path string) ([]model.Currency, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -27,10 +32,7 @@ func Read(path string) ([]model.Currency, error) {
 	decoder := xml.NewDecoder(file)
 	decoder.CharsetReader = charset.NewReaderLabel
 
-	var xmlData struct {
-		XMLName    xml.Name         `xml:"ValCurs"`
-		Currencies []model.Currency `xml:"Valute"`
-	}
+	var xmlData xmlDataStruct
 
 	if err := decoder.Decode(&xmlData); err != nil {
 		return nil, fmt.Errorf("failed to decode XML file %q: %w", path, err)

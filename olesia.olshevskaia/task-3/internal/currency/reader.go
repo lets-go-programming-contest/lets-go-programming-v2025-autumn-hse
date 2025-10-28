@@ -32,7 +32,9 @@ func Read(path string) ([]model.Currency, error) {
 	decoder := xml.NewDecoder(file)
 	decoder.CharsetReader = charset.NewReaderLabel
 
-	var xmlData xmlDataStruct
+	var xmlData struct {
+		Currencies []model.Currency `xml:"Valute"`
+	}
 
 	if err := decoder.Decode(&xmlData); err != nil {
 		return nil, fmt.Errorf("failed to decode XML file %q: %w", path, err)

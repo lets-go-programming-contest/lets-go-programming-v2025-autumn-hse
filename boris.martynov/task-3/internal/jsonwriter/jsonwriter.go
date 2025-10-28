@@ -12,7 +12,7 @@ import (
 func Jsonwrite(valuteCurs valuteinfo.ValuteCurs, outputFile string) error {
 	directory := filepath.Dir(outputFile)
 
-	if err := os.MkdirAll(directory, 0755); err != nil {
+	if err := os.MkdirAll(directory, 0o755); err != nil {
 		return fmt.Errorf("failed to make dir: %w", err)
 	}
 

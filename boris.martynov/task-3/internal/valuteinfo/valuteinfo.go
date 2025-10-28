@@ -10,9 +10,9 @@ import (
 type Value float64
 
 type Valute struct {
-	NumCode  int    `xml:"NumCode" json:"NumCode"`
-	CharCode string `xml:"CharCode" json:"CharCode"`
-	Value    Value  `xml:"Value" json:"Value"`
+	NumCode  int    `xml:"NumCode" json:"num_code"`
+	CharCode string `xml:"CharCode" json:"char_code"`
+	Value    Value  `xml:"Value" json:"value"`
 }
 
 type ValuteCurs struct {

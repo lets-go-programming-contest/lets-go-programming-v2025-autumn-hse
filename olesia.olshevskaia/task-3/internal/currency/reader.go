@@ -28,6 +28,7 @@ func Read(path string) ([]model.Currency, error) {
 	decoder.CharsetReader = charset.NewReaderLabel
 
 	var xmlData struct {
+		XMLName    xml.Name         `xml:"ValCurs"`
 		Currencies []model.Currency `xml:"Valute"`
 	}
 

@@ -46,8 +46,6 @@ func Read(path string) ([]model.Currency, error) {
 			CodeChar:  val.CodeChar,
 			RateValue: value,
 			HasValue:  hasValue,
-			RawNum:    val.RawNum,
-			RawValue:  val.RawValue,
 		})
 	}
 

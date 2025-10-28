@@ -23,6 +23,12 @@ func Jsonwrite(valuteCurs valuteinfo.ValuteCurs, outputFile string) error {
 		return fmt.Errorf("failed to make file: %w", err)
 	}
 
+	defer func() {
+		if err := file.Close(); err != nil {
+			panic(fmt.Errorf("failed to close file: %w", err))
+		}
+	}()
+
 	jsonData, err := json.MarshalIndent(valuteCurs.Valutes, "", " ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal JSON: %w", err)

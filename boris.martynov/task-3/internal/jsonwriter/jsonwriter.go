@@ -16,14 +16,12 @@ func Jsonwrite(valuteCurs valuteinfo.ValuteCurs, outputFile string) error {
 	}
 
 	file, err := os.Create(outputFile)
-
 	if err != nil {
 
 		return fmt.Errorf("failed to make file: %w", err)
 	}
 
 	jsonData, err := json.MarshalIndent(valuteCurs.Valutes, "", " ")
-
 	if err != nil {
 
 		return fmt.Errorf("failed to marshal JSON: %w", err)

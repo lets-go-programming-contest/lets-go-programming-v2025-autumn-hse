@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"golang.org/x/text/encoding/charmap"
 	"io"
 	"os"
 	"strings"
 
 	"github.com/JingolBong/task-3/internal/valuteinfo"
+	"golang.org/x/text/encoding/charmap"
 )
 
 func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {

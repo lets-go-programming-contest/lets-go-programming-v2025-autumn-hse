@@ -15,7 +15,7 @@ import (
 func Read(path string) ([]model.Currency, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open XML file %q: %w", path, err)
 	}
 
 	defer func() {
@@ -32,7 +32,7 @@ func Read(path string) ([]model.Currency, error) {
 	}
 
 	if err := decoder.Decode(&xmlData); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to decode XML file %q: %w", path, err)
 	}
 
 	result := make([]model.Currency, 0, len(xmlData.Currencies))
@@ -58,7 +58,6 @@ func Read(path string) ([]model.Currency, error) {
 
 func parseCodeNum(raw string) int {
 	raw = strings.TrimSpace(raw)
-
 	if raw == "" {
 		return 0
 	}
@@ -73,17 +72,15 @@ func parseCodeNum(raw string) int {
 
 func parseValue(raw string) (float64, bool) {
 	raw = strings.TrimSpace(raw)
-
 	if raw == "" {
 		return 0, false
 	}
 
 	raw = strings.ReplaceAll(raw, ",", ".")
-	v, err := strconv.ParseFloat(raw, 64)
-
+	value, err := strconv.ParseFloat(raw, 64)
 	if err != nil {
 		return 0, false
 	}
 
-	return v, true
+	return value, true
 }

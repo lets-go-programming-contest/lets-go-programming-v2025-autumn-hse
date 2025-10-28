@@ -24,6 +24,7 @@ func Jsonwrite(valuteCurs valuteinfo.ValuteCurs, outputFile string) error {
 	if err != nil {
 		return fmt.Errorf("failed to marshal JSON: %w", err)
 	}
+
 	if _, err := file.Write(jsonData); err != nil {
 		return fmt.Errorf("failed to write JSON: %w", err)
 	}

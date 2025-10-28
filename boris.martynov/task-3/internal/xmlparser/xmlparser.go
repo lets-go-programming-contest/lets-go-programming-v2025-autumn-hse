@@ -4,11 +4,10 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
+	"golang.org/x/text/encoding/charmap"
 	"io"
 	"os"
 	"strings"
-
-	"golang.org/x/text/encoding/charmap"
 
 	"github.com/JingolBong/task-3/internal/valuteinfo"
 )
@@ -18,7 +17,6 @@ func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {
 
 	xmlFile, err := os.Open(inputxml)
 	if err != nil {
-
 		return valuteinfo.ValuteCurs{}, fmt.Errorf("opening file: %w", err)
 	}
 
@@ -35,6 +33,7 @@ func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {
 
 	if bytes.Contains(data, []byte("windows-1251")) {
 		decoder := charmap.Windows1251.NewDecoder()
+
 		data, err = decoder.Bytes(data)
 		if err != nil {
 			return valuteinfo.ValuteCurs{}, fmt.Errorf("cannot decode windows-1251: %w", err)

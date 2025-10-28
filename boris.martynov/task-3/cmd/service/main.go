@@ -20,7 +20,6 @@ func main() {
 	}
 
 	sort.Slice(valCurs.Valutes, func(i, j int) bool {
-
 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
 	})
 

@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/Anfisa111/task-3/internal/valutes"
 )
 
 const fileOpenPermission = 0o755
 
-func WriteCurrenciesJSON(currencies []valutes.Valute, filePath string) error {
+func WriteFileJSON(value any, filePath string) error {
 	dir := filepath.Dir(filePath)
 
 	err := os.MkdirAll(dir, fileOpenPermission)
@@ -33,7 +31,7 @@ func WriteCurrenciesJSON(currencies []valutes.Valute, filePath string) error {
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", " ")
 
-	err = encoder.Encode(currencies)
+	err = encoder.Encode(value)
 	if err != nil {
 		return fmt.Errorf("error encoding file: %w", err)
 	}

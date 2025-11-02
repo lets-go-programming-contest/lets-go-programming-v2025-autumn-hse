@@ -30,14 +30,17 @@ func main() {
 		panic(fmt.Sprintf("Inputfile is not existing: %v", err))
 	}
 
-	currencies, err := xmlreader.DecodeValuteXML(config.InputFile)
+	var valCurs valutes.ValCurs
+
+	err = xmlreader.ReadFileXML(config.InputFile, &valCurs)
 	if err != nil {
-		panic(fmt.Sprintf("Cannot decode valute XML: %v", err))
+		panic(fmt.Sprintf("Cannot read Inputfile: %v", err))
 	}
 
+	currencies := valCurs.Valutes
 	valutes.SortValutes(currencies)
 
-	err = jsonwriter.WriteCurrenciesJSON(currencies, config.OutputFile)
+	err = jsonwriter.WriteFileJSON(currencies, config.OutputFile)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot write currencies to JSON: %v", err))
 	}

@@ -8,13 +8,12 @@ import (
 	"io"
 	"os"
 
-	"github.com/Anfisa111/task-3/internal/valutes"
 	"golang.org/x/text/encoding/charmap"
 )
 
 var errCharset = errors.New("unknown charset")
 
-func readFileXML(filepath string, value any) error {
+func ReadFileXML(filepath string, value any) error {
 	file, err := os.ReadFile(filepath)
 	if err != nil {
 		return fmt.Errorf("error opening file: %w", err)
@@ -37,15 +36,4 @@ func readFileXML(filepath string, value any) error {
 	}
 
 	return nil
-}
-
-func DecodeValuteXML(filepath string) ([]valutes.Valute, error) {
-	var valCurs valutes.ValCurs
-
-	err := readFileXML(filepath, &valCurs)
-	if err != nil {
-		return nil, fmt.Errorf("error reading XML file: %w", err)
-	}
-
-	return valCurs.Valutes, nil
 }

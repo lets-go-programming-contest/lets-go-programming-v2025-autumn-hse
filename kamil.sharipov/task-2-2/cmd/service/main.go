@@ -11,7 +11,6 @@ import (
 var (
 	errKPositive        error = errors.New("k must be positive")
 	errNotEnoughEls     error = errors.New("not enough elements to find k-th maximum")
-	errHeapBecameEmpty  error = errors.New("heap became empty before k-th element")
 	errHeapReturnedNill error = errors.New("heap returned nil")
 	errTypeAssertFailed error = errors.New("type assertion failed")
 )

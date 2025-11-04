@@ -33,10 +33,7 @@ func KthMaximum(arr []int, kth int) (int, error) {
 	var result int
 
 	for range kth - 1 {
-		val := heap.Pop(IntHeap)
-		if val == nil {
-			return 0, errHeapBecameEmpty
-		}
+		heap.Pop(IntHeap)
 	}
 
 	val := heap.Pop(IntHeap)

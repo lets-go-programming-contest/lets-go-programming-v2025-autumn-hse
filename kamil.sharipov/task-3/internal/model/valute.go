@@ -29,6 +29,6 @@ func (v *ValuteValue) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 
 type Valute struct {
 	NumCode  int         `json:"num_code" xml:"NumCode"`
-	CharCode string      `json:"char_code xml:"CharCode"`
+	CharCode string      `json:"char_code" xml:"CharCode"`
 	Value    ValuteValue `json:"value"    xml:"Value"`
 }

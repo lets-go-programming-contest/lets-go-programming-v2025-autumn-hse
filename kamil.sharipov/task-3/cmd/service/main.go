@@ -55,7 +55,11 @@ func parseFlags() string {
 }
 
 func loadConfig(path string) (config.Config, error) {
-	return config.LoadConfig(path)
+	cfg, err := config.LoadConfig(path)
+	if err != nil {
+		return config.Config{}, fmt.Errorf("failed to load config from %q: %w", path, err)
+	}
+	return cfg, nil
 }
 
 func readXMLFile(path string) ([]byte, error) {

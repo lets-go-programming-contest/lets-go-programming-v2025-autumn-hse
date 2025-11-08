@@ -76,15 +76,14 @@ func parseXMLData(data []byte) ([]model.Valute, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse XML: %w", err)
 	}
+
 	return valCurs, nil
 }
 
-func sortValCurs(valCurs []model.Valute) error {
+func sortValCurs(valCurs []model.Valute) {
 	sort.Slice(valCurs, func(i, j int) bool {
 		return float64(valCurs[i].Value) > float64(valCurs[j].Value)
 	})
-
-	return nil
 }
 
 func formatJSON(valCurs []model.Valute) ([]byte, error) {

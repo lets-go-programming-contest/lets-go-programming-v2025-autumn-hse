@@ -12,5 +12,6 @@ func FormateJSON(valutes []model.Valute) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal valutes to JSON: %w", err)
 	}
+
 	return data, nil
 }

@@ -10,24 +10,25 @@ import (
 type ValuteValue float64
 
 func (v *ValuteValue) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var s string
-	if err := d.DecodeElement(&s, &start); err != nil {
-		return err
+	var str string
+	if err := d.DecodeElement(&str, &start); err != nil {
+		return fmt.Errorf("failed to decode XML element: %w", err)
 	}
 
-	s = strings.Replace(s, ",", ".", 1)
+	str = strings.Replace(str, ",", ".", 1)
 
-	value, err := strconv.ParseFloat(s, 64)
+	value, err := strconv.ParseFloat(str, 64)
 	if err != nil {
-		return fmt.Errorf("failed to parse Value %q: %w", s, err)
+		return fmt.Errorf("failed to parse Value %q: %w", str, err)
 	}
 
 	*v = ValuteValue(value)
+
 	return nil
 }
 
 type Valute struct {
-	NumCode  int         `xml:"NumCode" json:"num_code"`
-	CharCode string      `xml:"CharCode" json:"char_code"`
-	Value    ValuteValue `xml:"Value" json:"value"`
+	NumCode  int         `json:"num_code" xml:"NumCode"`
+	CharCode string      `json:"char_code xml:"CharCode""`
+	Value    ValuteValue `json:"value"    xml:"Value"`
 }

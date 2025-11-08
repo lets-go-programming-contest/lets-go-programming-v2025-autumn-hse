@@ -59,6 +59,7 @@ func loadConfig(path string) (config.Config, error) {
 	if err != nil {
 		return config.Config{}, fmt.Errorf("failed to load config from %q: %w", path, err)
 	}
+
 	return cfg, nil
 }
 

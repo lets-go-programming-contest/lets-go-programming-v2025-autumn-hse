@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -17,12 +18,6 @@ type Config struct {
 	OutputFile string `yaml:"output-file"`
 }
 
-func panicOnErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func (c *Config) Validate() error {
 	if c.InputFile == "" {
 		return errNoInputFile
@@ -35,21 +30,24 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-func LoadConfig(path string) Config {
+func LoadConfig(path string) (Config, error) {
 	file, err := os.Open(path)
-	panicOnErr(err)
-
-	defer func() {
-		_ = file.Close()
-	}()
+	if err != nil {
+		return Config{}, fmt.Errorf("failed to open config file %q: %w", path, err)
+	}
+	defer file.Close()
 
 	var config Config
 
 	err = yaml.NewDecoder(file).Decode(&config)
-	panicOnErr(err)
+	if err != nil {
+		return Config{}, fmt.Errorf("failed to decode config: %w", err)
+	}
 
 	err = config.Validate()
-	panicOnErr(err)
+	if err != nil {
+		return Config{}, fmt.Errorf("invalid config: %w", err)
+	}
 
-	return config
+	return config, nil
 }

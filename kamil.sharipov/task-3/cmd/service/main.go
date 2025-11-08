@@ -9,6 +9,7 @@ import (
 
 	"github.com/kamilSharipov/task-3/internal/config"
 	json "github.com/kamilSharipov/task-3/internal/json_formatter"
+	"github.com/kamilSharipov/task-3/internal/model"
 	xml "github.com/kamilSharipov/task-3/internal/xml_parser"
 )
 
@@ -16,89 +17,94 @@ const (
 	dirPermissions = 0o755
 )
 
-func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Fprintln(os.Stderr, r)
-			os.Exit(1)
-		}
-	}()
-
-	cfg := loadConfig()
-
-	xmlData := readXMLFile(cfg.InputFile)
-
-	valCurs := parseXMLData(xmlData)
-	sortValCurs(valCurs)
-
-	jsonBytes := formatJSON(valCurs)
-	writeOutput(cfg.OutputFile, jsonBytes)
+func panicOnErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
 
-func loadConfig() config.Config {
+func main() {
+	configPath := parseFlags()
+	cfg, err := loadConfig(configPath)
+	panicOnErr(err)
+
+	xmlData, err := readXMLFile(cfg.InputFile)
+	panicOnErr(err)
+
+	valCurs, err := parseXMLData(xmlData)
+	panicOnErr(err)
+
+	sortValCurs(valCurs)
+
+	jsonBytes, err := formatJSON(valCurs)
+	panicOnErr(err)
+
+	err = writeOutput(cfg.OutputFile, jsonBytes)
+	panicOnErr(err)
+}
+
+func parseFlags() string {
 	configPath := flag.String("config", "", "config file path")
 	flag.Parse()
 
 	if *configPath == "" {
-		panic("no config path")
+		panic("missing required flag: -config")
 	}
 
-	return config.LoadConfig(*configPath)
+	return *configPath
 }
 
-func readXMLFile(path string) []byte {
+func loadConfig(path string) (config.Config, error) {
+	return config.LoadConfig(path)
+}
+
+func readXMLFile(path string) ([]byte, error) {
 	if _, err := os.Stat(path); err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to stat file %q: %w", path, err)
 	}
 
 	data, err := os.ReadFile(path)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to read file %q: %w", path, err)
 	}
 
-	return data
+	return data, nil
 }
 
-func parseXMLData(data []byte) []xml.Valute {
+func parseXMLData(data []byte) ([]model.Valute, error) {
 	valCurs, err := xml.ParseXML(data)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to parse XML: %w", err)
 	}
-
-	return valCurs
+	return valCurs, nil
 }
 
-func sortValCurs(valCurs []xml.Valute) {
+func sortValCurs(valCurs []model.Valute) error {
 	sort.Slice(valCurs, func(i, j int) bool {
-		value1, err1 := valCurs[i].GetValue()
-		value2, err2 := valCurs[j].GetValue()
-
-		if err1 != nil || err2 != nil {
-			panic(err1)
-		}
-
-		return value1 > value2
+		return float64(valCurs[i].Value) > float64(valCurs[j].Value)
 	})
+
+	return nil
 }
 
-func formatJSON(valCurs []xml.Valute) []byte {
+func formatJSON(valCurs []model.Valute) ([]byte, error) {
 	bytes, err := json.FormateJSON(valCurs)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to format JSON: %w", err)
 	}
 
-	return bytes
+	return bytes, nil
 }
 
-func writeOutput(outputPath string, data []byte) {
+func writeOutput(outputPath string, data []byte) error {
 	err := os.MkdirAll(filepath.Dir(outputPath), dirPermissions)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to create output directory for %q: %w", outputPath, err)
 	}
 
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to create output file %q: %w", outputPath, err)
 	}
 
 	defer func() {
@@ -107,6 +113,8 @@ func writeOutput(outputPath string, data []byte) {
 
 	_, err = outputFile.Write(data)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to write to %q: %w", outputPath, err)
 	}
+
+	return nil
 }

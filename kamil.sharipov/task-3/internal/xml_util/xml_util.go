@@ -9,7 +9,10 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-var ErrEmpty = errors.New("XML contains no elements")
+var (
+	ErrEmpty     = errors.New("XML contains no elements")
+	ErrWrongRoot = errors.New("XML root element name mismatch")
+)
 
 func ParseElements[T any](xmlData []byte, rootName, elementName string) ([]T, error) {
 	xmlDecoder := xml.NewDecoder(bytes.NewReader(xmlData))
@@ -25,7 +28,7 @@ func ParseElements[T any](xmlData []byte, rootName, elementName string) ([]T, er
 	}
 
 	if temp.XMLName.Local != rootName {
-		return nil, fmt.Errorf("expected root element %q, got %q", rootName, temp.XMLName.Local)
+		return nil, ErrWrongRoot
 	}
 
 	if len(temp.Elements) == 0 {

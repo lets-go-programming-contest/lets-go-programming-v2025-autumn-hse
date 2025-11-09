@@ -1,32 +1,17 @@
 package xml
 
 import (
-	"bytes"
-	"encoding/xml"
-	"errors"
 	"fmt"
 
 	"github.com/kamilSharipov/task-3/internal/model"
-	"golang.org/x/net/html/charset"
+	xmlutil "github.com/kamilSharipov/task-3/internal/xml_util"
 )
 
-var errNoValutes = errors.New("XML contains no valutes")
-
 func ParseXML(xmlData []byte) ([]model.Valute, error) {
-	xmlDecoder := xml.NewDecoder(bytes.NewReader(xmlData))
-	xmlDecoder.CharsetReader = charset.NewReaderLabel
-
-	var temp struct {
-		Valutes []model.Valute `xml:"Valute"`
+	valutes, err := xmlutil.ParseElements[model.Valute](xmlData, "ValCurs", "Valute")
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse XML into Valute: %w", err)
 	}
 
-	if err := xmlDecoder.Decode(&temp); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal XML: %w", err)
-	}
-
-	if len(temp.Valutes) == 0 {
-		return nil, errNoValutes
-	}
-
-	return temp.Valutes, nil
+	return valutes, nil
 }

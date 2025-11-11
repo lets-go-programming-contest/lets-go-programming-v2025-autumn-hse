@@ -18,6 +18,9 @@ func (h *IntHeap) Len() int {
 }
 
 func (h *IntHeap) Less(i, j int) bool {
+	if i < 0 || j < 0 || len(*h) < i || len(*h) < j {
+		panic("index out of range")
+	}
 	return (*h)[i] > (*h)[j]
 }
 
@@ -36,7 +39,7 @@ func (h *IntHeap) Push(x interface{}) {
 
 func (h *IntHeap) Pop() interface{} {
 	if h.Len() == 0 {
-		panic("cannot pop from empty heap")
+		return nil
 	}
 
 	old := *h

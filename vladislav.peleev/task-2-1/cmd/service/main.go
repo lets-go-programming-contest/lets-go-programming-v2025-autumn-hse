@@ -16,20 +16,18 @@ var errInvalidOperator = errors.New("invalid operator")
 type Department struct {
 	minTemp int
 	maxTemp int
-	isValid bool
 }
 
-func NewDepartment() *Department {
+func NewDepartment(minTemp, maxTemp int) *Department {
 	return &Department{
-		minTemp: MinTempLimit,
-		maxTemp: MaxTempLimit,
-		isValid: true,
+		minTemp: minTemp,
+		maxTemp: maxTemp,
 	}
 }
 
-func (d *Department) ProcessConstraint(operator string, temperature int) (string, error) {
-	if !d.isValid {
-		return "-1", nil
+func (d *Department) ProcessConstraint(operator string, temperature int) (int, error) {
+	if !d.isValid() {
+		return -1, nil
 	}
 
 	switch operator {
@@ -42,18 +40,18 @@ func (d *Department) ProcessConstraint(operator string, temperature int) (string
 			d.maxTemp = temperature
 		}
 	default:
-		d.isValid = false
-
-		return "-1", fmt.Errorf("%w: %s", errInvalidOperator, operator)
+		return -1, fmt.Errorf("%w: %s", errInvalidOperator, operator)
 	}
 
 	if d.minTemp <= d.maxTemp {
 		return strconv.Itoa(d.minTemp), nil
 	}
 
-	d.isValid = false
+	return -1, nil
+}
 
-	return "-1", nil
+func (d *Department) isValid() bool {
+	return d.minTemp <= d.maxTemp
 }
 
 func main() {
@@ -74,7 +72,7 @@ func main() {
 			return
 		}
 
-		dept := NewDepartment()
+		dept := NewDepartment(MinTempLimit, MaxTempLimit)
 
 		for range employeesCount {
 			var operator string

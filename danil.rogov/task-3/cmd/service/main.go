@@ -9,6 +9,8 @@ import (
 	"github.com/Tapochek2894/task-3/internal/xmlinput"
 )
 
+const outputMode = 0o777
+
 func main() {
 	configPath := flag.String("config", "local.yaml", "path to config file")
 	flag.Parse()
@@ -27,7 +29,7 @@ func main() {
 
 	data.Sort(true)
 
-	err = jsonoutput.WriteJSON(config.OutputFile, data.Valutes)
+	err = jsonoutput.WriteJSON(config.OutputFile, data.Valutes, outputMode)
 	if err != nil {
 		panic("JSON write error: " + err.Error())
 	}

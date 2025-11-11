@@ -7,9 +7,7 @@ import (
 	"path/filepath"
 )
 
-const mode = 0o777
-
-func WriteJSON(path string, valutes any) error {
+func WriteJSON(path string, valutes any, mode os.FileMode) error {
 	err := os.MkdirAll(filepath.Dir(path), mode)
 	if err != nil {
 		return fmt.Errorf("error creating %s with mode %o: %w", path, mode, err)

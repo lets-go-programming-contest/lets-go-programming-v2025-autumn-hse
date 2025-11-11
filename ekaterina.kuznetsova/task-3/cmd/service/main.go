@@ -33,7 +33,7 @@ func main() {
 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
 	})
 
-	err = writerjson.ParseJSON(config.OutputFile, valCurs, dirMode, fileMode)
+	err = writerjson.ParseJSON(config.OutputFile, valCurs.Valutes, dirMode, fileMode)
 	if err != nil {
 		panic(err)
 	}

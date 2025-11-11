@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"strconv"
 )
 
 const (
@@ -44,7 +43,7 @@ func (d *Department) ProcessConstraint(operator string, temperature int) (int, e
 	}
 
 	if d.minTemp <= d.maxTemp {
-		return strconv.Itoa(d.minTemp), nil
+		return d.minTemp, nil
 	}
 
 	return -1, nil

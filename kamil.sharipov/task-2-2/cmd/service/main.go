@@ -29,8 +29,6 @@ func KthMaximum(arr []int, kth int) (int, error) {
 		heap.Push(IntHeap, x)
 	}
 
-	var result int
-
 	for range kth - 1 {
 		heap.Pop(IntHeap)
 	}

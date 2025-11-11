@@ -12,8 +12,8 @@ type Config struct {
 	OutputFile string `yaml:"output-file"`
 }
 
-func LoadConfigYaml(configPath *string) (Config, error) {
-	dataConfig, err := os.ReadFile(*configPath)
+func LoadConfigYaml(configPath string) (Config, error) {
+	dataConfig, err := os.ReadFile(configPath)
 	if err != nil {
 		return Config{}, fmt.Errorf("error read config: %w", err)
 	}

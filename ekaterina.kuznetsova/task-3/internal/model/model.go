@@ -1,4 +1,4 @@
-package castomparsexml
+package model
 
 import (
 	"encoding/xml"
@@ -25,4 +25,14 @@ func (v *ValueFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 	*v = ValueFloat(value)
 
 	return nil
+}
+
+type Valute struct {
+	NumCode  int        `json:"num_code"  xml:"NumCode"`
+	CharCode string     `json:"char_code" xml:"CharCode"`
+	Value    ValueFloat `json:"value"     xml:"Value"`
+}
+
+type ValuteCurs struct {
+	Valutes []Valute `xml:"Valute"`
 }

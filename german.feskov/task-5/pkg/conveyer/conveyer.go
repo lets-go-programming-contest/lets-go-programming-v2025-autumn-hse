@@ -18,8 +18,7 @@ type handler interface {
 
 type DefaultConveyer struct {
 	size     int
-	input    map[string]chan string
-	output   map[string]chan string
+	channels map[string]chan string
 	handlers []handler
 }
 
@@ -28,8 +27,7 @@ var ErrChanNotFound = errors.New("chan not found")
 func New(size int) *DefaultConveyer {
 	return &DefaultConveyer{
 		size:     size,
-		input:    make(map[string]chan string),
-		output:   make(map[string]chan string),
+		channels: make(map[string]chan string),
 		handlers: make([]handler, 0),
 	}
 }
@@ -56,7 +54,7 @@ func (c *DefaultConveyer) Run(ctx context.Context) error {
 }
 
 func (c *DefaultConveyer) Send(input string, data string) error {
-	channel, ok := c.input[input]
+	channel, ok := c.channels[input]
 	if !ok {
 		return fmt.Errorf("channel %q: %w", input, ErrChanNotFound)
 	}
@@ -67,7 +65,7 @@ func (c *DefaultConveyer) Send(input string, data string) error {
 
 func (c *DefaultConveyer) Recv(output string) (string, error) {
 	//nolint:varnamelen // ok is classic name
-	channel, ok := c.output[output]
+	channel, ok := c.channels[output]
 	if !ok {
 		return "", fmt.Errorf("channel %q: %w", output, ErrChanNotFound)
 	}
@@ -108,28 +106,17 @@ func (c *DefaultConveyer) RegisterSeparator(foo SeparatorFunc, input string, out
 }
 
 func (c *DefaultConveyer) createChanIfNotExists(key string) chan string {
-	channel, ok := c.input[key]
+	channel, ok := c.channels[key]
 	if !ok {
-		channel, ok = c.output[key]
-		if !ok {
-			channel = make(chan string, c.size)
-			c.output[key] = channel
-		}
-
-		c.input[key] = channel
+		channel = make(chan string, c.size)
+		c.channels[key] = channel
 	}
 
 	return channel
 }
 
 func (c *DefaultConveyer) close() {
-	for key, ch := range c.output {
-		if _, ok := c.input[key]; !ok {
-			close(ch)
-		}
-	}
-
-	for _, ch := range c.input {
+	for _, ch := range c.channels {
 		close(ch)
 	}
 }

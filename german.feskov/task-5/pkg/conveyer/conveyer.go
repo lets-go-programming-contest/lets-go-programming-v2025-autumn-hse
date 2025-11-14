@@ -28,12 +28,12 @@ type DefaultConveyer struct {
 var ErrChanNotFound = errors.New("chan not found")
 
 func New(size int) *DefaultConveyer {
-	//nolint:exhaustruct // sync.Mutex dont need to initialize
 	return &DefaultConveyer{
 		size:     size,
 		input:    make(map[string]chan string),
 		output:   make(map[string]chan string),
 		handlers: make([]handler, 0),
+		mu:       sync.Mutex{},
 	}
 }
 
@@ -52,13 +52,13 @@ func (c *DefaultConveyer) Run(ctx context.Context) error {
 
 	err := errGroup.Wait()
 
-	for key, ch := range c.input {
-		if _, ok := c.output[key]; !ok {
+	for key, ch := range c.output {
+		if _, ok := c.input[key]; !ok {
 			close(ch)
 		}
 	}
 
-	for _, ch := range c.output {
+	for _, ch := range c.input {
 		close(ch)
 	}
 

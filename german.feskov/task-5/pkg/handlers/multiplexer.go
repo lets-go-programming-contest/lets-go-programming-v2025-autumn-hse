@@ -16,14 +16,14 @@ func MultiplexerFunc(
 	inputs []chan string,
 	output chan string,
 ) error {
-	for {
-		closedChan := 0
+	for closedChan := 0; closedChan != len(inputs); {
 
 		for _, ch := range inputs {
 			select {
 			case <-ctx.Done():
 				return nil
 			case data, ok := <-ch:
+				fmt.Println(data)
 				if !ok {
 					closedChan++
 
@@ -31,15 +31,14 @@ func MultiplexerFunc(
 				}
 
 				if strings.Contains(data, noMultiplexerStr) {
-					return fmt.Errorf("str %q: %w", data, ErrCantBeMultiplex)
+					continue
 				}
 
 				output <- data
+			default:
+				continue
 			}
 		}
-
-		if closedChan == len(inputs) {
-			return nil
-		}
 	}
+	return nil
 }

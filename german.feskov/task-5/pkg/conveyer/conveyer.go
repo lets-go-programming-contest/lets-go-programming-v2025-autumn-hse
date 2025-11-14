@@ -52,9 +52,6 @@ func (c *DefaultConveyer) Run(ctx context.Context) error {
 
 	err := errGroup.Wait()
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
 	for key, ch := range c.input {
 		if _, ok := c.output[key]; !ok {
 			close(ch)

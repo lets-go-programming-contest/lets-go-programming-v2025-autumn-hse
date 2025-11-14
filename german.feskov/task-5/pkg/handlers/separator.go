@@ -10,6 +10,7 @@ func SeparatorFunc(
 	outputs []chan string,
 ) error {
 	ind := 0
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -21,7 +22,6 @@ func SeparatorFunc(
 
 			outputs[ind] <- data
 			ind = (ind + 1) % len(outputs)
-
 		}
 	}
 }

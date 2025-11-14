@@ -120,7 +120,8 @@ jobs:
           name: build-artifacts
           path: bin
       - name: Make bin executable
-        run: [[ -d bin ]] && chmod +x bin/*
+        run: |
+          [[ -d bin ]] && chmod +x bin/*
       - name: Export env variables
         run: |
           echo "BUILD_BIN=${GITHUB_WORKSPACE}/bin" >> $GITHUB_ENV

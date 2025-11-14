@@ -2,11 +2,14 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 )
 
 const noMultiplexerStr = "no multiplexer"
+
+var ErrCantBeMultiplex = errors.New("cant be multiplex")
 
 func MultiplexerFunc(
 	ctx context.Context,
@@ -15,6 +18,7 @@ func MultiplexerFunc(
 ) error {
 	for {
 		closedChan := 0
+
 		for _, ch := range inputs {
 			select {
 			case <-ctx.Done():
@@ -22,17 +26,18 @@ func MultiplexerFunc(
 			case data, ok := <-ch:
 				if !ok {
 					closedChan++
+
 					continue
 				}
 
 				if strings.Contains(data, noMultiplexerStr) {
-					return fmt.Errorf("cant be multiplex %q", data)
+					return fmt.Errorf("str %q: %w", data, ErrCantBeMultiplex)
 				}
 
 				output <- data
-
 			}
 		}
+
 		if closedChan == len(inputs) {
 			return nil
 		}

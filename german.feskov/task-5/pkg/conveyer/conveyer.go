@@ -2,6 +2,7 @@ package conveyer
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -13,7 +14,7 @@ const (
 )
 
 type handler interface {
-	run(context.Context) error
+	run(ctx context.Context) error
 }
 
 type DefaultConveyer struct {
@@ -24,7 +25,10 @@ type DefaultConveyer struct {
 	mu       sync.Mutex
 }
 
+var ErrChanNotFound = errors.New("chan no found")
+
 func New(size int) *DefaultConveyer {
+	//nolint:exhaustruct // sync.Mutex dont need to initialize
 	return &DefaultConveyer{
 		size:     size,
 		input:    make(map[string]chan string),
@@ -34,13 +38,14 @@ func New(size int) *DefaultConveyer {
 }
 
 func (c *DefaultConveyer) Run(ctx context.Context) error {
-
 	errGroup, errGroupCtx := errgroup.WithContext(ctx)
 
 	for _, handler := range c.handlers {
 		h := handler
+
 		errGroup.Go(func() error {
 			err := h.run(errGroupCtx)
+
 			return err
 		})
 	}
@@ -55,10 +60,12 @@ func (c *DefaultConveyer) Run(ctx context.Context) error {
 			close(ch)
 		}
 	}
+
 	for _, ch := range c.output {
 		close(ch)
 	}
 
+	//nolint:wrapcheck // errgorup.Wait return errors from handlers
 	return err
 }
 
@@ -66,11 +73,12 @@ func (c *DefaultConveyer) Send(input string, data string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	ch, ok := c.input[input]
+	channel, ok := c.input[input]
 	if !ok {
-		return fmt.Errorf("chan not found %q", input)
+		return fmt.Errorf("str %q: %w", input, ErrChanNotFound)
 	}
-	ch <- data
+	channel <- data
+
 	return nil
 }
 
@@ -78,51 +86,58 @@ func (c *DefaultConveyer) Recv(output string) (string, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	ch, ok := c.output[output]
+	//nolint:varnamelen // ok is classic name
+	channel, ok := c.output[output]
 	if !ok {
-		return "", fmt.Errorf("chan not found %q", output)
+		return "", fmt.Errorf("str %q: %w", output, ErrChanNotFound)
 	}
-	res, ok := <-ch
+
+	res, ok := <-channel
 	if !ok {
 		return undefined, nil
 	}
+
 	return res, nil
 }
 
-func (c *DefaultConveyer) RegisterDecorator(fn DecoratorFunc, input string, output string) {
+func (c *DefaultConveyer) RegisterDecorator(foo DecoratorFunc, input string, output string) {
 	inCh := c.createChanIfNotExists(input)
 	outCh := c.createChanIfNotExists(output)
-	c.handlers = append(c.handlers, &decorator{fn: fn, input: inCh, output: outCh})
+	c.handlers = append(c.handlers, &decorator{fn: foo, input: inCh, output: outCh})
 }
 
-func (c *DefaultConveyer) RegisterMultiplexer(fn MultiplexerFunc, inputs []string, output string) {
+func (c *DefaultConveyer) RegisterMultiplexer(foo MultiplexerFunc, inputs []string, output string) {
 	inChs := make([]chan string, len(inputs))
 	for i, input := range inputs {
 		inChs[i] = c.createChanIfNotExists(input)
 	}
+
 	outCh := c.createChanIfNotExists(output)
-	c.handlers = append(c.handlers, &multiplexer{fn: fn, input: inChs, output: outCh})
+	c.handlers = append(c.handlers, &multiplexer{fn: foo, input: inChs, output: outCh})
 }
 
-func (c *DefaultConveyer) RegisterSeparator(fn SeparatorFunc, input string, outputs []string) {
+func (c *DefaultConveyer) RegisterSeparator(foo SeparatorFunc, input string, outputs []string) {
 	inCh := c.createChanIfNotExists(input)
+
 	outChs := make([]chan string, len(outputs))
 	for i, output := range outputs {
 		outChs[i] = c.createChanIfNotExists(output)
 	}
-	c.handlers = append(c.handlers, &separator{fn: fn, input: inCh, output: outChs})
+
+	c.handlers = append(c.handlers, &separator{fn: foo, input: inCh, output: outChs})
 }
 
 func (c *DefaultConveyer) createChanIfNotExists(key string) chan string {
-	ch, ok := c.input[key]
+	channel, ok := c.input[key]
 	if !ok {
-		ch, ok = c.output[key]
+		channel, ok = c.output[key]
 		if !ok {
-			ch = make(chan string, c.size)
-			c.output[key] = ch
+			channel = make(chan string, c.size)
+			c.output[key] = channel
 		}
-		c.input[key] = ch
+
+		c.input[key] = channel
 	}
 
-	return ch
+	return channel
 }

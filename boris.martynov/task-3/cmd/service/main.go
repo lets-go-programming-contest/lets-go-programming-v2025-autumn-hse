@@ -6,6 +6,7 @@ import (
 
 	"github.com/JingolBong/task-3/internal/config"
 	"github.com/JingolBong/task-3/internal/jsonwriter"
+	"github.com/JingolBong/task-3/internal/valuteinfo"
 	"github.com/JingolBong/task-3/internal/xmlparser"
 )
 
@@ -20,7 +21,8 @@ func main() {
 		panic(err)
 	}
 
-	valCurs, err := xmlparser.XMLParse(cfg.InputFile)
+	var valCurs valuteinfo.ValuteCurs
+	err = xmlparser.XMLParse(cfg.InputFile, valCurs)
 	if err != nil {
 		panic(err)
 	}

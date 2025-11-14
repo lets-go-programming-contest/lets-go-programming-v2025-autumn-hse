@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/JingolBong/task-3/internal/valuteinfo"
 )
 
-func JSONWrite(valuteCurs valuteinfo.ValuteCurs, outputFile string, dirPerm os.FileMode) error {
+func JSONWrite(data any, outputFile string, dirPerm os.FileMode) error {
 	directory := filepath.Dir(outputFile)
 
 	if err := os.MkdirAll(directory, dirPerm); err != nil {
@@ -27,7 +25,7 @@ func JSONWrite(valuteCurs valuteinfo.ValuteCurs, outputFile string, dirPerm os.F
 		}
 	}()
 
-	jsonData, err := json.MarshalIndent(valuteCurs.Valutes, "", " ")
+	jsonData, err := json.MarshalIndent(data, "", " ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal JSON: %w", err)
 	}

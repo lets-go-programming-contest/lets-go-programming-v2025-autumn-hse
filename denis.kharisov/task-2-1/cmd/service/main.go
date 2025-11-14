@@ -92,7 +92,7 @@ func main() {
 			}
 
 			if result, err := tempRange.optimalTemperature(operationType, temperature); err != nil {
-				if (errors.Is(err, errInvalidRange)) {
+				if errors.Is(err, errInvalidRange) {
 					fmt.Println("-1")
 				} else {
 					fmt.Printf("Error: %v\n", err)

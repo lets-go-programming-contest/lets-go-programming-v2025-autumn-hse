@@ -31,7 +31,7 @@ func main() {
 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
 	})
 
-	if err := jsonwriter.JSONWrite(valCurs, cfg.OutputFile, dirPerm); err != nil {
+	if err := jsonwriter.JSONWrite(valCurs.Valutes, cfg.OutputFile, dirPerm); err != nil {
 		panic(err)
 	}
 }

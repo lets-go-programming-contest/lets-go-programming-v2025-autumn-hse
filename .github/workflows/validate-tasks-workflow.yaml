@@ -113,6 +113,8 @@ jobs:
       - name: Prepare environment
         uses: ./.github/actions/prepare
       - name: Download artifacts from build job
+        # if artifacts not exists - continue.
+        continue-on-error: true   
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts

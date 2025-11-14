@@ -28,5 +28,9 @@ func XMLParse(inputxml string, data any) error {
 	decoder := xml.NewDecoder(reader)
 	decoder.CharsetReader = charset.NewReaderLabel
 
-	return decoder.Decode(data)
+	if err := decoder.Decode(data); err != nil {
+		return fmt.Errorf("decode XML: %w", err)
+	}
+
+	return nil
 }

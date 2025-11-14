@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sync"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -22,7 +21,6 @@ type DefaultConveyer struct {
 	input    map[string]chan string
 	output   map[string]chan string
 	handlers []handler
-	mu       sync.Mutex
 }
 
 var ErrChanNotFound = errors.New("chan not found")
@@ -33,11 +31,12 @@ func New(size int) *DefaultConveyer {
 		input:    make(map[string]chan string),
 		output:   make(map[string]chan string),
 		handlers: make([]handler, 0),
-		mu:       sync.Mutex{},
 	}
 }
 
 func (c *DefaultConveyer) Run(ctx context.Context) error {
+	defer c.close()
+
 	errGroup, errGroupCtx := errgroup.WithContext(ctx)
 
 	for _, handler := range c.handlers {
@@ -52,16 +51,6 @@ func (c *DefaultConveyer) Run(ctx context.Context) error {
 
 	err := errGroup.Wait()
 
-	for key, ch := range c.output {
-		if _, ok := c.input[key]; !ok {
-			close(ch)
-		}
-	}
-
-	for _, ch := range c.input {
-		close(ch)
-	}
-
 	//nolint:wrapcheck // errgorup.Wait return errors from handlers
 	return err
 }
@@ -69,7 +58,7 @@ func (c *DefaultConveyer) Run(ctx context.Context) error {
 func (c *DefaultConveyer) Send(input string, data string) error {
 	channel, ok := c.input[input]
 	if !ok {
-		return fmt.Errorf("str %q: %w", input, ErrChanNotFound)
+		return fmt.Errorf("channel %q: %w", input, ErrChanNotFound)
 	}
 	channel <- data
 
@@ -80,7 +69,7 @@ func (c *DefaultConveyer) Recv(output string) (string, error) {
 	//nolint:varnamelen // ok is classic name
 	channel, ok := c.output[output]
 	if !ok {
-		return "", fmt.Errorf("str %q: %w", output, ErrChanNotFound)
+		return "", fmt.Errorf("channel %q: %w", output, ErrChanNotFound)
 	}
 
 	res, ok := <-channel
@@ -131,4 +120,16 @@ func (c *DefaultConveyer) createChanIfNotExists(key string) chan string {
 	}
 
 	return channel
+}
+
+func (c *DefaultConveyer) close() {
+	for key, ch := range c.output {
+		if _, ok := c.input[key]; !ok {
+			close(ch)
+		}
+	}
+
+	for _, ch := range c.input {
+		close(ch)
+	}
 }

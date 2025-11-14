@@ -132,8 +132,6 @@ jobs:
           echo $BUILD_BIN
           echo $SOURCE_DIR
           echo #STATIC_DIR
-      - name: Ls -la
-        run: ls -la && ls -la bin && id
       - name: Run tests with build artifacts
         run: |
           lgp-validator module test \

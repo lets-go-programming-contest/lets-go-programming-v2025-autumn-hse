@@ -38,12 +38,28 @@ func (c *DefaultConveyer) Run(ctx context.Context) error {
 	errGroup, errGroupCtx := errgroup.WithContext(ctx)
 
 	for _, handler := range c.handlers {
+		h := handler
 		errGroup.Go(func() error {
-			return handler.run(errGroupCtx)
+			err := h.run(errGroupCtx)
+			return err
 		})
 	}
 
-	return errGroup.Wait()
+	err := errGroup.Wait()
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	for key, ch := range c.input {
+		if _, ok := c.output[key]; !ok {
+			close(ch)
+		}
+	}
+	for _, ch := range c.output {
+		close(ch)
+	}
+
+	return err
 }
 
 func (c *DefaultConveyer) Send(input string, data string) error {
@@ -74,33 +90,39 @@ func (c *DefaultConveyer) Recv(output string) (string, error) {
 }
 
 func (c *DefaultConveyer) RegisterDecorator(fn DecoratorFunc, input string, output string) {
-	inCh := createChanIfNotExists(c.input, input, c.size)
-	outCh := createChanIfNotExists(c.output, output, c.size)
+	inCh := c.createChanIfNotExists(input)
+	outCh := c.createChanIfNotExists(output)
 	c.handlers = append(c.handlers, &decorator{fn: fn, input: inCh, output: outCh})
 }
 
 func (c *DefaultConveyer) RegisterMultiplexer(fn MultiplexerFunc, inputs []string, output string) {
 	inChs := make([]chan string, len(inputs))
 	for i, input := range inputs {
-		inChs[i] = createChanIfNotExists(c.input, input, c.size)
+		inChs[i] = c.createChanIfNotExists(input)
 	}
-	outCh := createChanIfNotExists(c.output, output, c.size)
+	outCh := c.createChanIfNotExists(output)
 	c.handlers = append(c.handlers, &multiplexer{fn: fn, input: inChs, output: outCh})
 }
 
 func (c *DefaultConveyer) RegisterSeparator(fn SeparatorFunc, input string, outputs []string) {
-	inCh := createChanIfNotExists(c.input, input, c.size)
+	inCh := c.createChanIfNotExists(input)
 	outChs := make([]chan string, len(outputs))
 	for i, output := range outputs {
-		outChs[i] = createChanIfNotExists(c.output, output, c.size)
+		outChs[i] = c.createChanIfNotExists(output)
 	}
 	c.handlers = append(c.handlers, &separator{fn: fn, input: inCh, output: outChs})
 }
 
-func createChanIfNotExists(container map[string]chan string, key string, size int) chan string {
-	ch, ok := container[key]
+func (c *DefaultConveyer) createChanIfNotExists(key string) chan string {
+	ch, ok := c.input[key]
 	if !ok {
-		ch = make(chan string, size)
+		ch, ok = c.output[key]
+		if !ok {
+			ch = make(chan string, c.size)
+			c.output[key] = ch
+		}
+		c.input[key] = ch
 	}
+
 	return ch
 }

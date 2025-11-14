@@ -67,7 +67,6 @@ func (c *DefaultConveyer) Run(ctx context.Context) error {
 }
 
 func (c *DefaultConveyer) Send(input string, data string) error {
-
 	channel, ok := c.input[input]
 	if !ok {
 		return fmt.Errorf("str %q: %w", input, ErrChanNotFound)
@@ -78,7 +77,6 @@ func (c *DefaultConveyer) Send(input string, data string) error {
 }
 
 func (c *DefaultConveyer) Recv(output string) (string, error) {
-
 	//nolint:varnamelen // ok is classic name
 	channel, ok := c.output[output]
 	if !ok {

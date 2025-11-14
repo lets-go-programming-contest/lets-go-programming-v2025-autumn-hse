@@ -30,8 +30,10 @@ func XMLParse(inputxml string) (valuteinfo.ValuteCurs, error) {
 
 	decoder := xml.NewDecoder(reader)
 	decoder.CharsetReader = charset.NewReaderLabel
+
 	if err := decoder.Decode(&valuteCur); err != nil {
 		return valuteinfo.ValuteCurs{}, fmt.Errorf("unmarshal xml: %w", err)
 	}
+
 	return valuteCur, nil
 }

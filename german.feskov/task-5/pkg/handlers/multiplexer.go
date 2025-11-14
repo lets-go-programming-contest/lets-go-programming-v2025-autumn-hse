@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 )
 
@@ -17,13 +16,11 @@ func MultiplexerFunc(
 	output chan string,
 ) error {
 	for closedChan := 0; closedChan != len(inputs); {
-
 		for _, ch := range inputs {
 			select {
 			case <-ctx.Done():
 				return nil
 			case data, ok := <-ch:
-				fmt.Println(data)
 				if !ok {
 					closedChan++
 
@@ -40,5 +37,6 @@ func MultiplexerFunc(
 			}
 		}
 	}
+
 	return nil
 }

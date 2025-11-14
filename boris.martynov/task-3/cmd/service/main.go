@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"sort"
 
 	"github.com/JingolBong/task-3/internal/config"
@@ -8,13 +9,18 @@ import (
 	"github.com/JingolBong/task-3/internal/xmlparser"
 )
 
+const dirPerm = 0o755
+
 func main() {
-	cfg, err := config.ConfigLoader()
+	configPath := flag.String("config", "config.yaml", "config file path")
+	flag.Parse()
+
+	cfg, err := config.ConfigLoader(*configPath)
 	if err != nil {
 		panic(err)
 	}
 
-	valCurs, err := xmlparser.Xmlparser(cfg.InputFile)
+	valCurs, err := xmlparser.XMLParse(cfg.InputFile)
 	if err != nil {
 		panic(err)
 	}
@@ -23,7 +29,7 @@ func main() {
 		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
 	})
 
-	if err := jsonwriter.Jsonwrite(valCurs, cfg.OutputFile); err != nil {
+	if err := jsonwriter.JSONWrite(valCurs, cfg.OutputFile, dirPerm); err != nil {
 		panic(err)
 	}
 }

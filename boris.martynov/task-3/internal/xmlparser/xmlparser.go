@@ -12,7 +12,7 @@ import (
 	"golang.org/x/text/encoding/charmap"
 )
 
-func Xmlparser(inputxml string) (valuteinfo.ValuteCurs, error) {
+func XMLParse(inputxml string) (valuteinfo.ValuteCurs, error) {
 	var valuteCur valuteinfo.ValuteCurs
 
 	xmlFile, err := os.Open(inputxml)

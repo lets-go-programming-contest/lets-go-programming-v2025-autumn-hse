@@ -9,9 +9,7 @@ import (
 	"github.com/JingolBong/task-3/internal/valuteinfo"
 )
 
-const dirPerm = 0o755
-
-func Jsonwrite(valuteCurs valuteinfo.ValuteCurs, outputFile string) error {
+func JSONWrite(valuteCurs valuteinfo.ValuteCurs, outputFile string, dirPerm os.FileMode) error {
 	directory := filepath.Dir(outputFile)
 
 	if err := os.MkdirAll(directory, dirPerm); err != nil {

@@ -1,7 +1,6 @@
 package config
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
@@ -13,11 +12,8 @@ type Config struct {
 	OutputFile string `yaml:"output-file"`
 }
 
-func ConfigLoader() (Config, error) {
-	configPath := flag.String("config", "config.yaml", "config file path")
-	flag.Parse()
-
-	configData, err := os.ReadFile(*configPath)
+func ConfigLoader(configPath string) (Config, error) {
+	configData, err := os.ReadFile(configPath)
 	if err != nil {
 		return Config{}, fmt.Errorf("while reading config file: %w", err)
 	}

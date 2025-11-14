@@ -25,7 +25,7 @@ type DefaultConveyer struct {
 	mu       sync.Mutex
 }
 
-var ErrChanNotFound = errors.New("chan no found")
+var ErrChanNotFound = errors.New("chan not found")
 
 func New(size int) *DefaultConveyer {
 	//nolint:exhaustruct // sync.Mutex dont need to initialize

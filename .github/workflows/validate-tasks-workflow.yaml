@@ -113,15 +113,15 @@ jobs:
       - name: Prepare environment
         uses: ./.github/actions/prepare
       - name: Download artifacts from build job
-        # if artifacts not exists - continue.
+        # if artifacts not exist - continue.
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
           path: bin
       - name: Make bin executable
-        run: |
-          [[ -d bin ]] && chmod +x bin/*
+        # if artifacts not exist - continue.
+        run: chmod +x bin/* || true
       - name: Export env variables
         run: |
           echo "BUILD_BIN=${GITHUB_WORKSPACE}/bin" >> $GITHUB_ENV

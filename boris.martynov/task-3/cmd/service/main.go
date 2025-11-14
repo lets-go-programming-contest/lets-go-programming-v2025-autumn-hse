@@ -22,9 +22,8 @@ func main() {
 	}
 
 	var valCurs valuteinfo.ValuteCurs
-	err = xmlparser.XMLParse(cfg.InputFile, &valCurs)
 
-	if err != nil {
+	if err := xmlparser.XMLParse(cfg.InputFile, &valCurs); err != nil {
 		panic(err)
 	}
 

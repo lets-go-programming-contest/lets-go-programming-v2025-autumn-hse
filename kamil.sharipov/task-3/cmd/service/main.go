@@ -31,7 +31,7 @@ func main() {
 
 	sortValCurs(valCurs.Valutes)
 
-	err = jsonutil.WriteOutput(cfg.OutputFile, valCurs)
+	err = jsonutil.WriteOutput(cfg.OutputFile, valCurs.Valutes)
 	panicOnErr(err)
 }
 

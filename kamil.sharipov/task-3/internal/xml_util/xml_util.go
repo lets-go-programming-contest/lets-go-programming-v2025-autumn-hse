@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"os"
 
 	"golang.org/x/net/html/charset"
 )
@@ -14,26 +15,23 @@ var (
 	ErrWrongRoot = errors.New("XML root element name mismatch")
 )
 
-func ParseElements[T any](xmlData []byte, rootName, elementName string) ([]T, error) {
-	xmlDecoder := xml.NewDecoder(bytes.NewReader(xmlData))
-	xmlDecoder.CharsetReader = charset.NewReaderLabel
-
-	var temp struct {
-		XMLName  xml.Name `xml:""`
-		Elements []T      `xml:",any"`
+func ReadXMLFile[T any](path string) (*T, error) {
+	if _, err := os.Stat(path); err != nil {
+		return nil, fmt.Errorf("failed to stat file %q: %w", path, err)
 	}
 
-	if err := xmlDecoder.Decode(&temp); err != nil {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file %q: %w", path, err)
+	}
+
+	xmlDecoder := xml.NewDecoder(bytes.NewReader(data))
+	xmlDecoder.CharsetReader = charset.NewReaderLabel
+
+	var result T
+	if err := xmlDecoder.Decode(&result); err != nil {
 		return nil, fmt.Errorf("failed to decode XML: %w", err)
 	}
 
-	if temp.XMLName.Local != rootName {
-		return nil, ErrWrongRoot
-	}
-
-	if len(temp.Elements) == 0 {
-		return nil, ErrEmpty
-	}
-
-	return temp.Elements, nil
+	return &result, nil
 }

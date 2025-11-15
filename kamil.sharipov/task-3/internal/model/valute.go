@@ -9,6 +9,12 @@ import (
 
 type ValuteValue float64
 
+type Valute struct {
+	NumCode  int         `json:"num_code"  xml:"NumCode"`
+	CharCode string      `json:"char_code" xml:"CharCode"`
+	Value    ValuteValue `json:"value"     xml:"Value"`
+}
+
 func (v *ValuteValue) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var str string
 	if err := d.DecodeElement(&str, &start); err != nil {
@@ -25,10 +31,4 @@ func (v *ValuteValue) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 	*v = ValuteValue(value)
 
 	return nil
-}
-
-type Valute struct {
-	NumCode  int         `json:"num_code"  xml:"NumCode"`
-	CharCode string      `json:"char_code" xml:"CharCode"`
-	Value    ValuteValue `json:"value"     xml:"Value"`
 }

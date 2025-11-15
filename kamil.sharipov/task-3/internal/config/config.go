@@ -37,7 +37,9 @@ func LoadConfig(path string) (Config, error) {
 	}
 
 	defer func() {
-		_ = file.Close()
+		if ferr := file.Close(); ferr != nil {
+			panic(fmt.Errorf("close file %q: %w", path, err))
+		}
 	}()
 
 	var config Config

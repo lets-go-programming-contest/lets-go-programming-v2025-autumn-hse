@@ -26,7 +26,7 @@ func main() {
 	cfg, err := loadConfig(configPath)
 	panicOnErr(err)
 
-	valCurs, err := xmlutil.ReadXMLFile[ValCurs](cfg.InputFile)
+	valCurs, err := xmlutil.ReadInput[ValCurs](cfg.InputFile)
 	panicOnErr(err)
 
 	sortValCurs(valCurs.Valutes)

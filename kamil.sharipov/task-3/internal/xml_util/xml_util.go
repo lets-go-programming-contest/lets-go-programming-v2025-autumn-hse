@@ -15,7 +15,7 @@ var (
 	ErrWrongRoot = errors.New("XML root element name mismatch")
 )
 
-func ReadXMLFile[T any](path string) (*T, error) {
+func ReadInput[T any](path string) (*T, error) {
 	if _, err := os.Stat(path); err != nil {
 		return nil, fmt.Errorf("failed to stat file %q: %w", path, err)
 	}

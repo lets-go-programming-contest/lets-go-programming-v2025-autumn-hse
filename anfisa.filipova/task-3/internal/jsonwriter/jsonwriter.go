@@ -7,12 +7,10 @@ import (
 	"path/filepath"
 )
 
-const fileOpenPermission = 0o755
-
-func WriteFileJSON(value any, filePath string) error {
+func WriteFileJSON(value any, filePath string, fileMode os.FileMode) error {
 	dir := filepath.Dir(filePath)
 
-	err := os.MkdirAll(dir, fileOpenPermission)
+	err := os.MkdirAll(dir, fileMode)
 	if err != nil {
 		return fmt.Errorf("error creating directory: %w", err)
 	}

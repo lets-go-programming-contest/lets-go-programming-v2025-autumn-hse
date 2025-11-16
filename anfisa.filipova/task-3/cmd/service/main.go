@@ -11,6 +11,8 @@ import (
 	"github.com/Anfisa111/task-3/internal/xmlreader"
 )
 
+const fileOpenPermission = 0o755
+
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -18,16 +20,12 @@ func main() {
 		}
 	}()
 
-	configPath := flag.String("config", "", "Path to configuration file")
+	configPath := flag.String("config", "config.yaml", "Path to configuration file")
 	flag.Parse()
 
 	config, err := config.LoadConfigYAML(*configPath)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot load config yaml: %v", err))
-	}
-
-	if _, err := os.Stat(config.InputFile); os.IsNotExist(err) {
-		panic(fmt.Sprintf("Inputfile is not existing: %v", err))
 	}
 
 	var valCurs valutes.ValCurs
@@ -40,7 +38,7 @@ func main() {
 	currencies := valCurs.Valutes
 	valutes.SortValutes(currencies)
 
-	err = jsonwriter.WriteFileJSON(currencies, config.OutputFile)
+	err = jsonwriter.WriteFileJSON(currencies, config.OutputFile, fileOpenPermission)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot write currencies to JSON: %v", err))
 	}

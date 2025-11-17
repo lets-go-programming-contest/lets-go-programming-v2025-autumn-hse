@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"sort"
 
 	"github.com/kef1rch1k/task-3/internal/config"
 	"github.com/kef1rch1k/task-3/internal/jsonwriter"
@@ -22,10 +23,14 @@ func main() {
 		panic(fmt.Sprintf("Failed to load config: %v", err))
 	}
 
-	valutes, err := parser.ParseAndSortXML(cfg.InputFile)
+	valutes, err := parser.ParseXML(cfg.InputFile)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to parse XML: %v", err))
 	}
+
+	sort.Slice(valutes, func(i, j int) bool {
+		return valutes[i].Value > valutes[j].Value
+	})
 
 	err = jsonwriter.WriteToFile(valutes, cfg.OutputFile)
 	if err != nil {

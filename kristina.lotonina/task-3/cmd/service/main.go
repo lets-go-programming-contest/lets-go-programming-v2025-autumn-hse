@@ -7,6 +7,7 @@ import (
 
 	"github.com/kef1rch1k/task-3/internal/config"
 	"github.com/kef1rch1k/task-3/internal/jsonwriter"
+	"github.com/kef1rch1k/task-3/internal/models"
 	"github.com/kef1rch1k/task-3/internal/parser"
 )
 
@@ -23,10 +24,14 @@ func main() {
 		panic(fmt.Sprintf("Failed to load config: %v", err))
 	}
 
-	valutes, err := parser.ParseXML(cfg.InputFile)
+	var valCurs models.ValCurs
+
+	err = parser.ParseXML(cfg.InputFile, &valCurs)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to parse XML: %v", err))
 	}
+
+	valutes := valCurs.Valutes
 
 	sort.Slice(valutes, func(i, j int) bool {
 		return valutes[i].Value > valutes[j].Value

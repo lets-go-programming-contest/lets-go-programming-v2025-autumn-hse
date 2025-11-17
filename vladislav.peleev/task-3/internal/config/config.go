@@ -5,9 +5,8 @@ import (
 	"io"
 	"os"
 
-	"gopkg.in/yaml.v3"
-
 	"github.com/VlasfimosY/task-3/internal/models"
+	"gopkg.in/yaml.v3"
 )
 
 func Load(configPath *string) (*models.Config, error) {

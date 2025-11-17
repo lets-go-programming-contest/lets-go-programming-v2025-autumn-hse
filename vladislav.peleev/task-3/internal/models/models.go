@@ -33,5 +33,6 @@ func GetCharsetReader(charset string, input io.Reader) (io.Reader, error) {
 	if charset == "windows-1251" {
 		return charmap.Windows1251.NewDecoder().Reader(input), nil
 	}
+
 	return input, nil
 }

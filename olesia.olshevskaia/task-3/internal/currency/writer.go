@@ -1,6 +1,8 @@
 package currency
 
 import (
+	"fmt"
+
 	"github.com/Olesia.Ol/task-3/internal/jsonutil"
 	"github.com/Olesia.Ol/task-3/internal/model"
 )
@@ -11,5 +13,8 @@ const (
 )
 
 func WriteJSON(outputFile string, currencies []model.Currency) error {
-	return jsonutil.WriteOutput(outputFile, currencies, dirPerm, filePerm)
+	if err := jsonutil.WriteOutput(outputFile, currencies, dirPerm, filePerm); err != nil {
+		return fmt.Errorf("failed to write output to %q: %w", outputFile, err)
+	}
+	return nil
 }

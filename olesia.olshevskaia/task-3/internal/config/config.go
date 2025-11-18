@@ -19,5 +19,12 @@ func Load(path string) (model.Config, error) {
 		return model.Config{}, fmt.Errorf("failed to parse yaml config %q: %w", path, err)
 	}
 
+	if cfg.InputFile == "" {
+		return model.Config{}, fmt.Errorf("input_file is empty")
+	}
+	if cfg.OutputFile == "" {
+		return model.Config{}, fmt.Errorf("output_file is empty")
+	}
+
 	return cfg, nil
 }

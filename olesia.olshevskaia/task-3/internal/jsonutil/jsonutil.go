@@ -7,18 +7,18 @@ import (
 	"path/filepath"
 )
 
-func ParseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) error {
+func WriteOutput[T any](outputPath string, data T, dirmode, filemode os.FileMode) error {
 	outputJSON, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	if err := os.MkdirAll(filepath.Dir(outputFile), dirmode); err != nil {
-		return fmt.Errorf("error creating directory: %w", err)
+	if err := os.MkdirAll(filepath.Dir(outputPath), dirmode); err != nil {
+		return fmt.Errorf("error creating directory for %q: %w", outputPath, err)
 	}
 
-	if err := os.WriteFile(outputFile, outputJSON, filemode); err != nil {
-		return fmt.Errorf("error writing output file: %w", err)
+	if err := os.WriteFile(outputPath, outputJSON, filemode); err != nil {
+		return fmt.Errorf("error writing output file %q: %w", outputPath, err)
 	}
 
 	return nil

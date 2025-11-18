@@ -14,6 +14,18 @@ var (
 	ErrOutputFileEmpty = errors.New("output_file is empty")
 )
 
+func validateConfig(cfg model.Config) error {
+	if cfg.InputFile == "" {
+		return ErrInputFileEmpty
+	}
+
+	if cfg.OutputFile == "" {
+		return ErrOutputFileEmpty
+	}
+
+	return nil
+}
+
 func Load(path string) (model.Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -25,12 +37,8 @@ func Load(path string) (model.Config, error) {
 		return model.Config{}, fmt.Errorf("failed to parse yaml config %q: %w", path, err)
 	}
 
-	if cfg.InputFile == "" {
-		return model.Config{}, ErrInputFileEmpty
-	}
-
-	if cfg.OutputFile == "" {
-		return model.Config{}, ErrOutputFileEmpty
+	if err := validateConfig(cfg); err != nil {
+		return model.Config{}, err
 	}
 
 	return cfg, nil

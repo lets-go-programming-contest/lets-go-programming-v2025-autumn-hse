@@ -8,22 +8,33 @@ import (
 )
 
 const (
-	DirPerm  = 0o755
-	FilePerm = 0o644
+	DirPerm = 0o755
 )
 
 func ParseJSON[T any](outputPath string, data T) error {
-	bytes, err := json.MarshalIndent(data, "", "  ")
+	bytes, err := json.Marshal(data)
 	if err != nil {
 		return fmt.Errorf("failed to marshal data to JSON: %w", err)
 	}
 
-	dir := filepath.Dir(outputPath)
-	if err := os.MkdirAll(dir, DirPerm); err != nil {
-		return fmt.Errorf("failed to create output directory %q: %w", dir, err)
+	err = os.MkdirAll(filepath.Dir(outputPath), DirPerm)
+	if err != nil {
+		return fmt.Errorf("failed to create output directory for %q: %w", outputPath, err)
 	}
 
-	if err := os.WriteFile(outputPath, bytes, FilePerm); err != nil {
+	outputFile, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to create output file %q: %w", outputPath, err)
+	}
+
+	defer func() {
+		if ferr := outputFile.Close(); ferr != nil {
+			panic(fmt.Errorf("close file %q: %w", outputPath, err))
+		}
+	}()
+
+	_, err = outputFile.Write(bytes)
+	if err != nil {
 		return fmt.Errorf("failed to write to %q: %w", outputPath, err)
 	}
 

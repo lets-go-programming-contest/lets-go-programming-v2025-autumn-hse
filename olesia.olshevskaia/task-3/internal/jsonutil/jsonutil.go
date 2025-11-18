@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	DirPerm  = os.ModePerm
+	DirPerm  = 0o755
 	FilePerm = 0o644
 )
 

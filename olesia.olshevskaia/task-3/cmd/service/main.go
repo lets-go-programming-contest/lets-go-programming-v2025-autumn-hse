@@ -9,6 +9,10 @@ import (
 	"github.com/Olesia.Ol/task-3/internal/model"
 )
 
+type ValCurs struct {
+	Valutes []model.Currency `xml:"Valute"`
+}
+
 func main() {
 	configPath := flag.String("config", "config.yaml", "Path to YAML config file")
 	flag.Parse()
@@ -19,11 +23,13 @@ func main() {
 		return
 	}
 
-	currencies, err := currency.Read[model.Currency](cfg.InputFile, "Valute")
+	valCurs, err := currency.Read[ValCurs](cfg.InputFile)
 	if err != nil {
 		fmt.Println("Cannot read currencies:", err)
 		return
 	}
+
+	currencies := valCurs.Valutes
 
 	currency.Sort(currencies)
 

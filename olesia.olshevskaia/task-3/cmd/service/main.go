@@ -37,4 +37,5 @@ func main() {
 		fmt.Println("Cannot write JSON file:", err)
 		return
 	}
+
 }

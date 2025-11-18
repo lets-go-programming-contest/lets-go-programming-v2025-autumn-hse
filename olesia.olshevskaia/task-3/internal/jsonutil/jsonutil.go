@@ -7,30 +7,18 @@ import (
 	"path/filepath"
 )
 
-func WriteOutput[T any](outputPath string, data T) error {
-	bytes, err := json.MarshalIndent(data, "", "  ")
+func WriteOutput[T any](outputPath string, data T, dirmode, filemode os.FileMode) error {
+	outputJSON, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to marshal data to JSON: %w", err)
+		return fmt.Errorf("error marshaling JSON: %w", err)
 	}
 
-	absPath, err := filepath.Abs(outputPath)
-	if err != nil {
-		return fmt.Errorf("failed to get absolute path for %q: %w", outputPath, err)
+	if err := os.MkdirAll(filepath.Dir(outputPath), dirmode); err != nil {
+		return fmt.Errorf("error creating directory for %q: %w", outputPath, err)
 	}
 
-	dir := filepath.Dir(absPath)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return fmt.Errorf("failed to create output directory %q: %w", dir, err)
-	}
-
-	file, err := os.Create(absPath)
-	if err != nil {
-		return fmt.Errorf("failed to create output file %q: %w", absPath, err)
-	}
-	defer file.Close()
-
-	if _, err := file.Write(bytes); err != nil {
-		return fmt.Errorf("failed to write to %q: %w", absPath, err)
+	if err := os.WriteFile(outputPath, outputJSON, filemode); err != nil {
+		return fmt.Errorf("error writing output file %q: %w", outputPath, err)
 	}
 
 	return nil

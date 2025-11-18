@@ -16,5 +16,6 @@ func WriteJSON(outputFile string, currencies []model.Currency) error {
 	if err := jsonutil.WriteOutput(outputFile, currencies, dirPerm, filePerm); err != nil {
 		return fmt.Errorf("failed to write output to %q: %w", outputFile, err)
 	}
+
 	return nil
 }

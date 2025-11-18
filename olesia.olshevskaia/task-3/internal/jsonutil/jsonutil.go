@@ -13,11 +13,21 @@ func WriteOutput[T any](outputPath string, data T) error {
 		return fmt.Errorf("failed to marshal data to JSON: %w", err)
 	}
 
-	if err := os.MkdirAll(filepath.Dir(outputPath), 0o755); err != nil {
-		return fmt.Errorf("failed to create output directory for %q: %w", outputPath, err)
+	dir := filepath.Dir(outputPath)
+	if dir != "" && dir != "." {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return fmt.Errorf("failed to create output directory for %q: %w", outputPath, err)
+		}
 	}
 
-	if err := os.WriteFile(outputPath, bytes, 0o644); err != nil {
+	outputFile, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to create output file %q: %w", outputPath, err)
+	}
+	defer outputFile.Close()
+
+	_, err = outputFile.Write(bytes)
+	if err != nil {
 		return fmt.Errorf("failed to write to %q: %w", outputPath, err)
 	}
 

@@ -10,10 +10,6 @@ import (
 )
 
 func Read[T any](path string) (*T, error) {
-	if _, err := os.Stat(path); err != nil {
-		return nil, fmt.Errorf("failed to stat file %q: %w", path, err)
-	}
-
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file %q: %w", path, err)

@@ -12,25 +12,19 @@ const (
 	FilePerm = 0o644
 )
 
-func ParseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) error {
-	absPath, err := filepath.Abs(outputFile)
+func ParseJSON[T any](outputPath string, data T) error {
+	bytes, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		return fmt.Errorf("cannot get absolute path for %q: %w", outputFile, err)
+		return fmt.Errorf("failed to marshal data to JSON: %w", err)
 	}
 
-	dir := filepath.Dir(absPath)
-
-	if err := os.MkdirAll(dir, dirmode); err != nil {
-		return fmt.Errorf("cannot create directory %q: %w", dir, err)
+	dir := filepath.Dir(outputPath)
+	if err := os.MkdirAll(dir, DirPerm); err != nil {
+		return fmt.Errorf("failed to create output directory %q: %w", dir, err)
 	}
 
-	outputJSON, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return fmt.Errorf("error marshaling JSON: %w", err)
-	}
-
-	if err := os.WriteFile(absPath, outputJSON, filemode); err != nil {
-		return fmt.Errorf("error writing output file %q: %w", absPath, err)
+	if err := os.WriteFile(outputPath, bytes, FilePerm); err != nil {
+		return fmt.Errorf("failed to write to %q: %w", outputPath, err)
 	}
 
 	return nil

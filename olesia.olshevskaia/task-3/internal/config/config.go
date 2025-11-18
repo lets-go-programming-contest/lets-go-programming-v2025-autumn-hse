@@ -1,11 +1,17 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/Olesia.Ol/task-3/internal/model"
 	"gopkg.in/yaml.v3"
+)
+
+var (
+	ErrInputFileEmpty  = errors.New("input_file is empty")
+	ErrOutputFileEmpty = errors.New("output_file is empty")
 )
 
 func Load(path string) (model.Config, error) {
@@ -20,10 +26,11 @@ func Load(path string) (model.Config, error) {
 	}
 
 	if cfg.InputFile == "" {
-		return model.Config{}, fmt.Errorf("input_file is empty")
+		return model.Config{}, ErrInputFileEmpty
 	}
+
 	if cfg.OutputFile == "" {
-		return model.Config{}, fmt.Errorf("output_file is empty")
+		return model.Config{}, ErrOutputFileEmpty
 	}
 
 	return cfg, nil

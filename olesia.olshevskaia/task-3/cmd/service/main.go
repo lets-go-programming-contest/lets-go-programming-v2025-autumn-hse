@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/Olesia.Ol/task-3/internal/config"
 	"github.com/Olesia.Ol/task-3/internal/currency"
@@ -14,17 +15,20 @@ func main() {
 
 	cfg, err := config.Load(*configPath)
 	if err != nil {
-		panic("Cannot load config: " + err.Error())
+		fmt.Println("Cannot load config:", err)
+		return
 	}
 
 	currencies, err := currency.Read[model.Currency](cfg.InputFile, "Valute")
 	if err != nil {
-		panic("Cannot read currencies: " + err.Error())
+		fmt.Println("Cannot read currencies:", err)
+		return
 	}
 
 	currency.Sort(currencies)
 
 	if err := currency.WriteJSON(cfg.OutputFile, currencies); err != nil {
-		panic("Cannot write JSON file: " + err.Error())
+		fmt.Println("Cannot write JSON file:", err)
+		return
 	}
 }

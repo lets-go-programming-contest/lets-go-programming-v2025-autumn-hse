@@ -6,5 +6,5 @@ import (
 )
 
 func WriteJSON(outputFile string, currencies []model.Currency) error {
-	return parseJSON(outputFile, currencies, jsonutil.DirPerm, jsonutil.FilePerm)
+	return jsonutil.ParseJSON(outputFile, currencies, jsonutil.DirPerm, jsonutil.FilePerm)
 }

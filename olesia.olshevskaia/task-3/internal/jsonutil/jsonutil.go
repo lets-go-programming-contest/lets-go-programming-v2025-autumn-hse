@@ -12,7 +12,7 @@ const (
 	FilePerm = 0o644
 )
 
-func parseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) error {
+func ParseJSON[T any](outputFile string, data T, dirmode, filemode os.FileMode) error {
 	outputJSON, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return fmt.Errorf("error marshaling JSON: %w", err)

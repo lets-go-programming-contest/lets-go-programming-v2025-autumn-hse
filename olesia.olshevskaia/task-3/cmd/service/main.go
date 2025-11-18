@@ -22,11 +22,9 @@ func main() {
 		panic("Cannot read currencies: " + err.Error())
 	}
 
-	currencies := valCurs.Currencies
+	currency.Sort(valCurs.Currencies)
 
-	currency.Sort(currencies)
-
-	if err := currency.WriteJSON(cfg.OutputFile, currencies); err != nil {
+	if err := currency.WriteJSON(cfg.OutputFile, valCurs.Currencies); err != nil {
 		panic("Cannot write JSON file: " + err.Error())
 	}
 }

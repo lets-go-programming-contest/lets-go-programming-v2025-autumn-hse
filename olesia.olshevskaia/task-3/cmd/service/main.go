@@ -17,12 +17,12 @@ func main() {
 		panic("Cannot load config: " + err.Error())
 	}
 
-	rates, err := currency.Read[model.CurrencyRates](cfg.InputFile)
+	valCurs, err := currency.Read[model.ValCurs](cfg.InputFile)
 	if err != nil {
 		panic("Cannot read currencies: " + err.Error())
 	}
 
-	currencies := rates.Currencies
+	currencies := valCurs.Currencies
 
 	currency.Sort(currencies)
 

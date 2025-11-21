@@ -38,6 +38,19 @@ type handler struct {
 var ErrChanNotFound = errors.New("chan not found")
 
 func (c *conveyer) Run(ctx context.Context) error {
+	c.mutex.Lock()
+
+	for _, h := range c.handlers {
+		for _, input := range h.inputs {
+			c.getChannel(input)
+		}
+
+		for _, output := range h.outputs {
+			c.getChannel(output)
+		}
+	}
+	c.mutex.Unlock()
+
 	eg, ctx := errgroup.WithContext(ctx)
 
 	for _, h := range c.handlers {
@@ -85,7 +98,13 @@ func (c *conveyer) Run(ctx context.Context) error {
 }
 
 func (c *conveyer) Send(input string, data string) error {
-	channel := c.getChannel(input)
+	c.mutex.Lock()
+	channel, exists := c.channels[input]
+	c.mutex.Unlock()
+
+	if !exists {
+		return fmt.Errorf("%w: %s", ErrChanNotFound, input)
+	}
 
 	select {
 	case channel <- data:
@@ -96,7 +115,13 @@ func (c *conveyer) Send(input string, data string) error {
 }
 
 func (c *conveyer) Recv(output string) (string, error) {
-	channel := c.getChannel(output)
+	c.mutex.Lock()
+	channel, exists := c.channels[output]
+	c.mutex.Unlock()
+
+	if !exists {
+		return "", fmt.Errorf("%w: %s", ErrChanNotFound, output)
+	}
 
 	select {
 	case data, ok := <-channel:
@@ -124,12 +149,6 @@ func (c *conveyer) RegisterDecorator(
 	input string,
 	output string,
 ) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	c.getChannel(input)
-	c.getChannel(output)
-
 	c.handlers = append(c.handlers, handler{
 		typ:     handlerTypeDecorator,
 		fn:      fn,
@@ -143,14 +162,6 @@ func (c *conveyer) RegisterMultiplexer(
 	inputs []string,
 	output string,
 ) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	for _, input := range inputs {
-		c.getChannel(input)
-	}
-	c.getChannel(output)
-
 	c.handlers = append(c.handlers, handler{
 		typ:     handlerTypeMultiplexer,
 		fn:      fn,
@@ -164,14 +175,6 @@ func (c *conveyer) RegisterSeparator(
 	input string,
 	outputs []string,
 ) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	c.getChannel(input)
-	for _, output := range outputs {
-		c.getChannel(output)
-	}
-
 	c.handlers = append(c.handlers, handler{
 		typ:     handlerTypeSeparator,
 		fn:      fn,

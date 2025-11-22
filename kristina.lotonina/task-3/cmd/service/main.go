@@ -27,13 +27,11 @@ func main() {
 		panic(fmt.Sprintf("Failed to parse XML: %v", err))
 	}
 
-	valutes := valCurs.Valutes
-
-	sort.Slice(valutes, func(i, j int) bool {
-		return valutes[i].Value > valutes[j].Value
+	sort.Slice(valCurs.Valutes, func(i, j int) bool {
+		return valCurs.Valutes[i].Value > valCurs.Valutes[j].Value
 	})
 
-	err = jsonwriter.WriteToFile(valutes, cfg.OutputFile)
+	err = jsonwriter.WriteToFile(valCurs.Valutes, cfg.OutputFile)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to write JSON: %v", err))
 	}

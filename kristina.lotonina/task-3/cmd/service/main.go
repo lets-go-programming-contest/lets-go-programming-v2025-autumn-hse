@@ -12,12 +12,8 @@ import (
 )
 
 func main() {
-	configPath := flag.String("config", "", "Path to config YAML file")
+	configPath := flag.String("config", "config.yaml", "Path to config YAML file")
 	flag.Parse()
-
-	if *configPath == "" {
-		panic("Missing --config flag with path to config file")
-	}
 
 	cfg, err := config.LoadConfig(*configPath)
 	if err != nil {

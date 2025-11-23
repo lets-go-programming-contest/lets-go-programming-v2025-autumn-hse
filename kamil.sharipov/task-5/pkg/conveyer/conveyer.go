@@ -237,3 +237,11 @@ func (c *conveyer) getOrCreateChannel(name string) chan string {
 	}
 	return channel
 }
+
+func New(size int) *conveyer {
+	return &conveyer{
+		channels: make(map[string]chan string),
+		size:     size,
+		handlers: make([]handler, 0),
+	}
+}

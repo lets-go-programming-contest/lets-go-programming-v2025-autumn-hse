@@ -3,6 +3,7 @@ package heap
 type MinHeap []int
 
 func (h *MinHeap) Len() int {
+
 	return len(*h)
 }
 
@@ -10,7 +11,7 @@ func (h *MinHeap) Less(idxI, idxJ int) bool {
 	n := len(*h)
 
 	if idxI < 0 || idxJ < 0 || idxI >= n || idxJ >= n {
-		return false
+		panic("heap: index out of range in Less")
 	}
 
 	return (*h)[idxI] < (*h)[idxJ]
@@ -20,7 +21,7 @@ func (h *MinHeap) Swap(idxI, idxJ int) {
 	n := len(*h)
 
 	if idxI < 0 || idxJ < 0 || idxI >= n || idxJ >= n || idxI == idxJ {
-		return
+		panic("heap: invalid indices in Swap")
 	}
 
 	(*h)[idxI], (*h)[idxJ] = (*h)[idxJ], (*h)[idxI]
@@ -29,6 +30,7 @@ func (h *MinHeap) Swap(idxI, idxJ int) {
 func (h *MinHeap) Push(value any) {
 	v, ok := value.(int)
 	if !ok {
+
 		return
 	}
 
@@ -38,6 +40,7 @@ func (h *MinHeap) Push(value any) {
 func (h *MinHeap) Pop() any {
 	length := len(*h)
 	if length == 0 {
+
 		return nil
 	}
 

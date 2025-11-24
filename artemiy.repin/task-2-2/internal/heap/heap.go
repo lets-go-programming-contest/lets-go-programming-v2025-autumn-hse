@@ -3,7 +3,6 @@ package heap
 type MinHeap []int
 
 func (h *MinHeap) Len() int {
-
 	return len(*h)
 }
 
@@ -28,19 +27,17 @@ func (h *MinHeap) Swap(idxI, idxJ int) {
 }
 
 func (h *MinHeap) Push(value any) {
-	v, ok := value.(int)
+	intValue, ok := value.(int)
 	if !ok {
-
 		return
 	}
 
-	*h = append(*h, v)
+	*h = append(*h, intValue)
 }
 
 func (h *MinHeap) Pop() any {
 	length := len(*h)
 	if length == 0 {
-
 		return nil
 	}
 

@@ -35,7 +35,7 @@ func main() {
 	minHeap := &myheap.MinHeap{}
 	stdheap.Init(minHeap)
 
-	for i := 0; i < heapCount; i++ {
+	for range heapCount {
 		var preferenceScore int
 
 		if _, err := fmt.Fscan(input, &preferenceScore); err != nil {
@@ -57,17 +57,17 @@ func main() {
 
 	if preferredRank < 1 || preferredRank > heapCount {
 		fmt.Println("preferred rank is out of range")
-		
+
 		return
 	}
 
-	for i := 0; i < heapCount-preferredRank; i++ {
-		
+	for range heapCount - preferredRank {
 		if minHeap.Len() == 0 {
 			fmt.Println("heap is empty, cannot pop")
-		
+
 			return
 		}
+
 		stdheap.Pop(minHeap)
 	}
 
@@ -78,19 +78,7 @@ func main() {
 	}
 
 	value := stdheap.Pop(minHeap)
-
-	if value == nil {
-		fmt.Println("got nil from heap")
-
-		return
-	}
-
-	val, ok := value.(int)
-	if !ok {
-		fmt.Println("heap value is not int")
-
-		return
-	}
+	val := value.(int)
 
 	fmt.Println(val)
 }

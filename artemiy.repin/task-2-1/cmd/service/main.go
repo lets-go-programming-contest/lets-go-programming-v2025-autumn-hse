@@ -23,7 +23,7 @@ func main() {
 			return
 		}
 
-		temperature := temp.UpdateTemperature()
+		temperature := temp.NewTemperature(temp.MinBound, temp.MaxBound)
 
 		for range employees {
 			var (
@@ -35,7 +35,10 @@ func main() {
 				fmt.Println("couldn't read temp")
 			}
 
-			temperature.UpdateInterval(operator, val)
+			if err := temperature.UpdateInterval(operator, val); err != nil {
+				fmt.Println("invalid input:", err)
+				return
+			}
 			opt := temperature.GetOptimal()
 			fmt.Println(opt)
 		}

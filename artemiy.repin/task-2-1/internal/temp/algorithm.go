@@ -1,5 +1,7 @@
 package temp
 
+import "fmt"
+
 const (
 	MinBound = 15
 	MaxBound = 30
@@ -10,30 +12,28 @@ type Temperature struct {
 	RightBound int
 }
 
-func UpdateTemperature() Temperature {
-	temperature := Temperature{
-		LeftBound:  MinBound,
-		RightBound: MaxBound,
+func NewTemperature(left, right int) Temperature {
+	return Temperature{
+		LeftBound:  left,
+		RightBound: right,
 	}
-
-	return temperature
 }
 
-func (t *Temperature) UpdateInterval(operator string, value int) {
+func (t *Temperature) UpdateInterval(operator string, value int) error {
 	switch operator {
 	case "<=":
 		if value < t.RightBound {
 			t.RightBound = value
 		}
-
 	case ">=":
 		if value > t.LeftBound {
 			t.LeftBound = value
 		}
-
 	default:
-		return
+		return fmt.Errorf("unsupported operator %q", operator)
 	}
+
+	return nil
 }
 
 func (t *Temperature) GetOptimal() int {

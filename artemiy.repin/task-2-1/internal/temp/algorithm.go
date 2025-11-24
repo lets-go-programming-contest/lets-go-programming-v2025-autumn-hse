@@ -1,6 +1,6 @@
 package temp
 
-import "fmt"
+import "errors"
 
 const (
 	MinBound = 15
@@ -11,6 +11,8 @@ type Temperature struct {
 	LeftBound  int
 	RightBound int
 }
+
+var ErrUnsupportedOperator = errors.New("unsupported operator")
 
 func NewTemperature(left, right int) Temperature {
 	return Temperature{
@@ -30,7 +32,7 @@ func (t *Temperature) UpdateInterval(operator string, value int) error {
 			t.LeftBound = value
 		}
 	default:
-		return fmt.Errorf("unsupported operator %q", operator)
+		return ErrUnsupportedOperator
 	}
 
 	return nil

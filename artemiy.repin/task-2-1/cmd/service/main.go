@@ -37,8 +37,10 @@ func main() {
 
 			if err := temperature.UpdateInterval(operator, val); err != nil {
 				fmt.Println("invalid input:", err)
+
 				return
 			}
+
 			opt := temperature.GetOptimal()
 			fmt.Println(opt)
 		}

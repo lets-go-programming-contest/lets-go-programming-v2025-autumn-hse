@@ -20,7 +20,7 @@ func (h *MinHeap) Less(idxI, idxJ int) bool {
 func (h *MinHeap) Swap(idxI, idxJ int) {
 	n := len(*h)
 
-	if idxI < 0 || idxJ < 0 || idxI >= n || idxJ >= n || idxI == idxJ {
+	if idxI < 0 || idxJ < 0 || idxI >= n || idxJ >= n {
 		panic("heap: invalid indices in Swap")
 	}
 

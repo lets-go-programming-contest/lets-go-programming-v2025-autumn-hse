@@ -7,7 +7,6 @@ import (
 
 	"github.com/VlasfimosY/task-3/internal/config"
 	"github.com/VlasfimosY/task-3/internal/jsonwriter"
-	"github.com/VlasfimosY/task-3/internal/models"
 	"github.com/VlasfimosY/task-3/internal/xmlparser"
 )
 

@@ -28,8 +28,10 @@ func GetCharsetReader(charset string, input io.Reader) (io.Reader, error) {
 }
 
 func DecodeXML(filePath string) ([]models.Currency, error) {
-	var file *os.File
-	var err error
+	var (
+		file *os.File
+		err  error
+	)
 
 	file, err = os.Open(filePath)
 	defer func() {
@@ -64,7 +66,6 @@ func DecodeXML(filePath string) ([]models.Currency, error) {
 		}
 
 		numCode := 0
-
 		if currency.NumCode != "" {
 			if n, err := strconv.Atoi(strings.TrimSpace(currency.NumCode)); err == nil {
 				numCode = n

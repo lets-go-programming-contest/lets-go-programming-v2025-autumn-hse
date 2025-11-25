@@ -16,8 +16,10 @@ func SaveJSON(outputPath string, data any, dirPerm os.FileMode) error {
 		return fmt.Errorf("cannot create directory: %w", err)
 	}
 
-	var file *os.File
-	var err error
+	var (
+		file *os.File
+		err  error
+	)
 
 	file, err = os.Create(outputPath)
 	defer func() {

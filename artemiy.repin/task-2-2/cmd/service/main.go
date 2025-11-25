@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bufio"
 	stdheap "container/heap"
 	"fmt"
-	"os"
 
 	myheap "github.com/Nevermind0911/task-2-2/internal/heap"
 )
@@ -16,9 +14,7 @@ func main() {
 		}
 	}()
 
-	input := bufio.NewReader(os.Stdin)
-
-	minHeap, heapCount, preferredRank, ok := prepareHeap(input)
+	minHeap, heapCount, preferredRank, ok := prepareHeap()
 	if !ok {
 		return
 	}
@@ -30,10 +26,10 @@ func main() {
 	printTop(minHeap)
 }
 
-func prepareHeap(input *bufio.Reader) (*myheap.MinHeap, int, int, bool) {
+func prepareHeap() (*myheap.MinHeap, int, int, bool) {
 	var heapCount int
 
-	if _, err := fmt.Fscan(input, &heapCount); err != nil {
+	if _, err := fmt.Scan(&heapCount); err != nil {
 		fmt.Println("cannot read heap count")
 
 		return nil, 0, 0, false
@@ -51,7 +47,7 @@ func prepareHeap(input *bufio.Reader) (*myheap.MinHeap, int, int, bool) {
 	for range heapCount {
 		var preferenceScore int
 
-		if _, err := fmt.Fscan(input, &preferenceScore); err != nil {
+		if _, err := fmt.Scan(&preferenceScore); err != nil {
 			fmt.Println("cannot read preference score")
 
 			return nil, 0, 0, false
@@ -62,7 +58,7 @@ func prepareHeap(input *bufio.Reader) (*myheap.MinHeap, int, int, bool) {
 
 	var preferredRank int
 
-	if _, err := fmt.Fscan(input, &preferredRank); err != nil {
+	if _, err := fmt.Scan(&preferredRank); err != nil {
 		fmt.Println("cannot read preferred rank")
 
 		return nil, 0, 0, false

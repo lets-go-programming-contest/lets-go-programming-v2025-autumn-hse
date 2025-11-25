@@ -41,8 +41,7 @@ func (c *DefaultConveyer) Run(ctx context.Context) error {
 		h := handler
 
 		errGroup.Go(func() error {
-			err := h.run(errGroupCtx)
-			if err != nil {
+			if err := h.run(errGroupCtx); err != nil {
 				return err
 			}
 
@@ -63,13 +62,13 @@ func (c *DefaultConveyer) Send(input string, data string) error {
 	if !ok {
 		return fmt.Errorf("send data into channel %q: %w", input, ErrChanNotFound)
 	}
-
 	channel <- data
 
 	return nil
 }
 
 func (c *DefaultConveyer) Recv(output string) (string, error) {
+	//nolint:varnamelen // ok is classic name
 	channel, ok := c.channels[output]
 	if !ok {
 		return "", fmt.Errorf("receive data from channel %q: %w", output, ErrChanNotFound)

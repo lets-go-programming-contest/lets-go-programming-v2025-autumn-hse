@@ -8,7 +8,6 @@ import (
 
 func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
 	var wg sync.WaitGroup
-	//errorCh := make(chan error, 1)
 
 	for i, input := range inputs {
 		wg.Add(1)

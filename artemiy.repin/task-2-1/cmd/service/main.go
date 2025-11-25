@@ -33,6 +33,8 @@ func main() {
 
 			if _, err := fmt.Scan(&operator, &val); err != nil {
 				fmt.Println("couldn't read temp")
+
+				return
 			}
 
 			if err := temperature.UpdateInterval(operator, val); err != nil {

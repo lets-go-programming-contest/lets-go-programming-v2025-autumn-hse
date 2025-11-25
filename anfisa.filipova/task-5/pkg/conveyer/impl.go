@@ -60,7 +60,7 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 			return c.runHandler(ctx, h)
 		})
 	}
-
+	c.m.Unlock()
 	err := g.Wait()
 	c.closeAll()
 	return err

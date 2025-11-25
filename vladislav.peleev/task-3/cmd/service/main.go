@@ -29,7 +29,7 @@ func main() {
 		return currencies[i].Value > currencies[j].Value
 	})
 
-	if err := jsonwriter.SaveJSON(cfg.OutputFile, currencies); err != nil {
+	if err := jsonwriter.SaveJSON(cfg.OutputFile, currencies, 0o755); err != nil {
 		panic(fmt.Sprintf("Error saving JSON: %v", err))
 	}
 

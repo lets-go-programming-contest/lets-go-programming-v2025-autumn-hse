@@ -12,12 +12,16 @@ import (
 	"golang.org/x/text/encoding/charmap"
 )
 
+type xmlCurrency struct {
+	NumCode  string `xml:"NumCode"`
+	CharCode string `xml:"CharCode"`
+	Value    string `xml:"Value"`
+}
+
 func GetCharsetReader(charset string, input io.Reader) (io.Reader, error) {
 	switch strings.ToLower(charset) {
 	case "windows-1251", "cp1251":
 		return charmap.Windows1251.NewDecoder().Reader(input), nil
-	case "utf-8", "":
-		return input, nil
 	default:
 		return input, nil
 	}
@@ -38,7 +42,7 @@ func DecodeXML(filePath string) ([]models.Currency, error) {
 	decoder.CharsetReader = GetCharsetReader
 
 	var valCurs struct {
-		XMLName    xml.Name        `xml:"ValCurs"`
+		XMLName    xml.Name       `xml:"ValCurs"`
 		Currencies []xmlCurrency `xml:"Valute"`
 	}
 

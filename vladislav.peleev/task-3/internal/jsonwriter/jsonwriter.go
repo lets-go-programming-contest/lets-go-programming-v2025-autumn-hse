@@ -29,6 +29,7 @@ func SaveJSON(outputPath string, data any, dirPerm os.FileMode) error {
 			}
 		}
 	}()
+
 	if err != nil {
 		return fmt.Errorf("cannot create output file: %w", err)
 	}

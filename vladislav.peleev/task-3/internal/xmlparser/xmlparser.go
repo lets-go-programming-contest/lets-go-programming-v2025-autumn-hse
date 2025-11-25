@@ -41,6 +41,7 @@ func DecodeXML(filePath string) ([]models.Currency, error) {
 			}
 		}
 	}()
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to open XML file: %w", err)
 	}
@@ -66,6 +67,7 @@ func DecodeXML(filePath string) ([]models.Currency, error) {
 		}
 
 		numCode := 0
+
 		if currency.NumCode != "" {
 			if n, err := strconv.Atoi(strings.TrimSpace(currency.NumCode)); err == nil {
 				numCode = n

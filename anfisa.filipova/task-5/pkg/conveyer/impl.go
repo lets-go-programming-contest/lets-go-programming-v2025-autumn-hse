@@ -50,8 +50,8 @@ func (c *conveyerImpl) Recv(output string) (string, error) {
 }
 
 func (c *conveyerImpl) Run(ctx context.Context) error {
-	c.m.Lock()
-	defer c.m.Unlock()
+	//c.m.Lock()
+	//defer c.m.Unlock()
 
 	g, ctx := errgroup.WithContext(ctx)
 	for _, handler := range c.handlers {
@@ -60,7 +60,7 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 			return c.runHandler(ctx, h)
 		})
 	}
-	c.m.Unlock()
+
 	err := g.Wait()
 	c.closeAll()
 	return err

@@ -42,7 +42,7 @@ func DecodeXML(filePath string) ([]models.Currency, error) {
 	decoder.CharsetReader = GetCharsetReader
 
 	var valCurs struct {
-		XMLName    xml.Name       `xml:"ValCurs"`
+		XMLName    xml.Name      `xml:"ValCurs"`
 		Currencies []xmlCurrency `xml:"Valute"`
 	}
 
@@ -52,22 +52,23 @@ func DecodeXML(filePath string) ([]models.Currency, error) {
 
 	result := make([]models.Currency, 0, len(valCurs.Currencies))
 
-	for _, xc := range valCurs.Currencies {
-		value, err := strconv.ParseFloat(strings.ReplaceAll(xc.Value, ",", "."), 64)
+	for _, currency := range valCurs.Currencies {
+		value, err := strconv.ParseFloat(strings.ReplaceAll(currency.Value, ",", "."), 64)
 		if err != nil {
-			return nil, fmt.Errorf("cannot parse value '%s': %w", xc.Value, err)
+			return nil, fmt.Errorf("cannot parse value '%s': %w", currency.Value, err)
 		}
 
 		numCode := 0
-		if xc.NumCode != "" {
-			if n, err := strconv.Atoi(strings.TrimSpace(xc.NumCode)); err == nil {
+
+		if currency.NumCode != "" {
+			if n, err := strconv.Atoi(strings.TrimSpace(currency.NumCode)); err == nil {
 				numCode = n
 			}
 		}
 
 		result = append(result, models.Currency{
 			NumCode:  numCode,
-			CharCode: strings.TrimSpace(xc.CharCode),
+			CharCode: strings.TrimSpace(currency.CharCode),
 			Value:    value,
 		})
 	}

@@ -28,15 +28,20 @@ func GetCharsetReader(charset string, input io.Reader) (io.Reader, error) {
 }
 
 func DecodeXML(filePath string) ([]models.Currency, error) {
-	file, err := os.Open(filePath)
+	var file *os.File
+	var err error
+
+	file, err = os.Open(filePath)
+	defer func() {
+		if file != nil {
+			if cerr := file.Close(); cerr != nil {
+				fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", filePath, cerr)
+			}
+		}
+	}()
 	if err != nil {
 		return nil, fmt.Errorf("failed to open XML file: %w", err)
 	}
-	defer func() {
-		if cerr := file.Close(); cerr != nil {
-			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", filePath, cerr)
-		}
-	}()
 
 	decoder := xml.NewDecoder(file)
 	decoder.CharsetReader = GetCharsetReader

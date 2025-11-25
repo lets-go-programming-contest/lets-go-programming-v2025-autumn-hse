@@ -16,20 +16,25 @@ func SaveJSON(outputPath string, data any, dirPerm os.FileMode) error {
 		return fmt.Errorf("cannot create directory: %w", err)
 	}
 
-	file, err := os.Create(outputPath)
+	var file *os.File
+	var err error
+
+	file, err = os.Create(outputPath)
+	defer func() {
+		if file != nil {
+			if cerr := file.Close(); cerr != nil {
+				fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", outputPath, cerr)
+			}
+		}
+	}()
 	if err != nil {
 		return fmt.Errorf("cannot create output file: %w", err)
 	}
-	defer func() {
-		if cerr := file.Close(); cerr != nil {
-			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", outputPath, cerr)
-		}
-	}()
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "    ")
 
-	if err := encoder.Encode(data); err != nil {
+	if err = encoder.Encode(data); err != nil {
 		return fmt.Errorf("cannot encode JSON: %w", err)
 	}
 

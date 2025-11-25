@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sync"
+
+	"golang.org/x/sync/errgroup"
 )
 
 const undefined = "undefined"
@@ -52,33 +53,17 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 	c.m.Lock()
 	defer c.m.Unlock()
 
-	var wg sync.WaitGroup
-	errorCh := make(chan error, len(c.handlers))
+	g, ctx := errgroup.WithContext(ctx)
 	for _, handler := range c.handlers {
-		wg.Add(1)
-		go func(h handlerConfig) {
-			defer wg.Done()
-			if err := c.runHandler(ctx, h); err != nil {
-				errorCh <- err
-			}
-		}(handler)
+		h := handler
+		g.Go(func() error {
+			return c.runHandler(ctx, h)
+		})
 	}
-	go func() {
-		wg.Wait()
-		close(errorCh)
-	}()
 
-	select {
-	case err, ok := <-errorCh:
-		if ok {
-			c.closeAll()
-			return err
-		}
-		return nil
-	case <-ctx.Done():
-		c.closeAll()
-		return ctx.Err()
-	}
+	err := g.Wait()
+	c.closeAll()
+	return err
 }
 
 func (c *conveyerImpl) runHandler(ctx context.Context, config handlerConfig) error {

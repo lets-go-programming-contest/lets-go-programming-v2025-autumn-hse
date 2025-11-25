@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/VlasfimosY/task-3/internal/models"
 )
 
-const dirPerm = 0o755
+const DefaultDirPerm = 0o755
 
-func SaveJSON(outputPath string, currencies []models.CurrencyJSON) error {
+func SaveJSON(outputPath string, data any, dirPerm os.FileMode) error {
 	dir := filepath.Dir(outputPath)
 
 	if err := os.MkdirAll(dir, dirPerm); err != nil {
@@ -22,7 +20,6 @@ func SaveJSON(outputPath string, currencies []models.CurrencyJSON) error {
 	if err != nil {
 		return fmt.Errorf("cannot create output file: %w", err)
 	}
-
 	defer func() {
 		if cerr := file.Close(); cerr != nil {
 			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", outputPath, cerr)
@@ -32,7 +29,7 @@ func SaveJSON(outputPath string, currencies []models.CurrencyJSON) error {
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "    ")
 
-	if err := encoder.Encode(currencies); err != nil {
+	if err := encoder.Encode(data); err != nil {
 		return fmt.Errorf("cannot encode JSON: %w", err)
 	}
 

@@ -17,7 +17,7 @@ func Load(configPath *string) (*models.Config, error) {
 
 	defer func() {
 		if cerr := file.Close(); cerr != nil {
-			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", *configPath, cerr)
+			panic(fmt.Sprintf("failed to close config file %s: %v", *configPath, cerr))
 		}
 	}()
 
@@ -27,7 +27,6 @@ func Load(configPath *string) (*models.Config, error) {
 	}
 
 	var config models.Config
-
 	if err := yaml.Unmarshal(data, &config); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal YAML: %w", err)
 	}

@@ -3,19 +3,31 @@ package xmlparser
 import (
 	"encoding/xml"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/VlasfimosY/task-3/internal/models"
+	"golang.org/x/text/encoding/charmap"
 )
 
-func DecodeXML(filePath string) ([]models.CurrencyJSON, error) {
+func GetCharsetReader(charset string, input io.Reader) (io.Reader, error) {
+	switch strings.ToLower(charset) {
+	case "windows-1251", "cp1251":
+		return charmap.Windows1251.NewDecoder().Reader(input), nil
+	case "utf-8", "":
+		return input, nil
+	default:
+		return input, nil
+	}
+}
+
+func DecodeXML(filePath string) ([]models.Currency, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open XML file: %w", err)
 	}
-
 	defer func() {
 		if cerr := file.Close(); cerr != nil {
 			fmt.Fprintf(os.Stderr, "warning: failed to close file %s: %v\n", filePath, cerr)
@@ -23,34 +35,35 @@ func DecodeXML(filePath string) ([]models.CurrencyJSON, error) {
 	}()
 
 	decoder := xml.NewDecoder(file)
-	decoder.CharsetReader = models.GetCharsetReader
+	decoder.CharsetReader = GetCharsetReader
 
-	var valCurs models.ValCurs
+	var valCurs struct {
+		XMLName    xml.Name        `xml:"ValCurs"`
+		Currencies []xmlCurrency `xml:"Valute"`
+	}
 
 	if err := decoder.Decode(&valCurs); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal XML: %w", err)
 	}
 
-	result := make([]models.CurrencyJSON, 0, len(valCurs.Currencies))
+	result := make([]models.Currency, 0, len(valCurs.Currencies))
 
-	for _, currency := range valCurs.Currencies {
-		value, err := strconv.ParseFloat(strings.ReplaceAll(currency.Value, ",", "."), 64)
+	for _, xc := range valCurs.Currencies {
+		value, err := strconv.ParseFloat(strings.ReplaceAll(xc.Value, ",", "."), 64)
 		if err != nil {
-			return nil, fmt.Errorf("cannot parse value '%s': %w", currency.Value, err)
+			return nil, fmt.Errorf("cannot parse value '%s': %w", xc.Value, err)
 		}
 
-		numStr := strings.TrimSpace(currency.NumCode)
 		numCode := 0
-
-		if numStr != "" {
-			if n, err := strconv.Atoi(numStr); err == nil {
+		if xc.NumCode != "" {
+			if n, err := strconv.Atoi(strings.TrimSpace(xc.NumCode)); err == nil {
 				numCode = n
 			}
 		}
 
-		result = append(result, models.CurrencyJSON{
+		result = append(result, models.Currency{
 			NumCode:  numCode,
-			CharCode: strings.TrimSpace(currency.CharCode),
+			CharCode: strings.TrimSpace(xc.CharCode),
 			Value:    value,
 		})
 	}

@@ -3,6 +3,7 @@ package conveyer
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 
 	"golang.org/x/sync/errgroup"
@@ -27,7 +28,6 @@ var (
 	ErrChannelFull     = errors.New("channel full")
 	ErrUnknownTask     = errors.New("unknown task type")
 	ErrInvalidTaskFunc = errors.New("invalid task function")
-	ErrGroupWait       = errors.New("err errgroup wait")
 )
 
 func New(size int) *Conveyer {
@@ -76,12 +76,16 @@ func (c *Conveyer) Run(ctx context.Context) error {
 
 	for _, taskItem := range c.tasks {
 		tc := taskItem
+		
 		errGroup.Go(func() error {
 			return c.exec(ctx, tc)
 		})
 	}
 
-	return errGroup.Wait()
+	if err := errGroup.Wait(); err != nil {
+		return fmt.Errorf("run tasks failed: %w", err)
+	}
+	return nil
 }
 
 func (c *Conveyer) Send(name, data string) error {
@@ -167,7 +171,7 @@ func (c *Conveyer) exec(ctx context.Context, taskItem task) error {
 }
 
 func (c *Conveyer) RegisterDecorator(
-	fn func(context.Context, chan string, chan string) error,
+	Decfunc func(context.Context, chan string, chan string) error,
 	input string,
 	output string,
 ) {
@@ -176,14 +180,14 @@ func (c *Conveyer) RegisterDecorator(
 
 	c.tasks = append(c.tasks, task{
 		kind:    "decorator",
-		fn:      fn,
+		fn:      Decfunc,
 		inputs:  []string{input},
 		outputs: []string{output},
 	})
 }
 
 func (c *Conveyer) RegisterMultiplexer(
-	fn func(context.Context, []chan string, chan string) error,
+	Decfunc func(context.Context, []chan string, chan string) error,
 	inputs []string,
 	output string,
 ) {
@@ -195,14 +199,14 @@ func (c *Conveyer) RegisterMultiplexer(
 
 	c.tasks = append(c.tasks, task{
 		kind:    "multiplexer",
-		fn:      fn,
+		fn:      Decfunc,
 		inputs:  inputs,
 		outputs: []string{output},
 	})
 }
 
 func (c *Conveyer) RegisterSeparator(
-	fn func(context.Context, chan string, []chan string) error,
+	Decfunc func(context.Context, chan string, []chan string) error,
 	input string,
 	outputs []string,
 ) {
@@ -214,7 +218,7 @@ func (c *Conveyer) RegisterSeparator(
 
 	c.tasks = append(c.tasks, task{
 		kind:    "separator",
-		fn:      fn,
+		fn:      Decfunc,
 		inputs:  []string{input},
 		outputs: outputs,
 	})

@@ -3,7 +3,6 @@ package conveyer
 import (
 	"context"
 	"errors"
-	"fmt"
 	"sync"
 
 	"golang.org/x/sync/errgroup"
@@ -28,6 +27,7 @@ var (
 	ErrChannelFull     = errors.New("channel full")
 	ErrUnknownTask     = errors.New("unknown task type")
 	ErrInvalidTaskFunc = errors.New("invalid task function")
+	ErrGroupWait       = errors.New("err errgroup wait")
 )
 
 func New(size int) *Conveyer {
@@ -52,7 +52,8 @@ func (c *Conveyer) getOrCreate(name string) chan string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if channel, found := c.channels[name]; found {
+	channel, found := c.channels[name]
+	if found {
 		return channel
 	}
 
@@ -75,13 +76,15 @@ func (c *Conveyer) Run(ctx context.Context) error {
 
 	for _, taskItem := range c.tasks {
 		tc := taskItem
-		errGroup.Go(func() error { return c.exec(ctx, tc) })
+		errGroup.Go(func() error {
+			return c.exec(ctx, tc)
+		})
 	}
 
 	waitErr := errGroup.Wait()
 
 	if waitErr != nil {
-		return fmt.Errorf("errgroup wait: %w", waitErr)
+		return ErrGroupWait
 	}
 
 	return nil
@@ -140,6 +143,7 @@ func (c *Conveyer) exec(ctx context.Context, taskItem task) error {
 		}
 
 		ins := make([]chan string, len(taskItem.inputs))
+
 		for index, name := range taskItem.inputs {
 			ins[index] = c.getOrCreate(name)
 		}
@@ -155,6 +159,7 @@ func (c *Conveyer) exec(ctx context.Context, taskItem task) error {
 		}
 
 		outs := make([]chan string, len(taskItem.outputs))
+
 		for index, name := range taskItem.outputs {
 			outs[index] = c.getOrCreate(name)
 		}

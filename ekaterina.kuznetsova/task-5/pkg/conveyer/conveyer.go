@@ -73,7 +73,6 @@ func (c *Conveyer) Run(ctx context.Context) error {
 	}()
 
 	errGroup, _ := errgroup.WithContext(ctx)
-
 	for _, taskItem := range c.tasks {
 
 		tc := taskItem
@@ -83,10 +82,11 @@ func (c *Conveyer) Run(ctx context.Context) error {
 		})
 	}
 
-	if err := errGroup.Wait(); err != nil {
+	err := errGroup.Wait()
+	if err != nil {
 		return fmt.Errorf("run tasks failed: %w", err)
 	}
-	
+
 	return nil
 }
 

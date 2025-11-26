@@ -7,12 +7,27 @@ import (
 	"sync"
 )
 
-func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
-	var once sync.Once
+var closeRegistry = struct {
+	mu   sync.Mutex
+	once map[chan string]*sync.Once
+}{
+	once: make(map[chan string]*sync.Once),
+}
 
-	defer once.Do(func() {
-		close(output)
-	})
+func safeClose(ch chan string) {
+	closeRegistry.mu.Lock()
+	o, ok := closeRegistry.once[ch]
+	if !ok {
+		o = &sync.Once{}
+		closeRegistry.once[ch] = o
+	}
+	closeRegistry.mu.Unlock()
+
+	o.Do(func() { close(ch) })
+}
+
+func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
+defer safeClose(output)
 	for {
 		select {
 		case <-ctx.Done():
@@ -37,13 +52,11 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 		return errors.New("no outputs")
 	}
 
-	var once sync.Once
-
-	defer once.Do(func() {
+	defer func() {
 		for _, ch := range outputs {
-			close(ch)
+			safeClose(ch)
 		}
-	})
+	}()
 
 	i := 0
 	for {
@@ -64,11 +77,7 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 	if len(inputs) == 0 {
 		return errors.New("no inputs")
 	}
-	var once sync.Once
-
-	defer once.Do(func() {
-		close(output)
-	})
+	defer safeClose(output)
 
 	var wg sync.WaitGroup
 	for _, ch := range inputs {

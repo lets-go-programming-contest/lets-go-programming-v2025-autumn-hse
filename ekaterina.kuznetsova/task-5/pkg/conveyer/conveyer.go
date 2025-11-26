@@ -36,6 +36,25 @@ func (conv *Conveyer) get(name string) chan string {
 	return ch
 }
 
+var closeRegistry = struct {
+	mu   sync.Mutex
+	once map[chan string]*sync.Once
+}{
+	once: make(map[chan string]*sync.Once),
+}
+
+func safeClose(ch chan string) {
+	closeRegistry.mu.Lock()
+	o, ok := closeRegistry.once[ch]
+	if !ok {
+		o = &sync.Once{}
+		closeRegistry.once[ch] = o
+	}
+	closeRegistry.mu.Unlock()
+
+	o.Do(func() { close(ch) })
+}
+
 func (conv *Conveyer) closeAll() {
 	conv.mu.Lock()
 	defer conv.mu.Unlock()
@@ -46,7 +65,7 @@ func (conv *Conveyer) closeAll() {
 	conv.closed = true
 
 	for _, ch := range conv.channels {
-		close(ch)
+		safeClose(ch)
 	}
 }
 

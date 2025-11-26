@@ -6,63 +6,71 @@ import (
 	"strings"
 )
 
-func PrefixDecoratorFunc(ctx context.Context, in, out chan string) error {
+var (
+	ErrCantDecorate = errors.New("can't be decorated")
+)
+
+func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
-		case val, ok := <-in:
+
+		case value, ok := <-input:
 			if !ok {
 				return nil
 			}
 
-			if strings.Contains(val, "no decorator") {
-				return errors.New("can't be decorated")
+			if strings.Contains(value, "no decorator") {
+				return ErrCantDecorate
 			}
 
-			if !strings.HasPrefix(val, "decorated: ") {
-				val = "decorated: " + val
+			if !strings.HasPrefix(value, "decorated: ") {
+				value = "decorated: " + value
 			}
 
-			out <- val
+			output <- value
 		}
 	}
 }
 
-func SeparatorFunc(ctx context.Context, in chan string, outs []chan string) error {
-	i := 0
+func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string) error {
+	index := 0
 
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
-		case val, ok := <-in:
+
+		case value, ok := <-input:
 			if !ok {
 				return nil
 			}
 
-			outs[i] <- val
-			i = (i + 1) % len(outs)
+			outputs[index] <- value
+			index = (index + 1) % len(outputs)
 		}
 	}
 }
 
-func MultiplexerFunc(ctx context.Context, ins []chan string, out chan string) error {
+func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
 	for {
-		for _, ch := range ins {
+		for _, channel := range inputs {
 			select {
 			case <-ctx.Done():
 				return nil
-			case val, ok := <-ch:
+
+			case value, ok := <-channel:
 				if !ok {
 					continue
 				}
-				if strings.Contains(val, "no multiplexer") {
+
+				if strings.Contains(value, "no multiplexer") {
 					continue
 				}
 
-				out <- val
-			default:
+				output <- value
+
 			}
 		}
 	}

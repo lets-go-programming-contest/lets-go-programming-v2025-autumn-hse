@@ -23,13 +23,14 @@ type task struct {
 }
 
 var (
-	ErrChanNotFound = errors.New("chan not found")
-	ErrChannelFull  = errors.New("channel full")
-	ErrUnknownTask  = errors.New("unknown task type")
+	ErrChanNotFound    = errors.New("chan not found")
+	ErrChannelFull     = errors.New("channel full")
+	ErrUnknownTask     = errors.New("unknown task type")
+	ErrInvalidTaskFunc = errors.New("invalid task function")
+	ErrGroupWait = errors.New("error errgroup wait")
 )
 
 func New(size int) *Conveyer {
-
 	return &Conveyer{
 		channels: make(map[string]chan string),
 		size:     size,
@@ -41,22 +42,24 @@ func New(size int) *Conveyer {
 func (c *Conveyer) get(name string) (chan string, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	ch, ok := c.channels[name]
 
-	return ch, ok
+	channel, found := c.channels[name]
+
+	return channel, found
 }
 
 func (c *Conveyer) getOrCreate(name string) chan string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if ch, ok := c.channels[name]; ok {
-		return ch
+	if channel, found := c.channels[name]; found {
+		return channel
 	}
-	ch := make(chan string, c.size)
-	c.channels[name] = ch
 
-	return ch
+	channel := make(chan string, c.size)
+	c.channels[name] = channel
+
+	return channel
 }
 
 func (c *Conveyer) Run(ctx context.Context) error {
@@ -68,101 +71,152 @@ func (c *Conveyer) Run(ctx context.Context) error {
 		c.mu.Unlock()
 	}()
 
-	eg, _ := errgroup.WithContext(ctx)
+	errGroup, _ := errgroup.WithContext(ctx)
 
-	for _, t := range c.tasks {
-		tc := t
-		eg.Go(func() error { return c.exec(ctx, tc) })
+	for _, taskItem := range c.tasks {
+		tc := taskItem
+		errGroup.Go(func() error { return c.exec(ctx, tc) })
 	}
 
-	return eg.Wait()
+	waitErr := errGroup.Wait()
+
+	if waitErr != nil {
+		return ErrGroupWait
+	}
+
+	return nil
 }
 
 func (c *Conveyer) Send(name, data string) error {
-	ch, ok := c.get(name)
-
-	if !ok {
-
+	channel, found := c.get(name)
+	if !found {
 		return ErrChanNotFound
 	}
 
-	if len(ch) == cap(ch) {
-
+	if len(channel) == cap(channel) {
 		return ErrChannelFull
 	}
 
-	ch <- data
+	channel <- data
 
 	return nil
 }
 
 func (c *Conveyer) Recv(name string) (string, error) {
-	ch, ok := c.get(name)
-
-	if !ok {
-
+	channel, found := c.get(name)
+	if !found {
 		return "undefined", ErrChanNotFound
 	}
-	val, ok := <-ch
-	if !ok {
 
+	val, ok := <-channel
+	if !ok {
 		return "undefined", nil
 	}
 
 	return val, nil
 }
 
-func (c *Conveyer) exec(ctx context.Context, t task) error {
-	if len(t.inputs) == 0 || len(t.outputs) == 0 {
-
+func (c *Conveyer) exec(ctx context.Context, taskItem task) error {
+	if len(taskItem.inputs) == 0 || len(taskItem.outputs) == 0 {
 		return ErrChanNotFound
 	}
 
-	switch t.kind {
+	switch taskItem.kind {
 	case "decorator":
+		decoratorFn, ok := taskItem.fn.(func(context.Context, chan string, chan string) error)
+		if !ok {
+			return ErrInvalidTaskFunc
+		}
 
-		return t.fn.(func(context.Context, chan string, chan string) error)(ctx, c.getOrCreate(t.inputs[0]), c.getOrCreate(t.outputs[0]))
+		inputChannel := c.getOrCreate(taskItem.inputs[0])
+		outputChannel := c.getOrCreate(taskItem.outputs[0])
+
+		return decoratorFn(ctx, inputChannel, outputChannel)
+
 	case "multiplexer":
-		ins := make([]chan string, len(t.inputs))
-
-		for i, n := range t.inputs {
-			ins[i] = c.getOrCreate(n)
+		multiplexerFn, ok := taskItem.fn.(func(context.Context, []chan string, chan string) error)
+		if !ok {
+			return ErrInvalidTaskFunc
 		}
 
-		return t.fn.(func(context.Context, []chan string, chan string) error)(ctx, ins, c.getOrCreate(t.outputs[0]))
+		ins := make([]chan string, len(taskItem.inputs))
+		for index, name := range taskItem.inputs {
+			ins[index] = c.getOrCreate(name)
+		}
+
+		outputChannel := c.getOrCreate(taskItem.outputs[0])
+
+		return multiplexerFn(ctx, ins, outputChannel)
+
 	case "separator":
-		outs := make([]chan string, len(t.outputs))
-
-		for i, n := range t.outputs {
-			outs[i] = c.getOrCreate(n)
+		separatorFn, ok := taskItem.fn.(func(context.Context, chan string, []chan string) error)
+		if !ok {
+			return ErrInvalidTaskFunc
 		}
 
-		return t.fn.(func(context.Context, chan string, []chan string) error)(ctx, c.getOrCreate(t.inputs[0]), outs)
+		outs := make([]chan string, len(taskItem.outputs))
+		for index, name := range taskItem.outputs {
+			outs[index] = c.getOrCreate(name)
+		}
+
+		inputChannel := c.getOrCreate(taskItem.inputs[0])
+
+		return separatorFn(ctx, inputChannel, outs)
 	}
 
 	return ErrUnknownTask
 }
 
-func (c *Conveyer) RegisterDecorator(fn func(context.Context, chan string, chan string) error, input, output string) {
+func (c *Conveyer) RegisterDecorator(
+	fn func(context.Context, chan string, chan string) error,
+	input string,
+	output string,
+) {
 	c.getOrCreate(input)
 	c.getOrCreate(output)
-	c.tasks = append(c.tasks, task{"decorator", fn, []string{input}, []string{output}})
+
+	c.tasks = append(c.tasks, task{
+		kind:    "decorator",
+		fn:      fn,
+		inputs:  []string{input},
+		outputs: []string{output},
+	})
 }
 
-func (c *Conveyer) RegisterMultiplexer(fn func(context.Context, []chan string, chan string) error, inputs []string, output string) {
-	for _, n := range inputs {
-		c.getOrCreate(n)
+func (c *Conveyer) RegisterMultiplexer(
+	fn func(context.Context, []chan string, chan string) error,
+	inputs []string,
+	output string,
+) {
+	for _, name := range inputs {
+		c.getOrCreate(name)
 	}
-	
+
 	c.getOrCreate(output)
-	c.tasks = append(c.tasks, task{"multiplexer", fn, inputs, []string{output}})
+
+	c.tasks = append(c.tasks, task{
+		kind:    "multiplexer",
+		fn:      fn,
+		inputs:  inputs,
+		outputs: []string{output},
+	})
 }
 
-func (c *Conveyer) RegisterSeparator(fn func(context.Context, chan string, []chan string) error, input string, outputs []string) {
+func (c *Conveyer) RegisterSeparator(
+	fn func(context.Context, chan string, []chan string) error,
+	input string,
+	outputs []string,
+) {
 	c.getOrCreate(input)
-	for _, n := range outputs {
-		c.getOrCreate(n)
+
+	for _, name := range outputs {
+		c.getOrCreate(name)
 	}
 
-	c.tasks = append(c.tasks, task{"separator", fn, []string{input}, outputs})
+	c.tasks = append(c.tasks, task{
+		kind:    "separator",
+		fn:      fn,
+		inputs:  []string{input},
+		outputs: outputs,
+	})
 }

@@ -81,13 +81,7 @@ func (c *Conveyer) Run(ctx context.Context) error {
 		})
 	}
 
-	waitErr := errGroup.Wait()
-
-	if waitErr != nil {
-		return ErrGroupWait
-	}
-
-	return nil
+	return errGroup.Wait()
 }
 
 func (c *Conveyer) Send(name, data string) error {

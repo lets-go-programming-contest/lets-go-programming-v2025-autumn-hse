@@ -40,10 +40,10 @@ func (conv *Conveyer) closeAll() {
 	conv.mu.Lock()
 	defer conv.mu.Unlock()
 
-	if c.closed {
+	if conv.closed {
 		return
 	}
-	c.closed = true
+	conv.closed = true
 
 	for _, ch := range conv.channels {
 		close(ch)

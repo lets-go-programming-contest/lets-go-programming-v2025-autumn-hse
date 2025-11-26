@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"sync"
 )
 
 func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {

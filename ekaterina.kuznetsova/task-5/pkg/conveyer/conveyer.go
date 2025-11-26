@@ -13,7 +13,6 @@ type Conveyer struct {
 	size     int
 	tasks    []task
 	mu       sync.Mutex
-	active   bool
 }
 
 type task struct {
@@ -22,11 +21,6 @@ type task struct {
 	inputs  []string
 	outputs []string
 }
-
-var (
-	ErrChannelMissing = errors.New("chan not found")
-	ErrAlreadyRunning = errors.New("conveyer already running")
-)
 
 func New(size int) *Conveyer {
 	return &Conveyer{
@@ -42,7 +36,7 @@ func (c *Conveyer) get(name string) (chan string, bool) {
 	return ch, ok
 }
 
-func (c *Conveyer) getOrCreate(name string) chan string {
+func (c *Conveyer) get(name string) chan string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if ch, ok := c.channels[name]; ok {
@@ -54,17 +48,8 @@ func (c *Conveyer) getOrCreate(name string) chan string {
 }
 
 func (c *Conveyer) Run(ctx context.Context) error {
-	c.mu.Lock()
-	if c.active {
-		c.mu.Unlock()
-		return ErrAlreadyRunning
-	}
-	c.active = true
-	c.mu.Unlock()
-
 	defer func() {
 		c.mu.Lock()
-		c.active = false
 		for _, ch := range c.channels {
 			close(ch)
 		}
@@ -82,7 +67,7 @@ func (c *Conveyer) Run(ctx context.Context) error {
 func (c *Conveyer) Send(name, data string) error {
 	ch, ok := c.get(name)
 	if !ok {
-		return ErrChannelMissing
+		return errors.New("chan not found")
 	}
 	if len(ch) == cap(ch) {
 		return errors.New("channel full")
@@ -94,7 +79,7 @@ func (c *Conveyer) Send(name, data string) error {
 func (c *Conveyer) Recv(name string) (string, error) {
 	ch, ok := c.get(name)
 	if !ok {
-		return "undefined", ErrChannelMissing
+		return "undefined", errors.New("chan not found")
 	}
 	val, ok := <-ch
 	if !ok {
@@ -105,7 +90,7 @@ func (c *Conveyer) Recv(name string) (string, error) {
 
 func (c *Conveyer) exec(ctx context.Context, t task) error {
 	if len(t.inputs) == 0 || len(t.outputs) == 0 {
-		return ErrChannelMissing
+		return errors.New("chan not found")
 	}
 
 	switch t.kind {

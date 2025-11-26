@@ -35,11 +35,11 @@ func (conv *Conveyer) get(name string) chan string {
 	return ch
 }
 
-func (c *Conveyer) closeAll() {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+func (conv *Conveyer) closeAll() {
+	conv.mu.Lock()
+	defer conv.mu.Unlock()
 
-	for _, ch := range c.channels {
+	for _, ch := range conv.channels {
 		close(ch)
 	}
 }
@@ -70,9 +70,12 @@ func (conv *Conveyer) Send(input string, data string) error {
 		return errors.New("chan not found")
 	}
 
-	ch <- data
-
-	return nil
+	select {
+	case ch <- data:
+		return nil
+	case <-context.Background().Done():
+		return errors.New("send canceled")
+	}
 }
 
 func (conv *Conveyer) Recv(output string) (string, error) {

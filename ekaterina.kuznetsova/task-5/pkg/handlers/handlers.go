@@ -1,12 +1,5 @@
-package handlers
-
-import (
-	"context"
-	"errors"
-	"strings"
-)
-
-func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {
+func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
+	defer close(output)
 	for {
 		select {
 		case <-ctx.Done():
@@ -21,20 +14,18 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 			if !strings.HasPrefix(val, "decorated: ") {
 				val = "decorated: " + val
 			}
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case output <- val:
-			}
+			output <- val
 		}
 	}
 }
 
 func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string) error {
 	if len(outputs) == 0 {
-		return errors.New("no output channels")
+		return errors.New("no outputs")
 	}
-	index := 0
+	defer func() { for _, ch := range outputs { close(ch) } }()
+
+	i := 0
 	for {
 		select {
 		case <-ctx.Done():
@@ -43,59 +34,45 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 			if !ok {
 				return nil
 			}
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case outputs[index] <- val:
-			}
-			index = (index + 1) % len(outputs)
+			outputs[i] <- val
+			i = (i + 1) % len(outputs)
 		}
 	}
 }
 
 func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
 	if len(inputs) == 0 {
-		return errors.New("no input channels")
+		return errors.New("no inputs")
 	}
+	defer close(output)
 
-	active := make([]bool, len(inputs))
-	for i := range active {
-		active[i] = true
-	}
-
-	for {
-		for i, ch := range inputs {
-			if !active[i] {
-				continue
-			}
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case val, ok := <-ch:
-				if !ok {
-					active[i] = false
-					continue
-				}
-				if strings.Contains(val, "no multiplexer") {
-					continue
-				}
+	var wg sync.WaitGroup
+	for _, ch := range inputs {
+		wg.Add(1)
+		go func(c chan string) {
+			defer wg.Done()
+			for {
 				select {
 				case <-ctx.Done():
-					return ctx.Err()
-				case output <- val:
+					return
+				case v, ok := <-c:
+					if !ok {
+						return
+					}
+					if strings.Contains(v, "no multiplexer") {
+						continue
+					}
+					output <- v
 				}
-			default:
 			}
-		}
-		allClosed := true
-		for _, a := range active {
-			if a {
-				allClosed = false
-				break
-			}
-		}
-		if allClosed {
-			return nil
-		}
+		}(ch)
+	}
+	wg.Wait()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+		return nil
 	}
 }

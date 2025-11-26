@@ -70,7 +70,7 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 				}
 
 				output <- value
-
+			default:
 			}
 		}
 	}

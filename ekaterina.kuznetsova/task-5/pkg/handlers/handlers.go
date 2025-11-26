@@ -1,3 +1,11 @@
+package handlers
+
+import (
+	"context"
+	"errors"
+	"strings"
+)
+
 func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 	defer close(output)
 	for {

@@ -76,7 +76,6 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 					active[i] = false
 					continue
 				}
-				done = false
 				if strings.Contains(val, "no multiplexer") {
 					continue
 				}

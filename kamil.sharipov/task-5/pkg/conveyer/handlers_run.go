@@ -5,31 +5,31 @@ import (
 	"fmt"
 )
 
-func (c *conveyer) runHandler(ctx context.Context, h handler) error {
-	switch h.typ {
+func (c *conveyer) runHandler(ctx context.Context, hnd handler) error {
+	switch hnd.typ {
 	case handlerTypeDecorator:
-		return c.runDecorator(ctx, h)
+		return c.runDecorator(ctx, hnd)
 	case handlerTypeMultiplexer:
-		return c.runMultiplexer(ctx, h)
+		return c.runMultiplexer(ctx, hnd)
 	case handlerTypeSeparator:
-		return c.runSeparator(ctx, h)
+		return c.runSeparator(ctx, hnd)
 	default:
-		return fmt.Errorf("%w: %s", ErrUnknownHandlerType, h.typ)
+		return fmt.Errorf("%w: %s", ErrUnknownHandlerType, hnd.typ)
 	}
 }
 
-func (c *conveyer) runDecorator(ctx context.Context, h handler) error {
-	decoratorFn, ok := h.fn.(func(context.Context, chan string, chan string) error)
+func (c *conveyer) runDecorator(ctx context.Context, hnd handler) error {
+	decoratorFn, ok := hnd.fn.(func(context.Context, chan string, chan string) error)
 	if !ok {
 		return fmt.Errorf("%w: %T", ErrInvalidDecoratorType, h.fn)
 	}
 
-	inputCh, exists := c.getChannel(h.inputs[0])
+	inputCh, exists := c.getChannel(hnd.inputs[0])
 	if !exists {
 		return ErrChanNotFound
 	}
 
-	outputCh, exists := c.getChannel(h.outputs[0])
+	outputCh, exists := c.getChannel(hnd.outputs[0])
 	if !exists {
 		return ErrChanNotFound
 	}
@@ -37,23 +37,23 @@ func (c *conveyer) runDecorator(ctx context.Context, h handler) error {
 	return decoratorFn(ctx, inputCh, outputCh)
 }
 
-func (c *conveyer) runMultiplexer(ctx context.Context, h handler) error {
-	multiplexerFn, ok := h.fn.(func(context.Context, []chan string, chan string) error)
+func (c *conveyer) runMultiplexer(ctx context.Context, hnd handler) error {
+	multiplexerFn, ok := hnd.fn.(func(context.Context, []chan string, chan string) error)
 	if !ok {
-		return fmt.Errorf("%w: %T", ErrInvalidMultiplexerType, h.fn)
+		return fmt.Errorf("%w: %T", ErrInvalidMultiplexerType, hnd.fn)
 	}
 
-	inputChs := make([]chan string, len(h.inputs))
-	for i, input := range h.inputs {
+	inputChs := make([]chan string, len(hnd.inputs))
+	for index, input := range hnd.inputs {
 		ch, exists := c.getChannel(input)
 		if !exists {
 			return ErrChanNotFound
 		}
 
-		inputChs[i] = ch
+		inputChs[index] = ch
 	}
 
-	outputCh, exists := c.getChannel(h.outputs[0])
+	outputCh, exists := c.getChannel(hnd.outputs[0])
 	if !exists {
 		return ErrChanNotFound
 	}
@@ -61,25 +61,25 @@ func (c *conveyer) runMultiplexer(ctx context.Context, h handler) error {
 	return multiplexerFn(ctx, inputChs, outputCh)
 }
 
-func (c *conveyer) runSeparator(ctx context.Context, h handler) error {
-	separatorFn, ok := h.fn.(func(context.Context, chan string, []chan string) error)
+func (c *conveyer) runSeparator(ctx context.Context, hnd handler) error {
+	separatorFn, ok := hnd.fn.(func(context.Context, chan string, []chan string) error)
 	if !ok {
-		return fmt.Errorf("%w: %T", ErrInvalidSeparatorType, h.fn)
+		return fmt.Errorf("%w: %T", ErrInvalidSeparatorType, hnd.fn)
 	}
 
-	inputCh, exists := c.getChannel(h.inputs[0])
+	inputCh, exists := c.getChannel(hnd.inputs[0])
 	if !exists {
 		return ErrChanNotFound
 	}
 
-	outputChs := make([]chan string, len(h.outputs))
-	for i, output := range h.outputs {
+	outputChs := make([]chan string, len(hnd.outputs))
+	for index, output := range hnd.outputs {
 		ch, exists := c.getChannel(output)
 		if !exists {
 			return ErrChanNotFound
 		}
 
-		outputChs[i] = ch
+		outputChs[index] = ch
 	}
 
 	return separatorFn(ctx, inputCh, outputChs)

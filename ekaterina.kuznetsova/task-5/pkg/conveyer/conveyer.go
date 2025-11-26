@@ -57,7 +57,7 @@ func (c *Conveyer) getOrCreate(name string) chan string {
 		return channel
 	}
 
-	channel := make(chan string, c.size)
+	channel = make(chan string, c.size)
 	c.channels[name] = channel
 
 	return channel

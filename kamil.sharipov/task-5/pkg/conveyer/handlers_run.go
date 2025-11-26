@@ -21,7 +21,7 @@ func (c *conveyer) runHandler(ctx context.Context, hnd handler) error {
 func (c *conveyer) runDecorator(ctx context.Context, hnd handler) error {
 	decoratorFn, ok := hnd.fn.(func(context.Context, chan string, chan string) error)
 	if !ok {
-		return fmt.Errorf("%w: %T", ErrInvalidDecoratorType, h.fn)
+		return fmt.Errorf("%w: %T", ErrInvalidDecoratorType, hnd.fn)
 	}
 
 	inputCh, exists := c.getChannel(hnd.inputs[0])

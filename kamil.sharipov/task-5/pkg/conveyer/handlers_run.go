@@ -44,6 +44,7 @@ func (c *conveyer) runMultiplexer(ctx context.Context, hnd handler) error {
 	}
 
 	inputChs := make([]chan string, len(hnd.inputs))
+
 	for index, input := range hnd.inputs {
 		ch, exists := c.getChannel(input)
 		if !exists {
@@ -73,6 +74,7 @@ func (c *conveyer) runSeparator(ctx context.Context, hnd handler) error {
 	}
 
 	outputChs := make([]chan string, len(hnd.outputs))
+
 	for index, output := range hnd.outputs {
 		ch, exists := c.getChannel(output)
 		if !exists {

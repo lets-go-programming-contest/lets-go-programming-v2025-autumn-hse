@@ -17,15 +17,15 @@ type Conveyer struct {
 }
 
 type task struct {
-	kind      string
-	fn        interface{}
-	inputs    []string
-	outputs   []string
+	kind    string
+	fn      interface{}
+	inputs  []string
+	outputs []string
 }
 
 var (
-	ErrChannelMissing  = errors.New("channel missing")
-	ErrAlreadyRunning  = errors.New("conveyer already running")
+	ErrChannelMissing = errors.New("channel missing")
+	ErrAlreadyRunning = errors.New("conveyer already running")
 )
 
 func New(size int) *Conveyer {

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"strings"
 )
 
@@ -15,7 +16,7 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 				return nil
 			}
 			if strings.Contains(val, "no decorator") {
-				return New.Error("can't be decorated")
+				return errors.New("can't be decorated")
 			}
 			if !strings.HasPrefix(val, "decorated: ") {
 				val = "decorated: " + val
@@ -73,10 +74,4 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 			}
 		}
 	}
-}
-
-type DecoratorError struct{}
-
-func (DecoratorError) Error() string {
-	return "can't be decorated"
 }

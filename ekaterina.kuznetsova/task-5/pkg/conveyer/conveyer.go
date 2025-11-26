@@ -24,7 +24,7 @@ type task struct {
 }
 
 var (
-	ErrChannelMissing = errors.New("channel missing")
+	ErrChannelMissing = errors.New("chan not found")
 	ErrAlreadyRunning = errors.New("conveyer already running")
 )
 

@@ -64,7 +64,6 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 	}
 
 	for {
-		done := true
 		for i, ch := range inputs {
 			if !active[i] {
 				continue
@@ -87,7 +86,6 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 				case output <- val:
 				}
 			default:
-				done = false
 			}
 		}
 		allClosed := true

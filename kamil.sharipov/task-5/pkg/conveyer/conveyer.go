@@ -29,6 +29,13 @@ const (
 	undefined = "undefined"
 )
 
+var (
+	ErrChanNotFound           = errors.New("chan not found")
+	ErrConveyerAlreadyRunning = errors.New("conveyer is already running")
+	ErrChannelFull            = errors.New("channel is full")
+	ErrUnknownHandlerType     = errors.New("unknown handler type")
+)
+
 type handler struct {
 	typ     handlerType
 	fn      interface{}
@@ -36,13 +43,11 @@ type handler struct {
 	outputs []string
 }
 
-var ErrChanNotFound = errors.New("chan not found")
-
 func (c *conveyer) Run(ctx context.Context) error {
 	c.mutex.Lock()
 	if c.running {
 		c.mutex.Unlock()
-		return errors.New("conveyer is already running")
+		return ErrConveyerAlreadyRunning
 	}
 
 	c.running = true
@@ -63,11 +68,10 @@ func (c *conveyer) Run(ctx context.Context) error {
 		})
 	}
 
-	return errGroup.Wait()
+	return fmt.Errorf("conveyer execution failed: %w", errGroup.Wait())
 }
 
 func (c *conveyer) runHandler(ctx context.Context, h handler) error {
-
 	switch h.typ {
 	case handlerTypeDecorator:
 		fn := h.fn.(func(ctx context.Context, input chan string, output chan string) error)
@@ -113,6 +117,7 @@ func (c *conveyer) runHandler(ctx context.Context, h handler) error {
 		}
 
 		outputChs := make([]chan string, len(h.outputs))
+
 		for index, output := range h.outputs {
 			ch, exists := c.getChannel(output)
 			if !exists {
@@ -125,7 +130,7 @@ func (c *conveyer) runHandler(ctx context.Context, h handler) error {
 		return fn(ctx, inputCh, outputChs)
 
 	default:
-		return fmt.Errorf("unknown handler type: %s", h.typ)
+		return fmt.Errorf("%w: %s", ErrUnknownHandlerType, h.typ)
 	}
 }
 
@@ -142,7 +147,7 @@ func (c *conveyer) Send(input string, data string) error {
 	case channel <- data:
 		return nil
 	default:
-		return errors.New("channel is full")
+		return ErrChannelFull
 	}
 }
 
@@ -164,7 +169,7 @@ func (c *conveyer) Recv(output string) (string, error) {
 }
 
 func (c *conveyer) RegisterDecorator(
-	fn func(ctx context.Context, input chan string, output chan string) error,
+	decoratorFn func(ctx context.Context, input chan string, output chan string) error,
 	input string,
 	output string,
 ) {
@@ -173,14 +178,14 @@ func (c *conveyer) RegisterDecorator(
 
 	c.handlers = append(c.handlers, handler{
 		typ:     handlerTypeDecorator,
-		fn:      fn,
+		fn:      decoratorFn,
 		inputs:  []string{input},
 		outputs: []string{output},
 	})
 }
 
 func (c *conveyer) RegisterMultiplexer(
-	fn func(ctx context.Context, inputs []chan string, output chan string) error,
+	multiplexerFn func(ctx context.Context, inputs []chan string, output chan string) error,
 	inputs []string,
 	output string,
 ) {
@@ -192,14 +197,14 @@ func (c *conveyer) RegisterMultiplexer(
 
 	c.handlers = append(c.handlers, handler{
 		typ:     handlerTypeMultiplexer,
-		fn:      fn,
+		fn:      multiplexerFn,
 		inputs:  inputs,
 		outputs: []string{output},
 	})
 }
 
 func (c *conveyer) RegisterSeparator(
-	fn func(ctx context.Context, input chan string, outputs []chan string) error,
+	separatorFn func(ctx context.Context, input chan string, outputs []chan string) error,
 	input string,
 	outputs []string,
 ) {
@@ -211,7 +216,7 @@ func (c *conveyer) RegisterSeparator(
 
 	c.handlers = append(c.handlers, handler{
 		typ:     handlerTypeSeparator,
-		fn:      fn,
+		fn:      separatorFn,
 		inputs:  []string{input},
 		outputs: outputs,
 	})

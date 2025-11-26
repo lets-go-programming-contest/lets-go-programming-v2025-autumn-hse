@@ -36,25 +36,6 @@ func (conv *Conveyer) get(name string) chan string {
 	return ch
 }
 
-var closeRegistry = struct {
-	mu   sync.Mutex
-	once map[chan string]*sync.Once
-}{
-	once: make(map[chan string]*sync.Once),
-}
-
-func safeClose(ch chan string) {
-	closeRegistry.mu.Lock()
-	o, ok := closeRegistry.once[ch]
-	if !ok {
-		o = &sync.Once{}
-		closeRegistry.once[ch] = o
-	}
-	closeRegistry.mu.Unlock()
-
-	o.Do(func() { close(ch) })
-}
-
 func (conv *Conveyer) closeAll() {
 	conv.mu.Lock()
 	defer conv.mu.Unlock()
@@ -65,7 +46,7 @@ func (conv *Conveyer) closeAll() {
 	conv.closed = true
 
 	for _, ch := range conv.channels {
-		safeClose(ch)
+		close(ch)
 	}
 }
 
@@ -76,11 +57,9 @@ func (conv *Conveyer) Run(ctx context.Context) error {
 
 	for _, handler := range conv.handlers {
 		h := handler
-
-		runHandler := func() error {
+		errGroup.Go(func() error {
 			return h(gCtx)
-		}
-		errGroup.Go(runHandler)
+		})
 	}
 
 	return errGroup.Wait()
@@ -112,8 +91,8 @@ func (conv *Conveyer) Recv(output string) (string, error) {
 		return "", errors.New("chan not found")
 	}
 
-	val, ok_ := <-ch
-	if !ok_ {
+	val, ok := <-ch
+	if !ok {
 		return "undefined", nil
 	}
 
@@ -121,11 +100,7 @@ func (conv *Conveyer) Recv(output string) (string, error) {
 }
 
 func (conv *Conveyer) RegisterDecorator(
-	fn func(
-		ctx context.Context,
-		input chan string,
-		output chan string,
-	) error,
+	fn func(ctx context.Context, input chan string, output chan string) error,
 	input string,
 	output string,
 ) {
@@ -140,11 +115,7 @@ func (conv *Conveyer) RegisterDecorator(
 }
 
 func (conv *Conveyer) RegisterMultiplexer(
-	fn func(
-		ctx context.Context,
-		inputs []chan string,
-		output chan string,
-	) error,
+	fn func(ctx context.Context, inputs []chan string, output chan string) error,
 	inputs []string,
 	output string,
 ) {
@@ -160,22 +131,16 @@ func (conv *Conveyer) RegisterMultiplexer(
 	}
 
 	conv.handlers = append(conv.handlers, handler)
-
 }
 
 func (conv *Conveyer) RegisterSeparator(
-	fn func(
-		ctx context.Context,
-		input chan string,
-		outputs []chan string,
-	) error,
+	fn func(ctx context.Context, input chan string, outputs []chan string) error,
 	input string,
 	outputs []string,
 ) {
 	in := conv.get(input)
 
 	var outCh []chan string
-
 	for _, name := range outputs {
 		outCh = append(outCh, conv.get(name))
 	}
@@ -185,5 +150,4 @@ func (conv *Conveyer) RegisterSeparator(
 	}
 
 	conv.handlers = append(conv.handlers, handler)
-
 }

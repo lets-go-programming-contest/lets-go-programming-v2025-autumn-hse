@@ -38,14 +38,13 @@ type handler struct {
 
 var ErrChanNotFound = errors.New("chan not found")
 
-// var ErrChanNotFound = errors.New("chan not found - FROM MY CONVEYER")
-
 func (c *conveyer) Run(ctx context.Context) error {
 	c.mutex.Lock()
 	if c.running {
 		c.mutex.Unlock()
 		return errors.New("conveyer is already running")
 	}
+
 	c.running = true
 	c.mutex.Unlock()
 
@@ -56,16 +55,15 @@ func (c *conveyer) Run(ctx context.Context) error {
 		c.mutex.Unlock()
 	}()
 
-	eg, ctx := errgroup.WithContext(ctx)
+	errGroup, ctx := errgroup.WithContext(ctx)
 
-	for _, h := range c.handlers {
-		handler := h
-		eg.Go(func() error {
+	for _, handler := range c.handlers {
+		errGroup.Go(func() error {
 			return c.runHandler(ctx, handler)
 		})
 	}
 
-	return eg.Wait()
+	return errGroup.Wait()
 }
 
 func (c *conveyer) runHandler(ctx context.Context, h handler) error {
@@ -73,6 +71,7 @@ func (c *conveyer) runHandler(ctx context.Context, h handler) error {
 	switch h.typ {
 	case handlerTypeDecorator:
 		fn := h.fn.(func(ctx context.Context, input chan string, output chan string) error)
+
 		inputCh, exists := c.getChannel(h.inputs[0])
 		if !exists {
 			return ErrChanNotFound
@@ -88,14 +87,16 @@ func (c *conveyer) runHandler(ctx context.Context, h handler) error {
 	case handlerTypeMultiplexer:
 		fn := h.fn.(func(ctx context.Context, inputs []chan string, output chan string) error)
 		inputChs := make([]chan string, len(h.inputs))
-		for i, input := range h.inputs {
+
+		for index, input := range h.inputs {
 			ch, exists := c.getChannel(input)
 			if !exists {
 				return ErrChanNotFound
 			}
 
-			inputChs[i] = ch
+			inputChs[index] = ch
 		}
+
 		outputCh, exists := c.getChannel(h.outputs[0])
 		if !exists {
 			return ErrChanNotFound
@@ -105,19 +106,20 @@ func (c *conveyer) runHandler(ctx context.Context, h handler) error {
 
 	case handlerTypeSeparator:
 		fn := h.fn.(func(ctx context.Context, input chan string, outputs []chan string) error)
+
 		inputCh, exists := c.getChannel(h.inputs[0])
 		if !exists {
 			return ErrChanNotFound
 		}
 
 		outputChs := make([]chan string, len(h.outputs))
-		for i, output := range h.outputs {
+		for index, output := range h.outputs {
 			ch, exists := c.getChannel(output)
 			if !exists {
 				return ErrChanNotFound
 			}
 
-			outputChs[i] = ch
+			outputChs[index] = ch
 		}
 
 		return fn(ctx, inputCh, outputChs)
@@ -185,6 +187,7 @@ func (c *conveyer) RegisterMultiplexer(
 	for _, input := range inputs {
 		c.getOrCreateChannel(input)
 	}
+
 	c.getOrCreateChannel(output)
 
 	c.handlers = append(c.handlers, handler{
@@ -201,6 +204,7 @@ func (c *conveyer) RegisterSeparator(
 	outputs []string,
 ) {
 	c.getOrCreateChannel(input)
+
 	for _, output := range outputs {
 		c.getOrCreateChannel(output)
 	}
@@ -231,6 +235,7 @@ func (c *conveyer) getOrCreateChannel(name string) chan string {
 		channel = make(chan string, c.size)
 		c.channels[name] = channel
 	}
+
 	return channel
 }
 

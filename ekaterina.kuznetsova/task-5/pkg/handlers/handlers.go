@@ -13,7 +13,7 @@ func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 			return ctx.Err()
 		case val, ok := <-input:
 			if !ok {
-				return nil
+				return nil 
 			}
 			if strings.Contains(val, "no decorator") {
 				return errors.New("can't be decorated")
@@ -21,7 +21,11 @@ func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 			if !strings.HasPrefix(val, "decorated: ") {
 				val = "decorated: " + val
 			}
-			output <- val
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case output <- val:
+			}
 		}
 	}
 }
@@ -40,7 +44,11 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 			if !ok {
 				return nil
 			}
-			outputs[i] <- val
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case outputs[i] <- val:
+			}
 			i = (i + 1) % len(outputs)
 		}
 	}
@@ -51,29 +59,39 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 		return errors.New("no inputs")
 	}
 
-	done := make(chan struct{})
-	defer close(done)
-
+	errCh := make(chan error, len(inputs))
 	for _, ch := range inputs {
 		c := ch
 		go func() {
 			for {
 				select {
 				case <-ctx.Done():
+					errCh <- ctx.Err()
 					return
 				case v, ok := <-c:
 					if !ok {
+						errCh <- nil
 						return
 					}
 					if strings.Contains(v, "no multiplexer") {
 						continue
 					}
-					output <- v
+					select {
+					case <-ctx.Done():
+						errCh <- ctx.Err()
+						return
+					case output <- v:
+					}
 				}
 			}
 		}()
 	}
 
-	<-ctx.Done()
-	return ctx.Err()
+	for i := 0; i < len(inputs); i++ {
+		if err := <-errCh; err != nil && !errors.Is(err, context.Canceled) {
+			return err
+		}
+	}
+
+	return nil
 }

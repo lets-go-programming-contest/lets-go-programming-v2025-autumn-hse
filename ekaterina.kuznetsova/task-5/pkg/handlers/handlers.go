@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {
+func PrefixDecoratorFunc(ctx context.Context, in, out chan string) error {
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
-		case val, ok := <-input:
+		case val, ok := <-in:
 			if !ok {
 				return nil
 			}
@@ -24,40 +24,40 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 			select {
 			case <-ctx.Done():
 				return nil
-			case output <- val:
+			case out <- val:
 			}
 		}
 	}
 }
 
-func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string) error {
+func SeparatorFunc(ctx context.Context, in chan string, outs []chan string) error {
 	i := 0
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
-		case val, ok := <-input:
+		case val, ok := <-in:
 			if !ok {
 				return nil
 			}
 			select {
 			case <-ctx.Done():
 				return nil
-			case outputs[i] <- val:
+			case outs[i] <- val:
 			}
-			i = (i + 1) % len(outputs)
+			i = (i + 1) % len(outs)
 		}
 	}
 }
 
-func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
+func MultiplexerFunc(ctx context.Context, ins []chan string, out chan string) error {
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		default:
 		}
-		for _, ch := range inputs {
+		for _, ch := range ins {
 			select {
 			case <-ctx.Done():
 				return nil
@@ -68,7 +68,7 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 				select {
 				case <-ctx.Done():
 					return nil
-				case output <- val:
+				case out <- val:
 				}
 			default:
 			}

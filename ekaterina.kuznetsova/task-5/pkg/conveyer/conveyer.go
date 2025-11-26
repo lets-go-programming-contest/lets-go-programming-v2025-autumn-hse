@@ -32,8 +32,25 @@ func New(size int) *Conveyer {
 	return &Conveyer{
 		channels: make(map[string]chan string),
 		size:     size,
-		tasks:    make([]task, 0),
 	}
+}
+
+func (c *Conveyer) get(name string) (chan string, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	ch, ok := c.channels[name]
+	return ch, ok
+}
+
+func (c *Conveyer) getOrCreate(name string) chan string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if ch, ok := c.channels[name]; ok {
+		return ch
+	}
+	ch := make(chan string, c.size)
+	c.channels[name] = ch
+	return ch
 }
 
 func (c *Conveyer) Run(ctx context.Context) error {
@@ -54,41 +71,31 @@ func (c *Conveyer) Run(ctx context.Context) error {
 		c.mu.Unlock()
 	}()
 
-	eg, ctx := errgroup.WithContext(ctx)
+	eg, _ := errgroup.WithContext(ctx)
 	for _, t := range c.tasks {
-		taskCopy := t
-		eg.Go(func() error {
-			return c.executeTask(ctx, taskCopy)
-		})
+		tc := t
+		eg.Go(func() error { return c.exec(ctx, tc) })
 	}
-
 	return eg.Wait()
 }
 
 func (c *Conveyer) Send(name, data string) error {
-	c.mu.Lock()
-	ch, ok := c.channels[name]
-	c.mu.Unlock()
+	ch, ok := c.get(name)
 	if !ok {
 		return ErrChannelMissing
 	}
-
-	select {
-	case ch <- data:
-		return nil
-	default:
+	if len(ch) == cap(ch) {
 		return errors.New("channel full")
 	}
+	ch <- data
+	return nil
 }
 
 func (c *Conveyer) Recv(name string) (string, error) {
-	c.mu.Lock()
-	ch, ok := c.channels[name]
-	c.mu.Unlock()
+	ch, ok := c.get(name)
 	if !ok {
 		return "undefined", ErrChannelMissing
 	}
-
 	val, ok := <-ch
 	if !ok {
 		return "undefined", nil
@@ -96,45 +103,26 @@ func (c *Conveyer) Recv(name string) (string, error) {
 	return val, nil
 }
 
-func (c *Conveyer) getOrCreate(name string) chan string {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	ch, ok := c.channels[name]
-	if !ok {
-		ch = make(chan string, c.size)
-		c.channels[name] = ch
+func (c *Conveyer) exec(ctx context.Context, t task) error {
+	if len(t.inputs) == 0 || len(t.outputs) == 0 {
+		return ErrChannelMissing
 	}
-	return ch
-}
 
-func (c *Conveyer) executeTask(ctx context.Context, t task) error {
 	switch t.kind {
 	case "decorator":
-		fn, ok := t.fn.(func(context.Context, chan string, chan string) error)
-		if !ok {
-			return errors.New("invalid decorator type")
-		}
-		return fn(ctx, c.getOrCreate(t.inputs[0]), c.getOrCreate(t.outputs[0]))
+		return t.fn.(func(context.Context, chan string, chan string) error)(ctx, c.getOrCreate(t.inputs[0]), c.getOrCreate(t.outputs[0]))
 	case "multiplexer":
-		fn, ok := t.fn.(func(context.Context, []chan string, chan string) error)
-		if !ok {
-			return errors.New("invalid multiplexer type")
-		}
 		ins := make([]chan string, len(t.inputs))
 		for i, n := range t.inputs {
 			ins[i] = c.getOrCreate(n)
 		}
-		return fn(ctx, ins, c.getOrCreate(t.outputs[0]))
+		return t.fn.(func(context.Context, []chan string, chan string) error)(ctx, ins, c.getOrCreate(t.outputs[0]))
 	case "separator":
-		fn, ok := t.fn.(func(context.Context, chan string, []chan string) error)
-		if !ok {
-			return errors.New("invalid separator type")
-		}
 		outs := make([]chan string, len(t.outputs))
 		for i, n := range t.outputs {
 			outs[i] = c.getOrCreate(n)
 		}
-		return fn(ctx, c.getOrCreate(t.inputs[0]), outs)
+		return t.fn.(func(context.Context, chan string, []chan string) error)(ctx, c.getOrCreate(t.inputs[0]), outs)
 	}
 	return errors.New("unknown task type")
 }
@@ -142,36 +130,21 @@ func (c *Conveyer) executeTask(ctx context.Context, t task) error {
 func (c *Conveyer) RegisterDecorator(fn func(context.Context, chan string, chan string) error, input, output string) {
 	c.getOrCreate(input)
 	c.getOrCreate(output)
-	c.tasks = append(c.tasks, task{
-		kind:    "decorator",
-		fn:      fn,
-		inputs:  []string{input},
-		outputs: []string{output},
-	})
+	c.tasks = append(c.tasks, task{"decorator", fn, []string{input}, []string{output}})
 }
 
 func (c *Conveyer) RegisterMultiplexer(fn func(context.Context, []chan string, chan string) error, inputs []string, output string) {
-	for _, in := range inputs {
-		c.getOrCreate(in)
+	for _, n := range inputs {
+		c.getOrCreate(n)
 	}
 	c.getOrCreate(output)
-	c.tasks = append(c.tasks, task{
-		kind:    "multiplexer",
-		fn:      fn,
-		inputs:  inputs,
-		outputs: []string{output},
-	})
+	c.tasks = append(c.tasks, task{"multiplexer", fn, inputs, []string{output}})
 }
 
 func (c *Conveyer) RegisterSeparator(fn func(context.Context, chan string, []chan string) error, input string, outputs []string) {
 	c.getOrCreate(input)
-	for _, out := range outputs {
-		c.getOrCreate(out)
+	for _, n := range outputs {
+		c.getOrCreate(n)
 	}
-	c.tasks = append(c.tasks, task{
-		kind:    "separator",
-		fn:      fn,
-		inputs:  []string{input},
-		outputs: outputs,
-	})
+	c.tasks = append(c.tasks, task{"separator", fn, []string{input}, outputs})
 }

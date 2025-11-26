@@ -13,6 +13,7 @@ type Conveyer struct {
 	handlers []func(ctx context.Context) error
 	size     int
 	mu       sync.Mutex
+	closed   bool
 }
 
 func New(size int) *Conveyer {
@@ -38,6 +39,11 @@ func (conv *Conveyer) get(name string) chan string {
 func (conv *Conveyer) closeAll() {
 	conv.mu.Lock()
 	defer conv.mu.Unlock()
+
+	if c.closed {
+		return
+	}
+	c.closed = true
 
 	for _, ch := range conv.channels {
 		close(ch)

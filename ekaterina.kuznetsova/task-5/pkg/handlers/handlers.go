@@ -8,7 +8,11 @@ import (
 )
 
 func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
-	defer close(output)
+	var once sync.Once
+
+	defer once.Do(func() {
+		close(output)
+	})
 	for {
 		select {
 		case <-ctx.Done():
@@ -32,7 +36,14 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 	if len(outputs) == 0 {
 		return errors.New("no outputs")
 	}
-	defer func() { for _, ch := range outputs { close(ch) } }()
+
+	var once sync.Once
+
+	defer once.Do(func() {
+		for _, ch := range outputs {
+			close(ch)
+		}
+	})
 
 	i := 0
 	for {
@@ -53,7 +64,11 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 	if len(inputs) == 0 {
 		return errors.New("no inputs")
 	}
-	defer close(output)
+	var once sync.Once
+
+	defer once.Do(func() {
+		close(output)
+	})
 
 	var wg sync.WaitGroup
 	for _, ch := range inputs {

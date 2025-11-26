@@ -6,9 +6,7 @@ import (
 	"strings"
 )
 
-var (
-	ErrCantDecorate = errors.New("can't be decorated")
-)
+var ErrCantDecorate = errors.New("can't be decorated")
 
 func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 	for {

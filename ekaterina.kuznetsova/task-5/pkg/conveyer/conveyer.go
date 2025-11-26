@@ -32,7 +32,6 @@ func (conv *Conveyer) get(name string) chan string {
 		ch = make(chan string, conv.size)
 		conv.channels[name] = ch
 	}
-
 	return ch
 }
 

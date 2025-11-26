@@ -75,8 +75,9 @@ func (c *Conveyer) Run(ctx context.Context) error {
 	errGroup, _ := errgroup.WithContext(ctx)
 
 	for _, taskItem := range c.tasks {
+
 		tc := taskItem
-		
+
 		errGroup.Go(func() error {
 			return c.exec(ctx, tc)
 		})
@@ -85,6 +86,7 @@ func (c *Conveyer) Run(ctx context.Context) error {
 	if err := errGroup.Wait(); err != nil {
 		return fmt.Errorf("run tasks failed: %w", err)
 	}
+	
 	return nil
 }
 
@@ -171,7 +173,7 @@ func (c *Conveyer) exec(ctx context.Context, taskItem task) error {
 }
 
 func (c *Conveyer) RegisterDecorator(
-	Decfunc func(context.Context, chan string, chan string) error,
+	decFunc func(context.Context, chan string, chan string) error,
 	input string,
 	output string,
 ) {
@@ -180,14 +182,14 @@ func (c *Conveyer) RegisterDecorator(
 
 	c.tasks = append(c.tasks, task{
 		kind:    "decorator",
-		fn:      Decfunc,
+		fn:      decFunc,
 		inputs:  []string{input},
 		outputs: []string{output},
 	})
 }
 
 func (c *Conveyer) RegisterMultiplexer(
-	Decfunc func(context.Context, []chan string, chan string) error,
+	decFunc func(context.Context, []chan string, chan string) error,
 	inputs []string,
 	output string,
 ) {
@@ -199,14 +201,14 @@ func (c *Conveyer) RegisterMultiplexer(
 
 	c.tasks = append(c.tasks, task{
 		kind:    "multiplexer",
-		fn:      Decfunc,
+		fn:      decFunc,
 		inputs:  inputs,
 		outputs: []string{output},
 	})
 }
 
 func (c *Conveyer) RegisterSeparator(
-	Decfunc func(context.Context, chan string, []chan string) error,
+	decFunc func(context.Context, chan string, []chan string) error,
 	input string,
 	outputs []string,
 ) {
@@ -218,7 +220,7 @@ func (c *Conveyer) RegisterSeparator(
 
 	c.tasks = append(c.tasks, task{
 		kind:    "separator",
-		fn:      Decfunc,
+		fn:      decFunc,
 		inputs:  []string{input},
 		outputs: outputs,
 	})

@@ -17,7 +17,7 @@ func PrefixDecoratorFunc(ctx context.Context, in, out chan string) error {
 			}
 
 			if strings.Contains(val, "no decorator") {
-				return errors.New("can’t be decorated")
+				return errors.New("can't be decorated")
 			}
 
 			if !strings.HasPrefix(val, "decorated: ") {

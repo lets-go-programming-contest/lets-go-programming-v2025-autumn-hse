@@ -74,10 +74,8 @@ func (c *Conveyer) Run(ctx context.Context) error {
 
 	errGroup, _ := errgroup.WithContext(ctx)
 	for _, taskItem := range c.tasks {
-		tc := taskItem
-
 		errGroup.Go(func() error {
-			return c.exec(ctx, tc)
+			return c.exec(ctx, taskItem)
 		})
 	}
 

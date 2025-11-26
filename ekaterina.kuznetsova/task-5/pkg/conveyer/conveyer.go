@@ -36,7 +36,7 @@ func (c *Conveyer) get(name string) (chan string, bool) {
 	return ch, ok
 }
 
-func (c *Conveyer) get(name string) chan string {
+func (c *Conveyer) getOrCreate(name string) chan string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if ch, ok := c.channels[name]; ok {

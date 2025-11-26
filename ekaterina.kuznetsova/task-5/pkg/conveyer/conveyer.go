@@ -3,6 +3,7 @@ package conveyer
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 
 	"golang.org/x/sync/errgroup"
@@ -27,7 +28,6 @@ var (
 	ErrChannelFull     = errors.New("channel full")
 	ErrUnknownTask     = errors.New("unknown task type")
 	ErrInvalidTaskFunc = errors.New("invalid task function")
-	ErrGroupWait = errors.New("error errgroup wait")
 )
 
 func New(size int) *Conveyer {
@@ -81,7 +81,7 @@ func (c *Conveyer) Run(ctx context.Context) error {
 	waitErr := errGroup.Wait()
 
 	if waitErr != nil {
-		return ErrGroupWait
+		return fmt.Errorf("errgroup wait: %w", waitErr)
 	}
 
 	return nil

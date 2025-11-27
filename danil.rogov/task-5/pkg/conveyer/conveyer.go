@@ -77,7 +77,8 @@ func (conveyer *Conveyer) Run(ctx context.Context) error {
 
 	errGroup, _ := errgroup.WithContext(ctx)
 
-	for _, task := range conveyer.tasks {
+	for i := range conveyer.tasks {
+		task := conveyer.tasks[i]
 		errGroup.Go(func() error {
 			switch task.name {
 			case "decorator":

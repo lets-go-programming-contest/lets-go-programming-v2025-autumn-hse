@@ -19,8 +19,8 @@ func (c *conveyerImpl) RegisterDecorator(
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	c.getOrCreateChannel(input)
-	c.getOrCreateChannel(output)
+	c.prepareChannel(input)
+	c.prepareChannel(output)
 
 	c.handlers = append(c.handlers, handlerConfig{
 		handlerType: handlerDecorator,

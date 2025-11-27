@@ -20,10 +20,10 @@ func (c *conveyerImpl) RegisterMultiplexer(
 	defer c.mutex.Unlock()
 
 	for _, inputName := range inputs {
-		c.getOrCreateChannel(inputName)
+		c.prepareChannel(inputName)
 	}
 
-	c.getOrCreateChannel(output)
+	c.prepareChannel(output)
 	c.handlers = append(c.handlers, handlerConfig{
 		handlerType: handlerMultiplexer,
 		fn:          multiplexerfn,

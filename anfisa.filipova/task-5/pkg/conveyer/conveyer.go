@@ -63,6 +63,7 @@ type conveyerImpl struct {
 
 func New(size int) Conveyer {
 	return &conveyerImpl{
+		mutex:       sync.Mutex{},
 		channels:    make(map[string]chan string),
 		handlers:    make([]handlerConfig, 0),
 		channelSize: size,

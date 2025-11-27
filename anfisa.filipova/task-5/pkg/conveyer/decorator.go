@@ -7,7 +7,7 @@ import (
 
 var errInvalidDecoratorFnType = errors.New("invalid decorator function type")
 
-func (c *conveyerImpl) RegisterDecorator(
+func (c *Conveyer) RegisterDecorator(
 	decoratorfn func(
 		ctx context.Context,
 		input chan string,
@@ -30,7 +30,7 @@ func (c *conveyerImpl) RegisterDecorator(
 	})
 }
 
-func (c *conveyerImpl) runDecorator(
+func (c *Conveyer) runDecorator(
 	ctx context.Context,
 	handler handlerConfig,
 	inputs []chan string,

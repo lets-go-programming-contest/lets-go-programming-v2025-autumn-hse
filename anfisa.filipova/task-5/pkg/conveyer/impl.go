@@ -16,7 +16,7 @@ var (
 	errUnknownHandlerType = errors.New("unknown handler type")
 )
 
-func (c *conveyerImpl) Send(input string, data string) error {
+func (c *Conveyer) Send(input string, data string) error {
 	channel, exists := c.channels[input]
 	if !exists {
 		return errChanNotFound
@@ -30,7 +30,7 @@ func (c *conveyerImpl) Send(input string, data string) error {
 	}
 }
 
-func (c *conveyerImpl) Recv(output string) (string, error) {
+func (c *Conveyer) Recv(output string) (string, error) {
 	channel, exists := c.channels[output]
 	if !exists {
 		return undefined, errChanNotFound
@@ -44,7 +44,7 @@ func (c *conveyerImpl) Recv(output string) (string, error) {
 	return data, nil
 }
 
-func (c *conveyerImpl) Run(ctx context.Context) error {
+func (c *Conveyer) Run(ctx context.Context) error {
 	defer c.closeAll()
 
 	errGroup, ctx := errgroup.WithContext(ctx)
@@ -63,7 +63,7 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 	return nil
 }
 
-func (c *conveyerImpl) runHandler(ctx context.Context, handler handlerConfig) error {
+func (c *Conveyer) runHandler(ctx context.Context, handler handlerConfig) error {
 	inputChannels := make([]chan string, len(handler.inputs))
 	for i, name := range handler.inputs {
 		inputChannels[i] = c.channels[name]
@@ -86,7 +86,7 @@ func (c *conveyerImpl) runHandler(ctx context.Context, handler handlerConfig) er
 	}
 }
 
-func (c *conveyerImpl) closeAll() {
+func (c *Conveyer) closeAll() {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -97,7 +97,7 @@ func (c *conveyerImpl) closeAll() {
 	c.handlers = nil
 }
 
-func (c *conveyerImpl) prepareChannel(name string) {
+func (c *Conveyer) prepareChannel(name string) {
 	if _, exists := c.channels[name]; !exists {
 		c.channels[name] = make(chan string, c.channelSize)
 	}

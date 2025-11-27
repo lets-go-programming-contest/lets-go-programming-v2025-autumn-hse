@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	ErrChanNotFound           = errors.New("channel not found")
-	ErrChanIsFull             = errors.New("channel is full")
+	ErrChanNotFound           = errors.New("chan not found")
+	ErrChanIsFull             = errors.New("chan is full")
 	ErrUnknownTask            = errors.New("unknown task type")
 	ErrInvalidDecoratorType   = errors.New("invalid decorator function type")
 	ErrInvalidMultiplexerType = errors.New("invalid multiplexer function type")

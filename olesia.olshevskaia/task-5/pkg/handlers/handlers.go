@@ -23,12 +23,15 @@ func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 			if !ok {
 				return nil
 			}
+
 			if strings.Contains(data, skipDecorator) {
 				return errCantBeDecorated
 			}
+
 			if !strings.HasPrefix(data, decoratedPrefix) {
 				data = decoratedPrefix + data
 			}
+
 			output <- data
 		}
 	}

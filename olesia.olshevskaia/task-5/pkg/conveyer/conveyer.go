@@ -170,6 +170,9 @@ func (c *Conveyer) RegisterDecorator(
 	input string,
 	output string,
 ) {
+	c.getOrCreateChannel(input)
+	c.getOrCreateChannel(output)
+
 	c.handlers = append(c.handlers, handlerConfig{
 		kind:    "decorator",
 		fn:      fn,
@@ -183,6 +186,11 @@ func (c *Conveyer) RegisterMultiplexer(
 	inputs []string,
 	output string,
 ) {
+	for _, inputName := range inputs {
+		c.getOrCreateChannel(inputName)
+	}
+	c.getOrCreateChannel(output)
+
 	c.handlers = append(c.handlers, handlerConfig{
 		kind:    "multiplexer",
 		fn:      fn,
@@ -196,6 +204,11 @@ func (c *Conveyer) RegisterSeparator(
 	input string,
 	outputs []string,
 ) {
+	c.getOrCreateChannel(input)
+	for _, outputName := range outputs {
+		c.getOrCreateChannel(outputName)
+	}
+
 	c.handlers = append(c.handlers, handlerConfig{
 		kind:    "separator",
 		fn:      fn,

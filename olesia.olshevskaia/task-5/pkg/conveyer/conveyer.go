@@ -123,11 +123,21 @@ func (c *Conveyer) Run(ctx context.Context) error {
 		}(handler)
 	}
 
+	done := make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+
 	select {
 	case err := <-errorChan:
 		c.closeAllChannels()
 		wg.Wait()
 		return err
+
+	case <-done:
+		c.closeAllChannels()
+		return nil
 
 	case <-ctx.Done():
 		c.closeAllChannels()

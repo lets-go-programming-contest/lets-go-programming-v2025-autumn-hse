@@ -61,7 +61,7 @@ type conveyerImpl struct {
 	channelSize int
 }
 
-func New(size int) Conveyer {
+func New(size int) *conveyerImpl {
 	return &conveyerImpl{
 		mutex:       sync.Mutex{},
 		channels:    make(map[string]chan string),

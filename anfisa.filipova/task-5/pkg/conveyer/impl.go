@@ -42,12 +42,13 @@ func (c *conveyerImpl) Recv(output string) (string, error) {
 	}
 
 	return data, nil
-
 }
 
 func (c *conveyerImpl) Run(ctx context.Context) error {
 	defer c.closeAll()
+
 	errGroup, ctx := errgroup.WithContext(ctx)
+
 	for _, handler := range c.handlers {
 		errGroup.Go(func() error {
 			return c.runHandler(ctx, handler)
@@ -96,13 +97,8 @@ func (c *conveyerImpl) closeAll() {
 	c.handlers = nil
 }
 
-func (c *conveyerImpl) getOrCreateChannel(name string) chan string {
-	if channel, exists := c.channels[name]; exists {
-		return channel
+func (c *conveyerImpl) prepareChannel(name string) {
+	if _, exists := c.channels[name]; !exists {
+		c.channels[name] = make(chan string, c.channelSize)
 	}
-
-	channel := make(chan string, c.channelSize)
-	c.channels[name] = channel
-
-	return channel
 }

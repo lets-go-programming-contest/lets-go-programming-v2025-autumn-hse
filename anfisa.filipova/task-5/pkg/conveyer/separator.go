@@ -18,10 +18,10 @@ func (c *conveyerImpl) RegisterSeparator(
 ) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+	c.prepareChannel(input)
 
-	c.getOrCreateChannel(input)
 	for _, outputName := range outputs {
-		c.getOrCreateChannel(outputName)
+		c.prepareChannel(outputName)
 	}
 
 	c.handlers = append(c.handlers, handlerConfig{

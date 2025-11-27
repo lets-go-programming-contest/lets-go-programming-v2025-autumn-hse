@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"strings"
+
+	"golang.org/x/sync/errgroup"
 )
 
 var ErrNoDecorator = errors.New("can't be decorated")
@@ -31,7 +33,6 @@ func PrefixDecoratorFunc(ctx context.Context, inputChan, outputChan chan string)
 
 			select {
 			case outputChan <- value:
-				continue
 			case <-ctx.Done():
 				return ctx.Err()
 			}
@@ -56,27 +57,28 @@ func SeparatorFunc(ctx context.Context, inputChan chan string, outputChans []cha
 			}
 
 			select {
-			case outputChans[chanIndex] <- value:
-				chanIndex = (chanIndex + 1) % chanCount
-				continue
 			case <-ctx.Done():
 				return ctx.Err()
+			case outputChans[chanIndex] <- value:
+				chanIndex = (chanIndex + 1) % chanCount
 			}
 		}
 	}
 }
 
 func MultiplexerFunc(ctx context.Context, inputChans []chan string, outputChan chan string) error {
+	errGroup, ctx := errgroup.WithContext(ctx)
+
 	for _, ch := range inputChans {
-		go func(input <-chan string) {
+		inputChan := ch
+		errGroup.Go(func() error {
 			for {
 				select {
 				case <-ctx.Done():
-					return
-
-				case value, ok := <-input:
+					return ctx.Err()
+				case value, ok := <-inputChan:
 					if !ok {
-						return
+						return nil
 					}
 
 					if strings.Contains(value, "no multiplexer") {
@@ -85,15 +87,13 @@ func MultiplexerFunc(ctx context.Context, inputChans []chan string, outputChan c
 
 					select {
 					case outputChan <- value:
-						continue
 					case <-ctx.Done():
-						return
+						return ctx.Err()
 					}
 				}
 			}
-		}(ch)
+		})
 	}
 
-	<-ctx.Done()
-	return ctx.Err()
+	return errGroup.Wait()
 }

@@ -77,8 +77,7 @@ func (conveyer *Conveyer) Run(ctx context.Context) error {
 
 	errGroup, _ := errgroup.WithContext(ctx)
 
-	for i := range conveyer.tasks {
-		task := conveyer.tasks[i]
+	for _, task := range conveyer.tasks {
 		errGroup.Go(func() error {
 			switch task.name {
 			case "decorator":
@@ -140,7 +139,12 @@ func (conveyer *Conveyer) executeDecorator(ctx context.Context, task task) error
 	inputChan := conveyer.getOrCreate(task.inputs[0])
 	outputChan := conveyer.getOrCreate(task.outputs[0])
 
-	return decoratorFunc(ctx, inputChan, outputChan)
+	err := decoratorFunc(ctx, inputChan, outputChan)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (conveyer *Conveyer) executeMultiplexer(ctx context.Context, task task) error {

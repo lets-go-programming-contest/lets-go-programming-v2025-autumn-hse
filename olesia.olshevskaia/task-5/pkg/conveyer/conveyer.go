@@ -69,42 +69,31 @@ func (c *Conveyer) getChannel(name string) (chan string, error) {
 }
 
 func (c *Conveyer) Send(input string, data string) error {
-	ch, err := c.getChannel(input)
+	сhannel, err := c.getChannel(input)
 	if err != nil {
 		return err
 	}
 
-	if len(ch) == cap(ch) {
+	if len(сhannel) == cap(сhannel) {
 		return ErrChannelFull
 	}
-	ch <- data
+	сhannel <- data
 
 	return nil
 }
 
 func (c *Conveyer) Recv(output string) (string, error) {
-	ch, err := c.getChannel(output)
-
+	сhannel, err := c.getChannel(output)
 	if err != nil {
 		return undefined, err
 	}
 
-	data, ok := <-ch
+	data, ok := <-сhannel
 	if !ok {
 		return undefined, nil
 	}
 
 	return data, nil
-}
-
-func (c *Conveyer) closeAllChannels() {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	for name, ch := range c.channels {
-		close(ch)
-		delete(c.channels, name)
-	}
 }
 
 func (c *Conveyer) Run(ctx context.Context) error {
@@ -135,29 +124,42 @@ func (c *Conveyer) Run(ctx context.Context) error {
 func (c *Conveyer) runHandler(ctx context.Context, h handlerConfig) error {
 	switch h.kind {
 	case "decorator":
-		fn := h.fn.(func(context.Context, chan string, chan string) error)
+		fn, ok := h.fn.(func(context.Context, chan string, chan string) error)
+		if !ok {
+			return fmt.Errorf("invalid type of handler function for one input/one output")
+		}
 		input := c.getOrCreateChannel(h.inputs[0])
 		output := c.getOrCreateChannel(h.outputs[0])
+
 		return fn(ctx, input, output)
 
 	case "multiplexer":
-		fn := h.fn.(func(context.Context, []chan string, chan string) error)
+		fn, ok := h.fn.(func(context.Context, []chan string, chan string) error)
+		if !ok {
+			return fmt.Errorf("invalid handler function type for multiple inputs/one output")
+		}
 		inputs := make([]chan string, len(h.inputs))
 		for i, name := range h.inputs {
 			inputs[i] = c.getOrCreateChannel(name)
 		}
 		output := c.getOrCreateChannel(h.outputs[0])
+
 		return fn(ctx, inputs, output)
 
 	case "separator":
-		fn := h.fn.(func(context.Context, chan string, []chan string) error)
+		fn, ok := h.fn.(func(context.Context, chan string, []chan string) error)
+		if !ok {
+			return fmt.Errorf("invalid handler function type for one input/multiple outputs")
+		}
 		input := c.getOrCreateChannel(h.inputs[0])
 		outputs := make([]chan string, len(h.outputs))
 		for i, name := range h.outputs {
 			outputs[i] = c.getOrCreateChannel(name)
 		}
+
 		return fn(ctx, input, outputs)
 	}
+
 	return nil
 }
 

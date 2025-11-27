@@ -8,37 +8,50 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+var (
+	ErrAlreadyStarted     = errors.New("already started")
+	ErrUnknownHandlerType = errors.New("unknown handler type")
+	ErrChanNotFound       = errors.New("chan not found")
+)
+
 func New(size int) *conveyerImpl {
 	return &conveyerImpl{
-		size:  size,
-		chans: make(map[string]chan string),
+		size:     size,
+		chans:    make(map[string]chan string),
+		handlers: []handler{},
+		started:  false,
 	}
 }
 
 func (c *conveyerImpl) Run(ctx context.Context) error {
 	c.mu.Lock()
+
 	if c.started {
 		c.mu.Unlock()
-		return fmt.Errorf("already started")
+		return ErrAlreadyStarted
 	}
 	c.started = true
+
 	c.mu.Unlock()
 
-	g, ctx := errgroup.WithContext(ctx)
+	group, ctx := errgroup.WithContext(ctx)
 
 	for _, h := range c.handlers {
-		h := h
 
-		g.Go(func() error {
+		group.Go(func() error {
 			c.mu.RLock()
+
 			inChans := make([]chan string, len(h.inputIDs))
 			outChans := make([]chan string, len(h.outputIDs))
+
 			for i, id := range h.inputIDs {
 				inChans[i] = c.chans[id]
 			}
+
 			for i, id := range h.outputIDs {
 				outChans[i] = c.chans[id]
 			}
+
 			c.mu.RUnlock()
 
 			switch h.kind {
@@ -49,12 +62,12 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 			case hSeparator:
 				return h.fnSeparator(ctx, inChans[0], outChans)
 			default:
-				return fmt.Errorf("unknown handler type")
+				return ErrUnknownHandlerType
 			}
 		})
 	}
 
-	err := g.Wait()
+	err := group.Wait()
 
 	c.mu.Lock()
 	for _, ch := range c.chans {
@@ -62,32 +75,35 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 	}
 	c.mu.Unlock()
 
-	return err
+	if err != nil {
+		return fmt.Errorf("handler error: %w", err)
+	}
+	return nil
 }
 
 func (c *conveyerImpl) Send(id string, data string) error {
 	c.mu.RLock()
-	ch, ok := c.chans[id]
+	channel, ok := c.chans[id]
 	c.mu.RUnlock()
 
 	if !ok {
-		return errors.New("chan not found")
+		return ErrChanNotFound
 	}
 
-	ch <- data
+	channel <- data
 	return nil
 }
 
 func (c *conveyerImpl) Recv(id string) (string, error) {
 	c.mu.RLock()
-	ch, ok := c.chans[id]
+	channel, ok := c.chans[id]
 	c.mu.RUnlock()
 
 	if !ok {
-		return "", errors.New("chan not found")
+		return "", ErrChanNotFound
 	}
 
-	v, ok := <-ch
+	v, ok := <-channel
 	if !ok {
 		return "undefined", nil
 	}

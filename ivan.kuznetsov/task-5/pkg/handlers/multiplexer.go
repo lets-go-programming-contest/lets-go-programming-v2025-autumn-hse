@@ -11,6 +11,7 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 
 	for _, input := range inputs {
 		inputsWg.Add(1)
+
 		go func(inChan chan string) {
 			defer inputsWg.Done()
 

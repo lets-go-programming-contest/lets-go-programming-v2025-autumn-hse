@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -17,6 +18,7 @@ var (
 func New(size int) *conveyerImpl {
 	return &conveyerImpl{
 		size:     size,
+		mu:       sync.RWMutex{},
 		chans:    make(map[string]chan string),
 		handlers: []handler{},
 		started:  false,

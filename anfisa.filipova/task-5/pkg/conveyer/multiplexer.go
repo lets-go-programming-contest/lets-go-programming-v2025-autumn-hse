@@ -2,8 +2,10 @@ package conveyer
 
 import (
 	"context"
-	"fmt"
+	"errors"
 )
+
+var errInvalidMultiplexerFnType = errors.New("invalid multiplexer function type")
 
 func (c *conveyerImpl) RegisterMultiplexer(
 	fn func(
@@ -38,7 +40,7 @@ func (c *conveyerImpl) runMultiplexer(
 ) error {
 	multiplexerfn, ok := handler.fn.(func(ctx context.Context, inputs []chan string, output chan string) error)
 	if !ok {
-		return fmt.Errorf("invalid multiplexer function type")
+		return errInvalidMultiplexerFnType
 	}
 
 	return multiplexerfn(ctx, inputs, outputs[0])

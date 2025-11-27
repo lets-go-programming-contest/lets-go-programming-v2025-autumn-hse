@@ -2,34 +2,36 @@ package handlers
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"strings"
 )
 
+const (
+	noDecorator     = "no decorator"
+	prefixDecorated = "decorated: "
+)
+
+var errCannotBeDecorated = errors.New("can't be decorated")
+
 func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {
-	prefix := "decorated: "
 	for {
 		select {
+		case <-ctx.Done():
+			return nil
 		case data, ok := <-input:
 			if !ok {
 				return nil
 			}
 
-			if strings.Contains(data, "no decorator") {
-				return fmt.Errorf("can't be decorated")
+			if strings.Contains(data, noDecorator) {
+				return errCannotBeDecorated
 			}
 
-			if !strings.HasPrefix(data, prefix) {
-				data = prefix + data
+			if !strings.HasPrefix(data, prefixDecorated) {
+				data = prefixDecorated + data
 			}
 
-			select {
-			case output <- data:
-			case <-ctx.Done():
-				return ctx.Err()
-			}
-		case <-ctx.Done():
-			return ctx.Err()
+			output <- data
 		}
 	}
 }

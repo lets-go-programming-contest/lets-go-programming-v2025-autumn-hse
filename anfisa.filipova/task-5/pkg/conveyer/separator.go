@@ -2,8 +2,10 @@ package conveyer
 
 import (
 	"context"
-	"fmt"
+	"errors"
 )
+
+var errInvalidSeparatorFnType = errors.New("invalid separator function type")
 
 func (c *conveyerImpl) RegisterSeparator(
 	fn func(
@@ -37,7 +39,7 @@ func (c *conveyerImpl) runSeparator(
 ) error {
 	separatorfn, ok := handler.fn.(func(ctx context.Context, input chan string, outputs []chan string) error)
 	if !ok {
-		return fmt.Errorf("invalid separator function type")
+		return errInvalidSeparatorFnType
 	}
 
 	return separatorfn(ctx, inputs[0], outputs)

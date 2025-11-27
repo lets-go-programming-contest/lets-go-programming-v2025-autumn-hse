@@ -1,6 +1,9 @@
 package conveyer
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
 func (c *conveyerImpl) RegisterMultiplexer(
 	fn func(
@@ -11,18 +14,32 @@ func (c *conveyerImpl) RegisterMultiplexer(
 	inputs []string,
 	output string,
 ) {
-	c.m.Lock()
-	defer c.m.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
 	for _, inputName := range inputs {
-		c.getChannel(inputName)
+		c.getOrCreateChannel(inputName)
 	}
 
-	c.getChannel(output)
+	c.getOrCreateChannel(output)
 	c.handlers = append(c.handlers, handlerConfig{
 		handlerType: handlerMultiplexer,
 		fn:          fn,
 		inputs:      inputs,
-		output:      output,
+		outputs:     []string{output},
 	})
+}
+
+func (c *conveyerImpl) runMultiplexer(
+	ctx context.Context,
+	handler handlerConfig,
+	inputs []chan string,
+	outputs []chan string,
+) error {
+	multiplexerfn, ok := handler.fn.(func(ctx context.Context, inputs []chan string, output chan string) error)
+	if !ok {
+		return fmt.Errorf("invalid multiplexer function type")
+	}
+
+	return multiplexerfn(ctx, inputs, outputs[0])
 }

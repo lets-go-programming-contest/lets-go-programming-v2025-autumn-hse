@@ -50,14 +50,12 @@ const (
 type handlerConfig struct {
 	handlerType handlerType
 	fn          interface{}
-	input       string
 	inputs      []string
-	output      string
 	outputs     []string
 }
 
 type conveyerImpl struct {
-	m           sync.RWMutex
+	mutex       sync.Mutex
 	channels    map[string]chan string
 	handlers    []handlerConfig
 	channelSize int
@@ -66,6 +64,7 @@ type conveyerImpl struct {
 func New(size int) Conveyer {
 	return &conveyerImpl{
 		channels:    make(map[string]chan string),
+		handlers:    make([]handlerConfig, 0),
 		channelSize: size,
 	}
 }

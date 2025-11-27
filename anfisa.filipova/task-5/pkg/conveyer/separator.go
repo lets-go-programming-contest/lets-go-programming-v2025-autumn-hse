@@ -8,7 +8,7 @@ import (
 var errInvalidSeparatorFnType = errors.New("invalid separator function type")
 
 func (c *conveyerImpl) RegisterSeparator(
-	fn func(
+	separatorfn func(
 		ctx context.Context,
 		input chan string,
 		outputs []chan string,
@@ -26,7 +26,7 @@ func (c *conveyerImpl) RegisterSeparator(
 
 	c.handlers = append(c.handlers, handlerConfig{
 		handlerType: handlerSeparator,
-		fn:          fn,
+		fn:          separatorfn,
 		inputs:      []string{input},
 		outputs:     outputs,
 	})

@@ -8,7 +8,7 @@ import (
 var errInvalidMultiplexerFnType = errors.New("invalid multiplexer function type")
 
 func (c *conveyerImpl) RegisterMultiplexer(
-	fn func(
+	multiplexerfn func(
 		ctx context.Context,
 		inputs []chan string,
 		output chan string,
@@ -26,7 +26,7 @@ func (c *conveyerImpl) RegisterMultiplexer(
 	c.getOrCreateChannel(output)
 	c.handlers = append(c.handlers, handlerConfig{
 		handlerType: handlerMultiplexer,
-		fn:          fn,
+		fn:          multiplexerfn,
 		inputs:      inputs,
 		outputs:     []string{output},
 	})

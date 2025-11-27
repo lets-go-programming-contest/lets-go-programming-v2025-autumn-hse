@@ -23,6 +23,7 @@ func (c *conveyerImpl) RegisterSeparator(
 	for _, outputName := range outputs {
 		c.getOrCreateChannel(outputName)
 	}
+
 	c.handlers = append(c.handlers, handlerConfig{
 		handlerType: handlerSeparator,
 		fn:          fn,

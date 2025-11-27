@@ -58,6 +58,7 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("conveyer error: %w", err)
 	}
+
 	return nil
 }
 
@@ -87,9 +88,11 @@ func (c *conveyerImpl) runHandler(ctx context.Context, handler handlerConfig) er
 func (c *conveyerImpl) closeAll() {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+
 	for _, ch := range c.channels {
 		close(ch)
 	}
+
 	c.handlers = nil
 }
 
@@ -97,7 +100,9 @@ func (c *conveyerImpl) getOrCreateChannel(name string) chan string {
 	if ch, exists := c.channels[name]; exists {
 		return ch
 	}
+
 	ch := make(chan string, c.channelSize)
 	c.channels[name] = ch
+
 	return ch
 }

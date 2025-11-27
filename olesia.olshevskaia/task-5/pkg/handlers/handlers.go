@@ -55,23 +55,24 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 }
 
 func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
-	for {
-		select {
-		case <-ctx.Done():
-			return nil
-		default:
-			for _, in := range inputs {
+	for _, in := range inputs {
+		go func(input chan string) {
+			for {
 				select {
-				case data, ok := <-in:
+				case <-ctx.Done():
+					return
+				case data, ok := <-input:
 					if !ok {
-						continue
+						return
 					}
 					if !strings.Contains(data, skipMultiplexer) {
 						output <- data
 					}
-				default:
 				}
 			}
-		}
+		}(in)
 	}
+
+	<-ctx.Done()
+	return nil
 }

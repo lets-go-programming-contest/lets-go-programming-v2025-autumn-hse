@@ -25,42 +25,41 @@ func New(size int) *conveyerImpl {
 
 func (c *conveyerImpl) Run(ctx context.Context) error {
 	c.mu.Lock()
-
 	if c.started {
 		c.mu.Unlock()
+
 		return ErrAlreadyStarted
 	}
-	c.started = true
 
+	c.started = true
 	c.mu.Unlock()
 
 	group, ctx := errgroup.WithContext(ctx)
 
-	for _, h := range c.handlers {
-
+	for _, handl := range c.handlers {
 		group.Go(func() error {
 			c.mu.RLock()
 
-			inChans := make([]chan string, len(h.inputIDs))
-			outChans := make([]chan string, len(h.outputIDs))
+			inChans := make([]chan string, len(handl.inputIDs))
+			outChans := make([]chan string, len(handl.outputIDs))
 
-			for i, id := range h.inputIDs {
+			for i, id := range handl.inputIDs {
 				inChans[i] = c.chans[id]
 			}
 
-			for i, id := range h.outputIDs {
+			for i, id := range handl.outputIDs {
 				outChans[i] = c.chans[id]
 			}
 
 			c.mu.RUnlock()
 
-			switch h.kind {
+			switch handl.kind {
 			case hDecorator:
-				return h.fnDecorator(ctx, inChans[0], outChans[0])
+				return handl.fnDecorator(ctx, inChans[0], outChans[0])
 			case hMultiplexer:
-				return h.fnMultiplexer(ctx, inChans, outChans[0])
+				return handl.fnMultiplexer(ctx, inChans, outChans[0])
 			case hSeparator:
-				return h.fnSeparator(ctx, inChans[0], outChans)
+				return handl.fnSeparator(ctx, inChans[0], outChans)
 			default:
 				return ErrUnknownHandlerType
 			}
@@ -78,33 +77,35 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("handler error: %w", err)
 	}
+
 	return nil
 }
 
 func (c *conveyerImpl) Send(id string, data string) error {
 	c.mu.RLock()
-	channel, ok := c.chans[id]
+	channel, okey := c.chans[id]
 	c.mu.RUnlock()
 
-	if !ok {
+	if !okey {
 		return ErrChanNotFound
 	}
 
 	channel <- data
+
 	return nil
 }
 
 func (c *conveyerImpl) Recv(id string) (string, error) {
 	c.mu.RLock()
-	channel, ok := c.chans[id]
+	channel, okey := c.chans[id]
 	c.mu.RUnlock()
 
-	if !ok {
+	if !okey {
 		return "", ErrChanNotFound
 	}
 
-	v, ok := <-channel
-	if !ok {
+	v, okey := <-channel
+	if !okey {
 		return "undefined", nil
 	}
 

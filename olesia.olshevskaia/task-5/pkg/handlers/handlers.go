@@ -60,13 +60,17 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 			select {
 			case <-ctx.Done():
 				return nil
+
 			case value, ok := <-channel:
 				if !ok {
 					continue
 				}
-				if !strings.Contains(value, skipMultiplexer) {
-					output <- value
+
+				if strings.Contains(value, skipMultiplexer) {
+					continue
 				}
+
+				output <- value
 			default:
 			}
 		}

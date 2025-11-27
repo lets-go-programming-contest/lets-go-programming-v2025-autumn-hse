@@ -11,18 +11,17 @@ import (
 const undefined = "undefined"
 
 var (
-	errChanNotFound = errors.New("chan not found")
-	errChanIsFull   = errors.New("chan is full")
-	errChanIsEmpty  = errors.New("chan is empty")
+	errChanNotFound       = errors.New("chan not found")
+	errChanIsFull         = errors.New("chan is full")
+	errUnknownHandlerType = errors.New("unknown handler type")
 )
 
 func (c *conveyerImpl) Send(input string, data string) error {
-	c.mutex.RLock()
-	defer c.mutex.RUnlock()
 	ch, exists := c.channels[input]
 	if !exists {
 		return errChanNotFound
 	}
+
 	select {
 	case ch <- data:
 		return nil
@@ -32,21 +31,18 @@ func (c *conveyerImpl) Send(input string, data string) error {
 }
 
 func (c *conveyerImpl) Recv(output string) (string, error) {
-	c.mutex.RLock()
-	defer c.mutex.RUnlock()
 	ch, exists := c.channels[output]
 	if !exists {
-		return "", errChanNotFound
+		return undefined, errChanNotFound
 	}
-	select {
-	case data, ok := <-ch:
-		if !ok {
-			return undefined, nil
-		}
-		return data, nil
-	default: //empty, but open
-		return "", errChanIsEmpty
+
+	data, ok := <-ch
+	if !ok {
+		return undefined, nil
 	}
+
+	return data, nil
+
 }
 
 func (c *conveyerImpl) Run(ctx context.Context) error {
@@ -84,7 +80,7 @@ func (c *conveyerImpl) runHandler(ctx context.Context, handler handlerConfig) er
 	case handlerSeparator:
 		return c.runSeparator(ctx, handler, inputChannels, outputChannels)
 	default:
-		return fmt.Errorf("unknown handler type")
+		return errUnknownHandlerType
 	}
 }
 

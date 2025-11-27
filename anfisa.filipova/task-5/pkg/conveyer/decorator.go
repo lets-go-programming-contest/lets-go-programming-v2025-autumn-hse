@@ -2,8 +2,10 @@ package conveyer
 
 import (
 	"context"
-	"fmt"
+	"errors"
 )
+
+var errInvalidDecoratorFnType = errors.New("invalid decorator function type")
 
 func (c *conveyerImpl) RegisterDecorator(
 	fn func(
@@ -36,7 +38,7 @@ func (c *conveyerImpl) runDecorator(
 ) error {
 	decoratorfn, ok := handler.fn.(func(ctx context.Context, input chan string, output chan string) error)
 	if !ok {
-		return fmt.Errorf("invalid decorator function type")
+		return errInvalidDecoratorFnType
 	}
 
 	return decoratorfn(ctx, inputs[0], outputs[0])

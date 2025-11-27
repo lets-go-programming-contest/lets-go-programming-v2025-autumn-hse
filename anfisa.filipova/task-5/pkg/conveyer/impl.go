@@ -17,13 +17,13 @@ var (
 )
 
 func (c *conveyerImpl) Send(input string, data string) error {
-	ch, exists := c.channels[input]
+	channel, exists := c.channels[input]
 	if !exists {
 		return errChanNotFound
 	}
 
 	select {
-	case ch <- data:
+	case channel <- data:
 		return nil
 	default:
 		return errChanIsFull
@@ -31,12 +31,12 @@ func (c *conveyerImpl) Send(input string, data string) error {
 }
 
 func (c *conveyerImpl) Recv(output string) (string, error) {
-	ch, exists := c.channels[output]
+	channel, exists := c.channels[output]
 	if !exists {
 		return undefined, errChanNotFound
 	}
 
-	data, ok := <-ch
+	data, ok := <-channel
 	if !ok {
 		return undefined, nil
 	}
@@ -89,20 +89,20 @@ func (c *conveyerImpl) closeAll() {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	for _, ch := range c.channels {
-		close(ch)
+	for _, channel := range c.channels {
+		close(channel)
 	}
 
 	c.handlers = nil
 }
 
 func (c *conveyerImpl) getOrCreateChannel(name string) chan string {
-	if ch, exists := c.channels[name]; exists {
-		return ch
+	if channel, exists := c.channels[name]; exists {
+		return channel
 	}
 
-	ch := make(chan string, c.channelSize)
-	c.channels[name] = ch
+	channel := make(chan string, c.channelSize)
+	c.channels[name] = channel
 
-	return ch
+	return channel
 }

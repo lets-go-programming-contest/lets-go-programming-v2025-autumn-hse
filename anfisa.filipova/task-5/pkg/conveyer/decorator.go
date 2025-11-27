@@ -8,7 +8,7 @@ import (
 var errInvalidDecoratorFnType = errors.New("invalid decorator function type")
 
 func (c *conveyerImpl) RegisterDecorator(
-	fn func(
+	decoratorfn func(
 		ctx context.Context,
 		input chan string,
 		output chan string,
@@ -24,7 +24,7 @@ func (c *conveyerImpl) RegisterDecorator(
 
 	c.handlers = append(c.handlers, handlerConfig{
 		handlerType: handlerDecorator,
-		fn:          fn,
+		fn:          decoratorfn,
 		inputs:      []string{input},
 		outputs:     []string{output},
 	})

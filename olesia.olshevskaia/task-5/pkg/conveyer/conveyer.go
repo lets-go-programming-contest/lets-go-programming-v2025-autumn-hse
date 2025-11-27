@@ -3,7 +3,10 @@ package conveyer
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
+
+	"golang.org/x/sync/errgroup"
 )
 
 var (
@@ -105,45 +108,28 @@ func (c *Conveyer) closeAllChannels() {
 }
 
 func (c *Conveyer) Run(ctx context.Context) error {
-	var wg sync.WaitGroup
-	errorChan := make(chan error, 1)
-
-	for _, handler := range c.handlers {
-		wg.Add(1)
-
-		go func(h handlerConfig) {
-			defer wg.Done()
-
-			if err := c.runHandler(ctx, h); err != nil {
-				select {
-				case errorChan <- err:
-				default:
-				}
-			}
-		}(handler)
-	}
-
-	done := make(chan struct{})
-	go func() {
-		wg.Wait()
-		close(done)
+	defer func() {
+		c.mu.Lock()
+		for _, ch := range c.channels {
+			close(ch)
+		}
+		c.mu.Unlock()
 	}()
 
-	select {
-	case err := <-errorChan:
-		c.closeAllChannels()
-		wg.Wait()
-		return err
+	errGroup, gctx := errgroup.WithContext(ctx)
 
-	case <-done:
-		c.closeAllChannels()
-		return nil
-
-	case <-ctx.Done():
-		c.closeAllChannels()
-		wg.Wait()
-		return ctx.Err()
+	for _, taskItem := range c.handlers {
+		ti := taskItem
+		errGroup.Go(func() error {
+			return c.runHandler(gctx, ti)
+		})
 	}
+
+	if err := errGroup.Wait(); err != nil {
+		return fmt.Errorf("failed: %w", err)
+	}
+
+	return nil
 }
 
 func (c *Conveyer) runHandler(ctx context.Context, h handlerConfig) error {

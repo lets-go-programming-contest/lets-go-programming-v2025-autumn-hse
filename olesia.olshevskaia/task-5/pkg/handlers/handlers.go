@@ -32,7 +32,11 @@ func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 				data = decoratedPrefix + data
 			}
 
-			output <- data
+			select {
+			case <-ctx.Done():
+				return nil
+			case output <- data:
+			}
 		}
 	}
 }
@@ -48,7 +52,12 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 				return nil
 			}
 
-			outputs[i] <- data
+			select {
+			case <-ctx.Done():
+				return nil
+			case outputs[i] <- data:
+			}
+
 			i = (i + 1) % len(outputs)
 		}
 	}
@@ -60,7 +69,6 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 			select {
 			case <-ctx.Done():
 				return nil
-
 			case value, ok := <-channel:
 				if !ok {
 					continue
@@ -70,7 +78,11 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 					continue
 				}
 
-				output <- value
+				select {
+				case <-ctx.Done():
+					return nil
+				case output <- value:
+				}
 			default:
 			}
 		}

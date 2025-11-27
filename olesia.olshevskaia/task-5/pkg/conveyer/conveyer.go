@@ -10,9 +10,12 @@ import (
 )
 
 var (
-	ErrChannelNotFound        = errors.New("chan not found")
-	ErrChannelFull            = errors.New("channel full")
-	ErrConveyerAlreadyRunning = errors.New("conveyer already running")
+	ErrChannelNotFound           = errors.New("chan not found")
+	ErrChannelFull               = errors.New("channel full")
+	ErrConveyerAlreadyRunning    = errors.New("conveyer already running")
+	ErrInvalidDecoratorHandler   = errors.New("invalid type of handler function for one input/one output")
+	ErrInvalidMultiplexerHandler = errors.New("invalid handler function type for multiple inputs/one output")
+	ErrInvalidSeparatorHandler   = errors.New("invalid handler function type for one input/multiple outputs")
 )
 
 const (
@@ -128,7 +131,7 @@ func (c *Conveyer) runHandler(ctx context.Context, handler handlerConfig) error 
 	case "decorator":
 		handlerFunc, ok := handler.fn.(func(context.Context, chan string, chan string) error)
 		if !ok {
-			return errors.New("invalid type of handler function for one input/one output")
+			return ErrInvalidDecoratorHandler
 		}
 
 		inputChannel := c.getOrCreateChannel(handler.inputs[0])
@@ -139,7 +142,7 @@ func (c *Conveyer) runHandler(ctx context.Context, handler handlerConfig) error 
 	case "multiplexer":
 		handlerFunc, ok := handler.fn.(func(context.Context, []chan string, chan string) error)
 		if !ok {
-			return errors.New("invalid handler function type for multiple inputs/one output")
+			return ErrInvalidMultiplexerHandler
 		}
 
 		inputChannels := make([]chan string, len(handler.inputs))
@@ -155,7 +158,7 @@ func (c *Conveyer) runHandler(ctx context.Context, handler handlerConfig) error 
 	case "separator":
 		handlerFunc, ok := handler.fn.(func(context.Context, chan string, []chan string) error)
 		if !ok {
-			return errors.New("invalid handler function type for one input/multiple outputs")
+			return ErrInvalidSeparatorHandler
 		}
 
 		inputChannel := c.getOrCreateChannel(handler.inputs[0])

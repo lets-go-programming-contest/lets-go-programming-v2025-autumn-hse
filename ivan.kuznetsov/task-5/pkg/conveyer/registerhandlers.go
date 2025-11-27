@@ -9,7 +9,7 @@ func (c *conveyerImpl) createChanIfNotExist(id string) {
 }
 
 func (c *conveyerImpl) RegisterDecorator(
-	fn func(context.Context, chan string, chan string) error,
+	fnHandler func(context.Context, chan string, chan string) error,
 	input string,
 	output string,
 ) {
@@ -20,15 +20,17 @@ func (c *conveyerImpl) RegisterDecorator(
 	c.createChanIfNotExist(output)
 
 	c.handlers = append(c.handlers, handler{
-		kind:        hDecorator,
-		fnDecorator: fn,
-		inputIDs:    []string{input},
-		outputIDs:   []string{output},
+		kind:          hDecorator,
+		fnDecorator:   fnHandler,
+		fnMultiplexer: nil,
+		fnSeparator:   nil,
+		inputIDs:      []string{input},
+		outputIDs:     []string{output},
 	})
 }
 
 func (c *conveyerImpl) RegisterMultiplexer(
-	fn func(context.Context, []chan string, chan string) error,
+	fnHandler func(context.Context, []chan string, chan string) error,
 	inputs []string,
 	output string,
 ) {
@@ -38,18 +40,21 @@ func (c *conveyerImpl) RegisterMultiplexer(
 	for _, id := range inputs {
 		c.createChanIfNotExist(id)
 	}
+
 	c.createChanIfNotExist(output)
 
 	c.handlers = append(c.handlers, handler{
 		kind:          hMultiplexer,
-		fnMultiplexer: fn,
+		fnDecorator:   nil,
+		fnMultiplexer: fnHandler,
+		fnSeparator:   nil,
 		inputIDs:      inputs,
 		outputIDs:     []string{output},
 	})
 }
 
 func (c *conveyerImpl) RegisterSeparator(
-	fn func(context.Context, chan string, []chan string) error,
+	fnHandler func(context.Context, chan string, []chan string) error,
 	input string,
 	outputs []string,
 ) {
@@ -57,14 +62,17 @@ func (c *conveyerImpl) RegisterSeparator(
 	defer c.mu.Unlock()
 
 	c.createChanIfNotExist(input)
+
 	for _, id := range outputs {
 		c.createChanIfNotExist(id)
 	}
 
 	c.handlers = append(c.handlers, handler{
-		kind:        hSeparator,
-		fnSeparator: fn,
-		inputIDs:    []string{input},
-		outputIDs:   outputs,
+		kind:          hSeparator,
+		fnDecorator:   nil,
+		fnMultiplexer: nil,
+		fnSeparator:   fnHandler,
+		inputIDs:      []string{input},
+		outputIDs:     outputs,
 	})
 }

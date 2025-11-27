@@ -7,12 +7,12 @@ import (
 )
 
 func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
-	var wg sync.WaitGroup
+	var inputsWg sync.WaitGroup
 
 	for _, input := range inputs {
-		wg.Add(1)
+		inputsWg.Add(1)
 		go func(in chan string) {
-			defer wg.Done()
+			defer inputsWg.Done()
 
 			for {
 				select {
@@ -37,6 +37,7 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 		}(input)
 	}
 
-	wg.Wait()
+	inputsWg.Wait()
+
 	return nil
 }

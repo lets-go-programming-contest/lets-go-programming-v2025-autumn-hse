@@ -7,6 +7,7 @@ import (
 
 	"github.com/VlasfimosY/task-3/internal/config"
 	"github.com/VlasfimosY/task-3/internal/jsonwriter"
+	"github.com/VlasfimosY/task-3/internal/models"
 	"github.com/VlasfimosY/task-3/internal/xmlparser"
 )
 
@@ -19,16 +20,16 @@ func main() {
 		panic(fmt.Sprintf("Error loading config: %v", err))
 	}
 
-	currencies, err := xmlparser.DecodeXML(cfg.InputFile)
+	valCurs, err := xmlparser.Read[models.ValCurs](cfg.InputFile)
 	if err != nil {
 		panic(fmt.Sprintf("Error decoding XML: %v", err))
 	}
 
-	sort.Slice(currencies, func(i, j int) bool {
-		return currencies[i].Value > currencies[j].Value
+	sort.Slice(valCurs.Currencies, func(i, j int) bool {
+		return valCurs.Currencies[i].Value > valCurs.Currencies[j].Value
 	})
 
-	if err := jsonwriter.SaveJSON(cfg.OutputFile, currencies, jsonwriter.DefaultDirPerm); err != nil {
+	if err := jsonwriter.SaveJSON(cfg.OutputFile, valCurs.Currencies, cfg.DirPerm, cfg.FilePerm); err != nil {
 		panic(fmt.Sprintf("Error saving JSON: %v", err))
 	}
 

@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/VlasfimosY/task-3/internal/models"
@@ -10,26 +9,23 @@ import (
 )
 
 func Load(configPath *string) (*models.Config, error) {
-	file, err := os.Open(*configPath)
+	data, err := os.ReadFile(*configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open config file: %w", err)
 	}
 
-	defer func() {
-		if cerr := file.Close(); cerr != nil {
-			panic(fmt.Sprintf("failed to close config file %s: %v", *configPath, cerr))
-		}
-	}()
-
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return nil, fmt.Errorf("cannot read config file: %w", err)
-	}
-
-	var config models.Config
-	if err := yaml.Unmarshal(data, &config); err != nil {
+	var cfg models.Config
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal YAML: %w", err)
 	}
 
-	return &config, nil
+	if cfg.DirPerm == 0 {
+		cfg.DirPerm = 0o755
+	}
+
+	if cfg.FilePerm == 0 {
+		cfg.FilePerm = 0o644
+	}
+
+	return &cfg, nil
 }

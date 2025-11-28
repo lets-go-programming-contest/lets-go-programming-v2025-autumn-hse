@@ -23,19 +23,18 @@ type ValCurs struct {
 type DecimalFloat float64
 
 func (df *DecimalFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var s string
-	if err := d.DecodeElement(&s, &start); err != nil {
+	var valueStr string
+	if err := d.DecodeElement(&valueStr, &start); err != nil {
 		return fmt.Errorf("failed to decode Value element: %w", err)
 	}
-	
-	s = strings.ReplaceAll(s, ",", ".")
-	v, err := strconv.ParseFloat(s, 64)
 
+	valueStr = strings.ReplaceAll(valueStr, ",", ".")
+	parsedValue, err := strconv.ParseFloat(valueStr, 64)
 	if err != nil {
-		return fmt.Errorf("cannot parse %q as float: %w", s, err)
+		return fmt.Errorf("cannot parse %q as float: %w", valueStr, err)
 	}
 
-	*df = DecimalFloat(v)
+	*df = DecimalFloat(parsedValue)
 
 	return nil
 }
@@ -45,7 +44,7 @@ func (df DecimalFloat) MarshalJSON() ([]byte, error) {
 }
 
 type Currency struct {
-	NumCode  int         `json:"num_code"  xml:"NumCode"`
-	CharCode string      `json:"char_code" xml:"CharCode"`
+	NumCode  int          `json:"num_code"  xml:"NumCode"`
+	CharCode string       `json:"char_code" xml:"CharCode"`
 	Value    DecimalFloat `json:"value"     xml:"Value"`
 }

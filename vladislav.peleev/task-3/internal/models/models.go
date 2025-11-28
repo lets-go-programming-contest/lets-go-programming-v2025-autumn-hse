@@ -29,6 +29,7 @@ func (df *DecimalFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) err
 	}
 
 	valueStr = strings.ReplaceAll(valueStr, ",", ".")
+
 	parsedValue, err := strconv.ParseFloat(valueStr, 64)
 	if err != nil {
 		return fmt.Errorf("cannot parse %q as float: %w", valueStr, err)

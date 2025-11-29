@@ -16,8 +16,8 @@ func (c *Conveyer) RegisterDecorator(
 	input string,
 	output string,
 ) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
 
 	c.prepareChannel(input)
 	c.prepareChannel(output)

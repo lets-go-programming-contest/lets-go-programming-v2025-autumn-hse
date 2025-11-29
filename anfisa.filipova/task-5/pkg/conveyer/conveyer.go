@@ -20,7 +20,7 @@ type handlerConfig struct {
 }
 
 type Conveyer struct {
-	mutex       sync.Mutex
+	mutex       sync.RWMutex
 	channels    map[string]chan string
 	handlers    []handlerConfig
 	channelSize int
@@ -28,7 +28,7 @@ type Conveyer struct {
 
 func New(size int) *Conveyer {
 	return &Conveyer{
-		mutex:       sync.Mutex{},
+		mutex:       sync.RWMutex{},
 		channels:    make(map[string]chan string),
 		handlers:    make([]handlerConfig, 0),
 		channelSize: size,

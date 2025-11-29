@@ -45,7 +45,7 @@ func (c *Conveyer) Recv(output string) (string, error) {
 }
 
 func (c *Conveyer) Run(ctx context.Context) error {
-	defer c.closeAll()
+	defer c.closeAllChannels()
 
 	errGroup, ctx := errgroup.WithContext(ctx)
 
@@ -86,9 +86,9 @@ func (c *Conveyer) runHandler(ctx context.Context, handler handlerConfig) error 
 	}
 }
 
-func (c *Conveyer) closeAll() {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+func (c *Conveyer) closeAllChannels() {
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
 
 	for _, channel := range c.channels {
 		close(channel)

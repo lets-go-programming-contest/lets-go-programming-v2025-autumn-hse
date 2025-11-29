@@ -30,6 +30,8 @@ var (
 	ErrInvalidTaskFunc = errors.New("invalid task function")
 )
 
+var undefined = "undefined"
+
 func New(size int) *Conveyer {
 	return &Conveyer{
 		channels: make(map[string]chan string),
@@ -105,12 +107,12 @@ func (c *Conveyer) Send(name, data string) error {
 func (c *Conveyer) Recv(name string) (string, error) {
 	channel, found := c.get(name)
 	if !found {
-		return "undefined", ErrChanNotFound
+		return undefined, ErrChanNotFound
 	}
 
 	val, ok := <-channel
 	if !ok {
-		return "undefined", nil
+		return undefined, nil
 	}
 
 	return val, nil

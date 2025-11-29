@@ -50,7 +50,7 @@ func (c *Conveyer) get(name string) (chan string, bool) {
 	return channel, found
 }
 
-func (c *Conveyer) getOrCreate(name string) chan string {
+func (c *Conveyer) registr(name string) chan string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -130,8 +130,8 @@ func (c *Conveyer) exec(ctx context.Context, taskItem task) error {
 			return ErrInvalidTaskFunc
 		}
 
-		inputChannel := c.getOrCreate(taskItem.inputs[0])
-		outputChannel := c.getOrCreate(taskItem.outputs[0])
+		inputChannel := c.registr(taskItem.inputs[0])
+		outputChannel := c.registr(taskItem.outputs[0])
 
 		return decoratorFn(ctx, inputChannel, outputChannel)
 
@@ -144,10 +144,10 @@ func (c *Conveyer) exec(ctx context.Context, taskItem task) error {
 		ins := make([]chan string, len(taskItem.inputs))
 
 		for index, name := range taskItem.inputs {
-			ins[index] = c.getOrCreate(name)
+			ins[index] = c.registr(name)
 		}
 
-		outputChannel := c.getOrCreate(taskItem.outputs[0])
+		outputChannel := c.registr(taskItem.outputs[0])
 
 		return multiplexerFn(ctx, ins, outputChannel)
 
@@ -160,10 +160,10 @@ func (c *Conveyer) exec(ctx context.Context, taskItem task) error {
 		outs := make([]chan string, len(taskItem.outputs))
 
 		for index, name := range taskItem.outputs {
-			outs[index] = c.getOrCreate(name)
+			outs[index] = c.registr(name)
 		}
 
-		inputChannel := c.getOrCreate(taskItem.inputs[0])
+		inputChannel := c.registr(taskItem.inputs[0])
 
 		return separatorFn(ctx, inputChannel, outs)
 	}
@@ -176,8 +176,8 @@ func (c *Conveyer) RegisterDecorator(
 	input string,
 	output string,
 ) {
-	c.getOrCreate(input)
-	c.getOrCreate(output)
+	c.registr(input)
+	c.registr(output)
 
 	c.tasks = append(c.tasks, task{
 		kind:    "decorator",
@@ -193,10 +193,10 @@ func (c *Conveyer) RegisterMultiplexer(
 	output string,
 ) {
 	for _, name := range inputs {
-		c.getOrCreate(name)
+		c.registr(name)
 	}
 
-	c.getOrCreate(output)
+	c.registr(output)
 
 	c.tasks = append(c.tasks, task{
 		kind:    "multiplexer",
@@ -211,10 +211,10 @@ func (c *Conveyer) RegisterSeparator(
 	input string,
 	outputs []string,
 ) {
-	c.getOrCreate(input)
+	c.registr(input)
 
 	for _, name := range outputs {
-		c.getOrCreate(name)
+		c.registr(name)
 	}
 
 	c.tasks = append(c.tasks, task{

@@ -13,7 +13,7 @@ type Conveyer struct {
 	channels map[string]chan string
 	size     int
 	tasks    []task
-	mu       sync.Mutex
+	mu       sync.RWMutex
 }
 
 type task struct {
@@ -30,20 +30,20 @@ var (
 	ErrInvalidTaskFunc = errors.New("invalid task function")
 )
 
-var undefined = "undefined"
+const undefined = "undefined"
 
 func New(size int) *Conveyer {
 	return &Conveyer{
 		channels: make(map[string]chan string),
 		size:     size,
 		tasks:    []task{},
-		mu:       sync.Mutex{},
+		mu:       sync.RWMutex{},
 	}
 }
 
 func (c *Conveyer) get(name string) (chan string, bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 
 	channel, found := c.channels[name]
 

@@ -6,14 +6,10 @@ import (
 	"strings"
 )
 
-func PrefixDecoratorFunc(ctx context.Context, in chan string, out chan string) error {
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-		}
+var ErrCannotDecorate = errors.New("can't be decorated")
 
+func Decorator(ctx context.Context, in chan string, out chan string) error {
+	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -23,7 +19,7 @@ func PrefixDecoratorFunc(ctx context.Context, in chan string, out chan string) e
 			}
 
 			if strings.Contains(data, "no decorator") {
-				return errors.New("can't decorate")
+				return ErrCannotDecorate
 			}
 
 			if !strings.HasPrefix(data, "decorated: ") {
@@ -39,16 +35,10 @@ func PrefixDecoratorFunc(ctx context.Context, in chan string, out chan string) e
 	}
 }
 
-func SeparatorFunc(ctx context.Context, in chan string, outs []chan string) error {
+func Separator(ctx context.Context, in chan string, outs []chan string) error {
 	i := 0
 
 	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-		}
-
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -72,7 +62,7 @@ func SeparatorFunc(ctx context.Context, in chan string, outs []chan string) erro
 	}
 }
 
-func MultiplexerFunc(ctx context.Context, ins []chan string, out chan string) error {
+func Multiplexer(ctx context.Context, ins []chan string, out chan string) error {
 	merged := make(chan string, 64)
 
 	for _, in := range ins {
@@ -101,7 +91,11 @@ func MultiplexerFunc(ctx context.Context, ins []chan string, out chan string) er
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case data := <-merged:
+		case data, ok := <-merged:
+			if !ok {
+				close(out)
+				return nil
+			}
 			select {
 			case <-ctx.Done():
 				return ctx.Err()

@@ -9,10 +9,11 @@ import (
 )
 
 var (
-	ErrPipeNotFound = errors.New("pipe not found")
-	ErrPipeFull     = errors.New("pipe is full")
-	ErrPipeClosed   = errors.New("pipe closed")
-	ErrNoData       = errors.New("no data available")
+	ErrChanNotFound    = errors.New("chan not found")
+	ErrChanFull        = errors.New("channel is full")
+	ErrChanClosed      = errors.New("channel closed")
+	ErrUndefined       = errors.New("undefined")
+	ErrCannotDecorate  = errors.New("can't be decorated")
 )
 
 type Pipeline struct {
@@ -27,8 +28,8 @@ type Pipeline struct {
 }
 
 type Stage struct {
-	sType   string
-	fn      interface{}
+	sType   string      // "decorator", "multiplexer", "separator"
+	fn      interface{} // вызываемая функция
 	inputs  []string
 	outputs []string
 }
@@ -44,6 +45,7 @@ func New(bufSize int) *Pipeline {
 func (p *Pipeline) ensurePipe(id string) chan string {
 	p.mu.Lock()
 	defer p.mu.Unlock()
+
 	if ch, ok := p.pipes[id]; ok {
 		return ch
 	}
@@ -55,16 +57,18 @@ func (p *Pipeline) ensurePipe(id string) chan string {
 func (p *Pipeline) getPipe(id string) (chan string, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
+
 	ch, ok := p.pipes[id]
 	if !ok {
-		return nil, ErrPipeNotFound
+		return nil, ErrChanNotFound
 	}
 	return ch, nil
 }
 
-func (p *Pipeline) RegisterDecorator(fn func(context.Context, chan string, chan string) error, in, out string) {
+func (p *Pipeline) RegisterDecorator(fn func(context.Context, chan string, chan string) error, in string, out string) {
 	p.ensurePipe(in)
 	p.ensurePipe(out)
+
 	p.stages = append(p.stages, Stage{
 		sType:   "decorator",
 		fn:      fn,
@@ -73,59 +77,52 @@ func (p *Pipeline) RegisterDecorator(fn func(context.Context, chan string, chan 
 	})
 }
 
-func (p *Pipeline) RegisterMultiplexer(fn func(context.Context, []chan string, chan string) error, ins []string, out string) {
-	for _, id := range ins {
-		p.ensurePipe(id)
+func (p *Pipeline) RegisterMultiplexer(fn func(context.Context, []chan string, chan string) error, inputs []string, output string) {
+	for _, in := range inputs {
+		p.ensurePipe(in)
 	}
-	p.ensurePipe(out)
+	p.ensurePipe(output)
+
 	p.stages = append(p.stages, Stage{
 		sType:   "multiplexer",
 		fn:      fn,
-		inputs:  ins,
-		outputs: []string{out},
+		inputs:  inputs,
+		outputs: []string{output},
 	})
 }
 
-func (p *Pipeline) RegisterSeparator(fn func(context.Context, chan string, []chan string) error, in string, outs []string) {
-	p.ensurePipe(in)
-	for _, id := range outs {
-		p.ensurePipe(id)
+func (p *Pipeline) RegisterSeparator(fn func(context.Context, chan string, []chan string) error, input string, outputs []string) {
+	p.ensurePipe(input)
+	for _, out := range outputs {
+		p.ensurePipe(out)
 	}
+
 	p.stages = append(p.stages, Stage{
 		sType:   "separator",
 		fn:      fn,
-		inputs:  []string{in},
-		outputs: outs,
+		inputs:  []string{input},
+		outputs: outputs,
 	})
 }
 
-// Run запускает все стадии через errgroup
+// Run запускает все стадии с использованием errgroup
 func (p *Pipeline) Run(ctx context.Context) error {
 	ctx, p.cancel = context.WithCancel(ctx)
 	g, ctx := errgroup.WithContext(ctx)
 
 	for _, st := range p.stages {
-		st := st // локальная копия
+		st := st
 		g.Go(func() error {
-			return p.runStage(ctx, st)
+			return p.runStageSafe(ctx, st)
 		})
 	}
 
-	err := g.Wait()
-
-	// После завершения закрываем все каналы
-	p.mu.Lock()
-	for id, ch := range p.pipes {
-		close(ch)
-		delete(p.pipes, id)
-	}
-	p.mu.Unlock()
-
-	return err
+	return g.Wait() // дождёмся всех стадий или первой ошибки
 }
 
-func (p *Pipeline) runStage(ctx context.Context, st Stage) error {
+func (p *Pipeline) runStageSafe(ctx context.Context, st Stage) error {
 	switch st.sType {
+
 	case "decorator":
 		fn := st.fn.(func(context.Context, chan string, chan string) error)
 		in, _ := p.getPipe(st.inputs[0])
@@ -134,36 +131,41 @@ func (p *Pipeline) runStage(ctx context.Context, st Stage) error {
 
 	case "multiplexer":
 		fn := st.fn.(func(context.Context, []chan string, chan string) error)
+
 		ins := make([]chan string, len(st.inputs))
 		for i, id := range st.inputs {
 			ins[i], _ = p.getPipe(id)
 		}
 		out, _ := p.getPipe(st.outputs[0])
+
 		return fn(ctx, ins, out)
 
 	case "separator":
 		fn := st.fn.(func(context.Context, chan string, []chan string) error)
+
 		in, _ := p.getPipe(st.inputs[0])
 		outs := make([]chan string, len(st.outputs))
 		for i, id := range st.outputs {
 			outs[i], _ = p.getPipe(id)
 		}
+
 		return fn(ctx, in, outs)
 	}
 
 	return nil
 }
 
-func (p *Pipeline) Send(pipe, data string) error {
+func (p *Pipeline) Send(pipe string, data string) error {
 	ch, err := p.getPipe(pipe)
 	if err != nil {
 		return err
 	}
+
 	select {
 	case ch <- data:
 		return nil
 	default:
-		return ErrPipeFull
+		return ErrChanFull
 	}
 }
 
@@ -172,14 +174,15 @@ func (p *Pipeline) Recv(pipe string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	select {
 	case v, ok := <-ch:
 		if !ok {
-			return "", ErrPipeClosed
+			return "", ErrChanClosed
 		}
 		return v, nil
 	default:
-		return "", ErrNoData
+		return "", ErrUndefined
 	}
 }
 
@@ -187,4 +190,11 @@ func (p *Pipeline) Stop() {
 	if p.cancel != nil {
 		p.cancel()
 	}
+
+	p.mu.Lock()
+	for k, ch := range p.pipes {
+		close(ch)
+		delete(p.pipes, k)
+	}
+	p.mu.Unlock()
 }

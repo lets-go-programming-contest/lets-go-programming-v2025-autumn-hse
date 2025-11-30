@@ -9,11 +9,10 @@ import (
 )
 
 var (
-	ErrChanNotFound    = errors.New("chan not found")
-	ErrChanFull        = errors.New("channel is full")
-	ErrChanClosed      = errors.New("channel closed")
-	ErrUndefined       = errors.New("undefined")
-	ErrCannotDecorate  = errors.New("can't be decorated")
+	ErrPipeNotFound = errors.New("chan not found")
+	ErrPipeFull     = errors.New("channel is full")
+	ErrPipeClosed   = errors.New("channel closed")
+	ErrNoData       = errors.New("no data available")
 )
 
 type Pipeline struct {
@@ -25,6 +24,7 @@ type Pipeline struct {
 	stages []Stage
 
 	cancel context.CancelFunc
+	wg     sync.WaitGroup
 }
 
 type Stage struct {
@@ -60,7 +60,7 @@ func (p *Pipeline) getPipe(id string) (chan string, error) {
 
 	ch, ok := p.pipes[id]
 	if !ok {
-		return nil, ErrChanNotFound
+		return nil, ErrPipeNotFound
 	}
 	return ch, nil
 }
@@ -105,22 +105,22 @@ func (p *Pipeline) RegisterSeparator(fn func(context.Context, chan string, []cha
 	})
 }
 
-// Run запускает все стадии с использованием errgroup
 func (p *Pipeline) Run(ctx context.Context) error {
-	ctx, p.cancel = context.WithCancel(ctx)
+	ctx, cancel := context.WithCancel(ctx)
+	p.cancel = cancel
 	g, ctx := errgroup.WithContext(ctx)
 
 	for _, st := range p.stages {
-		st := st
+		stage := st
 		g.Go(func() error {
-			return p.runStageSafe(ctx, st)
+			return p.runStage(ctx, stage)
 		})
 	}
-
-	return g.Wait() // дождёмся всех стадий или первой ошибки
+	err := g.Wait()
+	return err
 }
 
-func (p *Pipeline) runStageSafe(ctx context.Context, st Stage) error {
+func (p *Pipeline) runStage(ctx context.Context, st Stage) error {
 	switch st.sType {
 
 	case "decorator":
@@ -131,27 +131,22 @@ func (p *Pipeline) runStageSafe(ctx context.Context, st Stage) error {
 
 	case "multiplexer":
 		fn := st.fn.(func(context.Context, []chan string, chan string) error)
-
 		ins := make([]chan string, len(st.inputs))
 		for i, id := range st.inputs {
 			ins[i], _ = p.getPipe(id)
 		}
 		out, _ := p.getPipe(st.outputs[0])
-
 		return fn(ctx, ins, out)
 
 	case "separator":
 		fn := st.fn.(func(context.Context, chan string, []chan string) error)
-
 		in, _ := p.getPipe(st.inputs[0])
 		outs := make([]chan string, len(st.outputs))
 		for i, id := range st.outputs {
 			outs[i], _ = p.getPipe(id)
 		}
-
 		return fn(ctx, in, outs)
 	}
-
 	return nil
 }
 
@@ -164,8 +159,8 @@ func (p *Pipeline) Send(pipe string, data string) error {
 	select {
 	case ch <- data:
 		return nil
-	default:
-		return ErrChanFull
+	case <-context.Background().Done():
+		return ErrPipeFull
 	}
 }
 
@@ -178,11 +173,11 @@ func (p *Pipeline) Recv(pipe string) (string, error) {
 	select {
 	case v, ok := <-ch:
 		if !ok {
-			return "", ErrChanClosed
+			return "", ErrPipeClosed
 		}
 		return v, nil
 	default:
-		return "", ErrUndefined
+		return "", ErrNoData
 	}
 }
 
@@ -197,4 +192,6 @@ func (p *Pipeline) Stop() {
 		delete(p.pipes, k)
 	}
 	p.mu.Unlock()
+
+	p.wg.Wait()
 }

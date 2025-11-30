@@ -6,10 +6,14 @@ import (
 	"strings"
 )
 
-var ErrCannotDecorate = errors.New("can't be decorated")
-
 func PrefixDecoratorFunc(ctx context.Context, in chan string, out chan string) error {
 	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -17,15 +21,12 @@ func PrefixDecoratorFunc(ctx context.Context, in chan string, out chan string) e
 			if !ok {
 				return nil
 			}
-
 			if strings.Contains(data, "no decorator") {
-				return ErrCannotDecorate
+				return errors.New("can't be decorated")
 			}
-
 			if !strings.HasPrefix(data, "decorated: ") {
 				data = "decorated: " + data
 			}
-
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
@@ -37,8 +38,13 @@ func PrefixDecoratorFunc(ctx context.Context, in chan string, out chan string) e
 
 func SeparatorFunc(ctx context.Context, in chan string, outs []chan string) error {
 	i := 0
-
 	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -49,10 +55,8 @@ func SeparatorFunc(ctx context.Context, in chan string, outs []chan string) erro
 				}
 				return nil
 			}
-
 			idx := i % len(outs)
 			i++
-
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
@@ -64,14 +68,17 @@ func SeparatorFunc(ctx context.Context, in chan string, outs []chan string) erro
 
 func MultiplexerFunc(ctx context.Context, ins []chan string, out chan string) error {
 	merged := make(chan string, 64)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	for _, in := range ins {
-		go func(ch chan string) {
+		inChan := in
+		go func() {
 			for {
 				select {
 				case <-ctx.Done():
 					return
-				case data, ok := <-ch:
+				case data, ok := <-inChan:
 					if !ok {
 						return
 					}
@@ -84,20 +91,18 @@ func MultiplexerFunc(ctx context.Context, ins []chan string, out chan string) er
 					}
 				}
 			}
-		}(in)
+		}()
 	}
 
 	for {
 		select {
 		case <-ctx.Done():
+			close(out)
 			return ctx.Err()
-		case data, ok := <-merged:
-			if !ok {
-				close(out)
-				return nil
-			}
+		case data := <-merged:
 			select {
 			case <-ctx.Done():
+				close(out)
 				return ctx.Err()
 			case out <- data:
 			}

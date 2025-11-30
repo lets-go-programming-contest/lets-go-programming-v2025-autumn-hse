@@ -2,7 +2,7 @@ package conveyer
 
 import "context"
 
-func (c *conveyerImpl) createChanIfNotExist(id string) {
+func (c *conveyerImpl) ensureChannel(id string) {
 	if _, ok := c.chans[id]; !ok {
 		c.chans[id] = make(chan string, c.size)
 	}
@@ -16,8 +16,8 @@ func (c *conveyerImpl) RegisterDecorator(
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	c.createChanIfNotExist(input)
-	c.createChanIfNotExist(output)
+	c.ensureChannel(input)
+	c.ensureChannel(output)
 
 	c.handlers = append(c.handlers, handler{
 		kind:          hDecorator,
@@ -38,10 +38,10 @@ func (c *conveyerImpl) RegisterMultiplexer(
 	defer c.mu.Unlock()
 
 	for _, id := range inputs {
-		c.createChanIfNotExist(id)
+		c.ensureChannel(id)
 	}
 
-	c.createChanIfNotExist(output)
+	c.ensureChannel(output)
 
 	c.handlers = append(c.handlers, handler{
 		kind:          hMultiplexer,
@@ -61,10 +61,10 @@ func (c *conveyerImpl) RegisterSeparator(
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	c.createChanIfNotExist(input)
+	c.ensureChannel(input)
 
 	for _, id := range outputs {
-		c.createChanIfNotExist(id)
+		c.ensureChannel(id)
 	}
 
 	c.handlers = append(c.handlers, handler{

@@ -2,9 +2,13 @@ package conveyer
 
 import "context"
 
+func (c *conveyerImpl) initChannel(id string) {
+	c.chans[id] = make(chan string, c.size)
+}
+
 func (c *conveyerImpl) ensureChannel(id string) {
 	if _, ok := c.chans[id]; !ok {
-		c.chans[id] = make(chan string, c.size)
+		c.initChannel(id)
 	}
 }
 

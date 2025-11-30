@@ -26,7 +26,7 @@ const (
 )
 
 const (
-	undefined = "undefined"
+	undefinedStr = "undefined"
 )
 
 var (
@@ -102,12 +102,12 @@ func (c *conveyer) Recv(output string) (string, error) {
 	c.mutex.Unlock()
 
 	if !exists {
-		return undefined, ErrChanNotFound
+		return undefinedStr, ErrChanNotFound
 	}
 
 	data, ok := <-channel
 	if !ok {
-		return undefined, nil
+		return undefinedStr, nil
 	}
 
 	return data, nil
@@ -122,7 +122,7 @@ func (c *conveyer) getChannel(name string) (chan string, bool) {
 	return ch, ok
 }
 
-func (c *conveyer) getOrCreateChannel(name string) chan string {
+func (c *conveyer) ensureChannel(name string) chan string {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 

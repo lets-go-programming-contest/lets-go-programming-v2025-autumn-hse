@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"strings"
-	"golang.org/x/sync/errgroup"
 )
 
 func PrefixDecoratorFunc(ctx context.Context, in chan string, out chan string) error {
@@ -58,58 +57,47 @@ func SeparatorFunc(ctx context.Context, in chan string, outs []chan string) erro
 				return ctx.Err()
 			case outs[idx] <- data:
 			}
+		default:
 		}
 	}
 }
 
-func MultiplexerFunc(ctx context.Context, ins []chan string, out chan string) error {
-	merged := make(chan string)
-	g, ctx := errgroup.WithContext(ctx)
+func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
+	openChannels := len(inputs)
 
-	for _, inChan := range ins {
-		ch := inChan
-		g.Go(func() error {
-			for {
-				select {
-				case <-ctx.Done():
-					return ctx.Err()
-				case data, ok := <-ch:
-					if !ok {
-						return nil
-					}
-					if !strings.Contains(data, "no multiplexer") {
-						select {
-						case <-ctx.Done():
-							return ctx.Err()
-						case merged <- data:
-						}
-					}
-				}
+	for openChannels > 0 {
+		for i := 0; i < len(inputs); i++ {
+			ch := inputs[i]
+			if ch == nil {
+				continue
 			}
-		})
-	}
 
-	go func() {
-		g.Wait()
-		close(merged)
-	}()
-
-	for {
-		select {
-		case <-ctx.Done():
-			close(out)
-			return ctx.Err()
-		case data, ok := <-merged:
-			if !ok {
-				close(out)
-				return nil
-			}
 			select {
 			case <-ctx.Done():
-				close(out)
+				close(output)
 				return ctx.Err()
-			case out <- data:
+			case data, ok := <-ch:
+				if !ok {
+					openChannels--
+					inputs[i] = nil
+					continue
+				}
+
+				if strings.Contains(data, "no multiplexer") {
+					continue
+				}
+
+				select {
+				case <-ctx.Done():
+					close(output)
+					return ctx.Err()
+				case output <- data:
+				}
+			default:
 			}
 		}
 	}
+
+	close(output)
+	return nil
 }

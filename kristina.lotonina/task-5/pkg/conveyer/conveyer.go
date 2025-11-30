@@ -24,7 +24,6 @@ type Pipeline struct {
 	stages []Stage
 
 	cancel context.CancelFunc
-	wg     sync.WaitGroup
 }
 
 type Stage struct {
@@ -38,7 +37,7 @@ func New(bufSize int) *Pipeline {
 	return &Pipeline{
 		bufSize: bufSize,
 		pipes:   make(map[string]chan string),
-		stages:  make([]Stage, 0),
+		stages:  []Stage{},
 	}
 }
 
@@ -68,7 +67,6 @@ func (p *Pipeline) getPipe(id string) (chan string, error) {
 func (p *Pipeline) RegisterDecorator(fn func(context.Context, chan string, chan string) error, in string, out string) {
 	p.ensurePipe(in)
 	p.ensurePipe(out)
-
 	p.stages = append(p.stages, Stage{
 		sType:   "decorator",
 		fn:      fn,
@@ -82,7 +80,6 @@ func (p *Pipeline) RegisterMultiplexer(fn func(context.Context, []chan string, c
 		p.ensurePipe(in)
 	}
 	p.ensurePipe(output)
-
 	p.stages = append(p.stages, Stage{
 		sType:   "multiplexer",
 		fn:      fn,
@@ -96,7 +93,6 @@ func (p *Pipeline) RegisterSeparator(fn func(context.Context, chan string, []cha
 	for _, out := range outputs {
 		p.ensurePipe(out)
 	}
-
 	p.stages = append(p.stages, Stage{
 		sType:   "separator",
 		fn:      fn,
@@ -116,13 +112,11 @@ func (p *Pipeline) Run(ctx context.Context) error {
 			return p.runStage(ctx, stage)
 		})
 	}
-	err := g.Wait()
-	return err
+	return g.Wait()
 }
 
 func (p *Pipeline) runStage(ctx context.Context, st Stage) error {
 	switch st.sType {
-
 	case "decorator":
 		fn := st.fn.(func(context.Context, chan string, chan string) error)
 		in, _ := p.getPipe(st.inputs[0])
@@ -192,6 +186,4 @@ func (p *Pipeline) Stop() {
 		delete(p.pipes, k)
 	}
 	p.mu.Unlock()
-
-	p.wg.Wait()
 }

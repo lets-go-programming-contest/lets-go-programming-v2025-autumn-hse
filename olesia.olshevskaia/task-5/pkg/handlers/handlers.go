@@ -32,7 +32,11 @@ func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 				data = decoratedPrefix + data
 			}
 
-			output <- data
+			select {
+			case <-ctx.Done():
+				return nil
+			case output <- data:
+			}
 		}
 	}
 }

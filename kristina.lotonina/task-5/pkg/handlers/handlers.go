@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
-	"string"
+	"strings"
 )
 
 func Decorator(ctx context.Context, in chan string, out chan string) error {

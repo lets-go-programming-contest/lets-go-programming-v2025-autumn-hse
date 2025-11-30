@@ -8,7 +8,7 @@ import (
 
 var ErrCannotDecorate = errors.New("can't be decorated")
 
-func Decorator(ctx context.Context, in chan string, out chan string) error {
+func PrefixDecoratorFunc(ctx context.Context, in chan string, out chan string) error {
 	for {
 		select {
 		case <-ctx.Done():
@@ -35,7 +35,7 @@ func Decorator(ctx context.Context, in chan string, out chan string) error {
 	}
 }
 
-func Separator(ctx context.Context, in chan string, outs []chan string) error {
+func SeparatorFunc(ctx context.Context, in chan string, outs []chan string) error {
 	i := 0
 
 	for {
@@ -62,7 +62,7 @@ func Separator(ctx context.Context, in chan string, outs []chan string) error {
 	}
 }
 
-func Multiplexer(ctx context.Context, ins []chan string, out chan string) error {
+func MultiplexerFunc(ctx context.Context, ins []chan string, out chan string) error {
 	merged := make(chan string, 64)
 
 	for _, in := range ins {

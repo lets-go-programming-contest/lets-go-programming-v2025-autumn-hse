@@ -28,8 +28,8 @@ type Pipeline struct {
 }
 
 type Stage struct {
-	sType   string      // "decorator", "multiplexer", "separator"
-	fn      interface{} // вызываемая функция
+	sType   string
+	fn      interface{}
 	inputs  []string
 	outputs []string
 }

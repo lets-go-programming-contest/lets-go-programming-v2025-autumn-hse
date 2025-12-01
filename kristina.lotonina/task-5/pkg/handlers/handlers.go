@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"strings"
-	"sync"
 
 	"golang.org/x/sync/errgroup"
 )

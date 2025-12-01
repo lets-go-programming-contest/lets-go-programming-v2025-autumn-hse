@@ -3,15 +3,9 @@ package handlers
 import (
 	"context"
 	"strings"
-
-	"golang.org/x/sync/errgroup"
 )
 
 func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {
-	defer func() {
-		close(output)
-	}()
-
 	for {
 		select {
 		case <-ctx.Done():
@@ -39,13 +33,9 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 }
 
 func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string) error {
-	defer func() {
-		for _, output := range outputs {
-			close(output)
-		}
-	}()
-
 	counter := 0
+	outputCount := len(outputs)
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -55,51 +45,66 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 				return nil
 			}
 
-			outputIndex := counter % len(outputs)
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case outputs[outputIndex] <- data:
+			for attempt := 0; attempt < outputCount; attempt++ {
+				outputIndex := (counter + attempt) % outputCount
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case outputs[outputIndex] <- data:
+					counter = (outputIndex + 1) % outputCount
+					break
+				default:
+					continue
+				}
+				break
 			}
-
-			counter++
 		}
 	}
 }
 
 func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
-	defer close(output)
+	merged := make(chan string, len(inputs)*2)
 
-	g, ctx := errgroup.WithContext(ctx)
-	merged := make(chan string, len(inputs)*10)
+	done := make(chan struct{}, len(inputs))
 
-	for _, input := range inputs {
-		input := input
-		g.Go(func() error {
+	for _, in := range inputs {
+		go func(inputChan chan string) {
+			defer func() {
+				done <- struct{}{}
+			}()
+
 			for {
 				select {
 				case <-ctx.Done():
-					return ctx.Err()
-				case data, ok := <-input:
+					return
+				case data, ok := <-inputChan:
 					if !ok {
-						return nil
+						return
 					}
+
 					if strings.Contains(data, "no multiplexer") {
 						continue
 					}
+
 					select {
 					case <-ctx.Done():
-						return ctx.Err()
+						return
 					case merged <- data:
 					}
 				}
 			}
-		})
+		}(in)
 	}
 
 	go func() {
-		g.Wait()
-		close(merged)
+		completed := 0
+		for range done {
+			completed++
+			if completed == len(inputs) {
+				close(merged)
+				return
+			}
+		}
 	}()
 
 	for {
@@ -110,6 +115,7 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 			if !ok {
 				return nil
 			}
+
 			select {
 			case <-ctx.Done():
 				return ctx.Err()

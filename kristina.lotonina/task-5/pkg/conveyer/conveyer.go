@@ -3,7 +3,7 @@ package conveyer
 import (
 	"context"
 	"errors"
-	"fmt"
+	"strings"
 	"sync"
 )
 
@@ -20,6 +20,7 @@ type conveyerImpl struct {
 	mutex    sync.RWMutex
 	wg       sync.WaitGroup
 	cancel   context.CancelFunc
+	stopped  bool
 }
 
 type handler struct {
@@ -34,6 +35,7 @@ func New(size int) *conveyerImpl {
 		size:     size,
 		channels: make(map[string]chan string),
 		handlers: make([]handler, 0),
+		stopped:  false,
 	}
 }
 
@@ -54,6 +56,10 @@ func (c *conveyerImpl) getChannel(id string) (chan string, error) {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
+	if c.stopped {
+		return nil, errors.New(ErrConveyerStopped)
+	}
+
 	if ch, exists := c.channels[id]; exists {
 		return ch, nil
 	}
@@ -66,6 +72,9 @@ func (c *conveyerImpl) RegisterDecorator(
 	input string,
 	output string,
 ) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	inputChan := c.getOrCreateChannel(input)
 	outputChan := c.getOrCreateChannel(output)
 
@@ -82,6 +91,9 @@ func (c *conveyerImpl) RegisterMultiplexer(
 	inputs []string,
 	output string,
 ) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	inputChans := make([]chan string, len(inputs))
 	for i, input := range inputs {
 		inputChans[i] = c.getOrCreateChannel(input)
@@ -101,6 +113,9 @@ func (c *conveyerImpl) RegisterSeparator(
 	input string,
 	outputs []string,
 ) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
 	inputChan := c.getOrCreateChannel(input)
 	outputChans := make([]chan string, len(outputs))
 	for i, output := range outputs {
@@ -116,8 +131,11 @@ func (c *conveyerImpl) RegisterSeparator(
 }
 
 func (c *conveyerImpl) Run(ctx context.Context) error {
+	if c.stopped {
+		return errors.New(ErrConveyerStopped)
+	}
+
 	ctx, c.cancel = context.WithCancel(ctx)
-	defer c.cancel()
 
 	for _, h := range c.handlers {
 		c.wg.Add(1)
@@ -127,35 +145,58 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 		}(h)
 	}
 
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	}
+	c.wg.Wait()
+	return nil
 }
 
 func (c *conveyerImpl) runHandler(ctx context.Context, h handler) {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
+
 	switch h.handlerType {
 	case "decorator":
 		if fn, ok := h.fn.(func(ctx context.Context, input chan string, output chan string) error); ok {
-			inputChan, _ := c.getChannel(h.inputs[0])
-			outputChan, _ := c.getChannel(h.outputs[0])
+			inputChan, err := c.getChannel(h.inputs[0])
+			if err != nil {
+				return
+			}
+			outputChan, err := c.getChannel(h.outputs[0])
+			if err != nil {
+				return
+			}
 			fn(ctx, inputChan, outputChan)
 		}
 	case "multiplexer":
 		if fn, ok := h.fn.(func(ctx context.Context, inputs []chan string, output chan string) error); ok {
 			inputChans := make([]chan string, len(h.inputs))
 			for i, input := range h.inputs {
-				inputChans[i], _ = c.getChannel(input)
+				ch, err := c.getChannel(input)
+				if err != nil {
+					return
+				}
+				inputChans[i] = ch
 			}
-			outputChan, _ := c.getChannel(h.outputs[0])
+			outputChan, err := c.getChannel(h.outputs[0])
+			if err != nil {
+				return
+			}
 			fn(ctx, inputChans, outputChan)
 		}
 	case "separator":
 		if fn, ok := h.fn.(func(ctx context.Context, input chan string, outputs []chan string) error); ok {
-			inputChan, _ := c.getChannel(h.inputs[0])
+			inputChan, err := c.getChannel(h.inputs[0])
+			if err != nil {
+				return
+			}
 			outputChans := make([]chan string, len(h.outputs))
 			for i, output := range h.outputs {
-				outputChans[i], _ = c.getChannel(output)
+				ch, err := c.getChannel(output)
+				if err != nil {
+					return
+				}
+				outputChans[i] = ch
 			}
 			fn(ctx, inputChan, outputChans)
 		}
@@ -166,6 +207,10 @@ func (c *conveyerImpl) Send(input string, data string) error {
 	ch, err := c.getChannel(input)
 	if err != nil {
 		return err
+	}
+
+	if c.stopped {
+		return errors.New(ErrConveyerStopped)
 	}
 
 	select {
@@ -185,7 +230,7 @@ func (c *conveyerImpl) Recv(output string) (string, error) {
 	select {
 	case data, ok := <-ch:
 		if !ok {
-			return ErrUndefined, nil
+			return "", errors.New(ErrUndefined)
 		}
 		return data, nil
 	default:
@@ -199,11 +244,12 @@ func (c *conveyerImpl) Stop() {
 	}
 
 	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	c.stopped = true
 	for id, ch := range c.channels {
 		close(ch)
 		delete(c.channels, id)
 	}
+	c.mutex.Unlock()
 
 	c.wg.Wait()
 }

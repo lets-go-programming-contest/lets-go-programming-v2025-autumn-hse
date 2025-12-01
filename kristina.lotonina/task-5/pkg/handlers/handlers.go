@@ -6,98 +6,98 @@ import (
 	"strings"
 )
 
-func PrefixDecoratorFunc(ctx context.Context, in chan string, out chan string) error {
+func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case data, ok := <-in:
+		case data, ok := <-input:
 			if !ok {
-				close(out)
 				return nil
 			}
+
 			if strings.Contains(data, "no decorator") {
 				return errors.New("can't be decorated")
 			}
+
 			if !strings.HasPrefix(data, "decorated: ") {
 				data = "decorated: " + data
 			}
+
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
-			case out <- data:
+			case output <- data:
 			}
 		}
 	}
 }
 
-func SeparatorFunc(ctx context.Context, in chan string, outs []chan string) error {
-	i := 0
+func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string) error {
+	counter := 0
 	for {
 		select {
 		case <-ctx.Done():
-			for _, ch := range outs {
-				close(ch)
-			}
 			return ctx.Err()
-		case data, ok := <-in:
+		case data, ok := <-input:
 			if !ok {
-				for _, ch := range outs {
-					close(ch)
+				for _, output := range outputs {
+					close(output)
 				}
 				return nil
 			}
-			idx := i % len(outs)
-			i++
+
+			outputIndex := counter % len(outputs)
 			select {
 			case <-ctx.Done():
-				for _, ch := range outs {
-					close(ch)
-				}
 				return ctx.Err()
-			case outs[idx] <- data:
+			case outputs[outputIndex] <- data:
 			}
-		default:
+
+			counter++
 		}
 	}
 }
 
 func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
-	openChannels := len(inputs)
+	merged := make(chan string, 100)
 
-	for openChannels > 0 {
-		for i := 0; i < len(inputs); i++ {
-			ch := inputs[i]
-			if ch == nil {
-				continue
-			}
-
-			select {
-			case <-ctx.Done():
-				close(output)
-				return ctx.Err()
-			case data, ok := <-ch:
-				if !ok {
-					openChannels--
-					inputs[i] = nil
-					continue
-				}
-
-				if strings.Contains(data, "no multiplexer") {
-					continue
-				}
-
+	for _, input := range inputs {
+		go func(in chan string) {
+			for {
 				select {
 				case <-ctx.Done():
-					close(output)
-					return ctx.Err()
-				case output <- data:
+					return
+				case data, ok := <-in:
+					if !ok {
+						return
+					}
+					if !strings.Contains(data, "no multiplexer") {
+						select {
+						case <-ctx.Done():
+							return
+						case merged <- data:
+						}
+					}
 				}
-			default:
+			}
+		}(input)
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case data, ok := <-merged:
+			if !ok {
+				close(output)
+				return nil
+			}
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case output <- data:
 			}
 		}
 	}
-
-	close(output)
-	return nil
 }

@@ -3,149 +3,167 @@ package conveyer
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
-
-	"golang.org/x/sync/errgroup"
 )
 
-var (
-	ErrPipeNotFound = errors.New("chan not found")
-	ErrPipeFull     = errors.New("channel is full")
-	ErrPipeClosed   = errors.New("channel closed")
-	ErrNoData       = errors.New("no data available")
+const (
+	ErrChanNotFound    = "chan not found"
+	ErrUndefined       = "undefined"
+	ErrConveyerStopped = "conveyer stopped"
 )
 
-type Pipeline struct {
-	bufSize int
-
-	mu    sync.RWMutex
-	pipes map[string]chan string
-
-	stages []Stage
-
-	cancel context.CancelFunc
+type conveyerImpl struct {
+	size     int
+	channels map[string]chan string
+	handlers []handler
+	mutex    sync.RWMutex
+	wg       sync.WaitGroup
+	cancel   context.CancelFunc
 }
 
-type Stage struct {
-	sType   string
-	fn      interface{}
-	inputs  []string
-	outputs []string
+type handler struct {
+	handlerType string
+	fn          interface{}
+	inputs      []string
+	outputs     []string
 }
 
-func New(bufSize int) *Pipeline {
-	return &Pipeline{
-		bufSize: bufSize,
-		pipes:   make(map[string]chan string),
-		stages:  []Stage{},
+func New(size int) *conveyerImpl {
+	return &conveyerImpl{
+		size:     size,
+		channels: make(map[string]chan string),
+		handlers: make([]handler, 0),
 	}
 }
 
-func (p *Pipeline) ensurePipe(id string) chan string {
-	p.mu.Lock()
-	defer p.mu.Unlock()
+func (c *conveyerImpl) getOrCreateChannel(id string) chan string {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-	if ch, ok := p.pipes[id]; ok {
+	if ch, exists := c.channels[id]; exists {
 		return ch
 	}
-	ch := make(chan string, p.bufSize)
-	p.pipes[id] = ch
+
+	ch := make(chan string, c.size)
+	c.channels[id] = ch
 	return ch
 }
 
-func (p *Pipeline) getPipe(id string) (chan string, error) {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
+func (c *conveyerImpl) getChannel(id string) (chan string, error) {
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
 
-	ch, ok := p.pipes[id]
-	if !ok {
-		return nil, ErrPipeNotFound
+	if ch, exists := c.channels[id]; exists {
+		return ch, nil
 	}
-	return ch, nil
+
+	return nil, errors.New(ErrChanNotFound)
 }
 
-func (p *Pipeline) RegisterDecorator(fn func(context.Context, chan string, chan string) error, in string, out string) {
-	p.ensurePipe(in)
-	p.ensurePipe(out)
-	p.stages = append(p.stages, Stage{
-		sType:   "decorator",
-		fn:      fn,
-		inputs:  []string{in},
-		outputs: []string{out},
+func (c *conveyerImpl) RegisterDecorator(
+	fn func(ctx context.Context, input chan string, output chan string) error,
+	input string,
+	output string,
+) {
+	inputChan := c.getOrCreateChannel(input)
+	outputChan := c.getOrCreateChannel(output)
+
+	c.handlers = append(c.handlers, handler{
+		handlerType: "decorator",
+		fn:          fn,
+		inputs:      []string{input},
+		outputs:     []string{output},
 	})
 }
 
-func (p *Pipeline) RegisterMultiplexer(fn func(context.Context, []chan string, chan string) error, inputs []string, output string) {
-	for _, in := range inputs {
-		p.ensurePipe(in)
+func (c *conveyerImpl) RegisterMultiplexer(
+	fn func(ctx context.Context, inputs []chan string, output chan string) error,
+	inputs []string,
+	output string,
+) {
+	inputChans := make([]chan string, len(inputs))
+	for i, input := range inputs {
+		inputChans[i] = c.getOrCreateChannel(input)
 	}
-	p.ensurePipe(output)
-	p.stages = append(p.stages, Stage{
-		sType:   "multiplexer",
-		fn:      fn,
-		inputs:  inputs,
-		outputs: []string{output},
+	outputChan := c.getOrCreateChannel(output)
+
+	c.handlers = append(c.handlers, handler{
+		handlerType: "multiplexer",
+		fn:          fn,
+		inputs:      inputs,
+		outputs:     []string{output},
 	})
 }
 
-func (p *Pipeline) RegisterSeparator(fn func(context.Context, chan string, []chan string) error, input string, outputs []string) {
-	p.ensurePipe(input)
-	for _, out := range outputs {
-		p.ensurePipe(out)
+func (c *conveyerImpl) RegisterSeparator(
+	fn func(ctx context.Context, input chan string, outputs []chan string) error,
+	input string,
+	outputs []string,
+) {
+	inputChan := c.getOrCreateChannel(input)
+	outputChans := make([]chan string, len(outputs))
+	for i, output := range outputs {
+		outputChans[i] = c.getOrCreateChannel(output)
 	}
-	p.stages = append(p.stages, Stage{
-		sType:   "separator",
-		fn:      fn,
-		inputs:  []string{input},
-		outputs: outputs,
+
+	c.handlers = append(c.handlers, handler{
+		handlerType: "separator",
+		fn:          fn,
+		inputs:      []string{input},
+		outputs:     outputs,
 	})
 }
 
-func (p *Pipeline) Run(ctx context.Context) error {
-	ctx, cancel := context.WithCancel(ctx)
-	p.cancel = cancel
-	g, ctx := errgroup.WithContext(ctx)
+func (c *conveyerImpl) Run(ctx context.Context) error {
+	ctx, c.cancel = context.WithCancel(ctx)
+	defer c.cancel()
 
-	for _, st := range p.stages {
-		stage := st
-		g.Go(func() error {
-			return p.runStage(ctx, stage)
-		})
+	for _, h := range c.handlers {
+		c.wg.Add(1)
+		go func(handler handler) {
+			defer c.wg.Done()
+			c.runHandler(ctx, handler)
+		}(h)
 	}
-	return g.Wait()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
-func (p *Pipeline) runStage(ctx context.Context, st Stage) error {
-	switch st.sType {
+func (c *conveyerImpl) runHandler(ctx context.Context, h handler) {
+	switch h.handlerType {
 	case "decorator":
-		fn := st.fn.(func(context.Context, chan string, chan string) error)
-		in, _ := p.getPipe(st.inputs[0])
-		out, _ := p.getPipe(st.outputs[0])
-		return fn(ctx, in, out)
-
+		if fn, ok := h.fn.(func(ctx context.Context, input chan string, output chan string) error); ok {
+			inputChan, _ := c.getChannel(h.inputs[0])
+			outputChan, _ := c.getChannel(h.outputs[0])
+			fn(ctx, inputChan, outputChan)
+		}
 	case "multiplexer":
-		fn := st.fn.(func(context.Context, []chan string, chan string) error)
-		ins := make([]chan string, len(st.inputs))
-		for i, id := range st.inputs {
-			ins[i], _ = p.getPipe(id)
+		if fn, ok := h.fn.(func(ctx context.Context, inputs []chan string, output chan string) error); ok {
+			inputChans := make([]chan string, len(h.inputs))
+			for i, input := range h.inputs {
+				inputChans[i], _ = c.getChannel(input)
+			}
+			outputChan, _ := c.getChannel(h.outputs[0])
+			fn(ctx, inputChans, outputChan)
 		}
-		out, _ := p.getPipe(st.outputs[0])
-		return fn(ctx, ins, out)
-
 	case "separator":
-		fn := st.fn.(func(context.Context, chan string, []chan string) error)
-		in, _ := p.getPipe(st.inputs[0])
-		outs := make([]chan string, len(st.outputs))
-		for i, id := range st.outputs {
-			outs[i], _ = p.getPipe(id)
+		if fn, ok := h.fn.(func(ctx context.Context, input chan string, outputs []chan string) error); ok {
+			inputChan, _ := c.getChannel(h.inputs[0])
+			outputChans := make([]chan string, len(h.outputs))
+			for i, output := range h.outputs {
+				outputChans[i], _ = c.getChannel(output)
+			}
+			fn(ctx, inputChan, outputChans)
 		}
-		return fn(ctx, in, outs)
 	}
-	return nil
 }
 
-func (p *Pipeline) Send(pipe string, data string) error {
-	ch, err := p.getPipe(pipe)
+func (c *conveyerImpl) Send(input string, data string) error {
+	ch, err := c.getChannel(input)
 	if err != nil {
 		return err
 	}
@@ -153,37 +171,39 @@ func (p *Pipeline) Send(pipe string, data string) error {
 	select {
 	case ch <- data:
 		return nil
-	case <-context.Background().Done():
-		return ErrPipeFull
+	default:
+		return errors.New("channel is full")
 	}
 }
 
-func (p *Pipeline) Recv(pipe string) (string, error) {
-	ch, err := p.getPipe(pipe)
+func (c *conveyerImpl) Recv(output string) (string, error) {
+	ch, err := c.getChannel(output)
 	if err != nil {
 		return "", err
 	}
 
 	select {
-	case v, ok := <-ch:
+	case data, ok := <-ch:
 		if !ok {
-			return "", ErrPipeClosed
+			return ErrUndefined, nil
 		}
-		return v, nil
+		return data, nil
 	default:
-		return "", ErrNoData
+		return "", errors.New("no data available")
 	}
 }
 
-func (p *Pipeline) Stop() {
-	if p.cancel != nil {
-		p.cancel()
+func (c *conveyerImpl) Stop() {
+	if c.cancel != nil {
+		c.cancel()
 	}
 
-	p.mu.Lock()
-	for k, ch := range p.pipes {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	for id, ch := range c.channels {
 		close(ch)
-		delete(p.pipes, k)
+		delete(c.channels, id)
 	}
-	p.mu.Unlock()
+
+	c.wg.Wait()
 }

@@ -3,11 +3,16 @@ package handlers
 import (
 	"context"
 	"strings"
+	"sync"
+
+	"golang.org/x/sync/errgroup"
 )
 
 func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {
-	defer close(output)
-	
+	defer func() {
+		close(output)
+	}()
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -65,36 +70,36 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 
 func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
 	defer close(output)
-	
-	var wg sync.WaitGroup
+
+	g, ctx := errgroup.WithContext(ctx)
 	merged := make(chan string, len(inputs)*10)
 
 	for _, input := range inputs {
-		wg.Add(1)
-		go func(in chan string) {
-			defer wg.Done()
+		input := input
+		g.Go(func() error {
 			for {
 				select {
 				case <-ctx.Done():
-					return
-				case data, ok := <-in:
+					return ctx.Err()
+				case data, ok := <-input:
 					if !ok {
-						return
+						return nil
 					}
-					if !strings.Contains(data, "no multiplexer") {
-						select {
-						case <-ctx.Done():
-							return
-						case merged <- data:
-						}
+					if strings.Contains(data, "no multiplexer") {
+						continue
+					}
+					select {
+					case <-ctx.Done():
+						return ctx.Err()
+					case merged <- data:
 					}
 				}
 			}
-		}(input)
+		})
 	}
 
 	go func() {
-		wg.Wait()
+		g.Wait()
 		close(merged)
 	}()
 

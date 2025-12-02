@@ -57,6 +57,7 @@ func SeparatorFunc(ctx context.Context, inputChan chan string, outputChans []cha
 			select {
 			case outputChans[chanIndex] <- value:
 				chanIndex = (chanIndex + 1) % chanCount
+
 				continue
 			case <-ctx.Done():
 				return nil

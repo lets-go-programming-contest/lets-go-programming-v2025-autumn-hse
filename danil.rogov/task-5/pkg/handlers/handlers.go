@@ -57,7 +57,6 @@ func SeparatorFunc(ctx context.Context, inputChan chan string, outputChans []cha
 			select {
 			case outputChans[chanIndex] <- value:
 				chanIndex = (chanIndex + 1) % chanCount
-
 				continue
 			case <-ctx.Done():
 				return nil
@@ -82,7 +81,12 @@ func MultiplexerFunc(ctx context.Context, inputChans []chan string, outputChan c
 					continue
 				}
 
-				outputChan <- value
+				select {
+				case outputChan <- value:
+					continue
+				case <-ctx.Done():
+					return nil
+				}
 			default:
 				continue
 			}

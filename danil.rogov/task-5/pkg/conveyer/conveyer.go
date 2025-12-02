@@ -43,7 +43,7 @@ func New(size int) *Conveyer {
 	}
 }
 
-func (conveyer *Conveyer) get(name string) (chan string, bool) {
+func (conveyer *Conveyer) findChan(name string) (chan string, bool) {
 	conveyer.mutex.RLock()
 	defer conveyer.mutex.RUnlock()
 
@@ -52,7 +52,7 @@ func (conveyer *Conveyer) get(name string) (chan string, bool) {
 	return channel, found
 }
 
-func (conveyer *Conveyer) getOrCreate(name string) chan string {
+func (conveyer *Conveyer) ensureChan(name string) chan string {
 	conveyer.mutex.RLock()
 	defer conveyer.mutex.RUnlock()
 
@@ -100,7 +100,7 @@ func (conveyer *Conveyer) Run(ctx context.Context) error {
 }
 
 func (conveyer *Conveyer) Send(name, data string) error {
-	channel, found := conveyer.get(name)
+	channel, found := conveyer.findChan(name)
 	if !found {
 		return ErrChanNotFound
 	}
@@ -115,7 +115,7 @@ func (conveyer *Conveyer) Send(name, data string) error {
 }
 
 func (conveyer *Conveyer) Recv(name string) (string, error) {
-	channel, found := conveyer.get(name)
+	channel, found := conveyer.findChan(name)
 	if !found {
 		return undefined, ErrChanNotFound
 	}

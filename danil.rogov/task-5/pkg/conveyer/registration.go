@@ -2,15 +2,15 @@ package conveyer
 
 import "context"
 
-func (c *Conveyer) RegisterDecorator(
+func (conveyer *Conveyer) RegisterDecorator(
 	decoratorFunc func(context.Context, chan string, chan string) error,
 	input string,
 	output string,
 ) {
-	c.getOrCreate(input)
-	c.getOrCreate(output)
+	conveyer.ensureChan(input)
+	conveyer.ensureChan(output)
 
-	c.tasks = append(c.tasks, task{
+	conveyer.tasks = append(conveyer.tasks, task{
 		name:        "decorator",
 		function:    decoratorFunc,
 		inputChans:  []string{input},
@@ -18,18 +18,18 @@ func (c *Conveyer) RegisterDecorator(
 	})
 }
 
-func (c *Conveyer) RegisterMultiplexer(
+func (conveyer *Conveyer) RegisterMultiplexer(
 	multiplexerFunc func(context.Context, []chan string, chan string) error,
 	inputs []string,
 	output string,
 ) {
 	for _, name := range inputs {
-		c.getOrCreate(name)
+		conveyer.ensureChan(name)
 	}
 
-	c.getOrCreate(output)
+	conveyer.ensureChan(output)
 
-	c.tasks = append(c.tasks, task{
+	conveyer.tasks = append(conveyer.tasks, task{
 		name:        "multiplexer",
 		function:    multiplexerFunc,
 		inputChans:  inputs,
@@ -37,17 +37,18 @@ func (c *Conveyer) RegisterMultiplexer(
 	})
 }
 
-func (c *Conveyer) RegisterSeparator(
+func (conveyer *Conveyer) RegisterSeparator(
 	separatorFunc func(context.Context, chan string, []chan string) error,
 	input string,
 	outputs []string,
 ) {
-	c.getOrCreate(input)
+	conveyer.ensureChan(input)
+
 	for _, chanName := range outputs {
-		c.getOrCreate(chanName)
+		conveyer.ensureChan(chanName)
 	}
 
-	c.tasks = append(c.tasks, task{
+	conveyer.tasks = append(conveyer.tasks, task{
 		name:        "separator",
 		function:    separatorFunc,
 		inputChans:  []string{input},

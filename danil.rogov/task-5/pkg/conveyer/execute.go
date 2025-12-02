@@ -12,8 +12,8 @@ func (conveyer *Conveyer) executeDecorator(ctx context.Context, task task) error
 		return ErrInvalidDecoratorType
 	}
 
-	inputChan := conveyer.getOrCreate(task.inputChans[0])
-	outputChan := conveyer.getOrCreate(task.outputChans[0])
+	inputChan := conveyer.ensureChan(task.inputChans[0])
+	outputChan := conveyer.ensureChan(task.outputChans[0])
 
 	return decoratorFunc(ctx, inputChan, outputChan)
 }
@@ -27,10 +27,10 @@ func (conveyer *Conveyer) executeMultiplexer(ctx context.Context, task task) err
 	inputChans := make([]chan string, len(task.inputChans))
 
 	for index, name := range task.inputChans {
-		inputChans[index] = conveyer.getOrCreate(name)
+		inputChans[index] = conveyer.ensureChan(name)
 	}
 
-	outputChan := conveyer.getOrCreate(task.outputChans[0])
+	outputChan := conveyer.ensureChan(task.outputChans[0])
 
 	return multiplexerFunc(ctx, inputChans, outputChan)
 }
@@ -44,10 +44,10 @@ func (conveyer *Conveyer) executeSeparator(ctx context.Context, taskItem task) e
 	outputChans := make([]chan string, len(taskItem.outputChans))
 
 	for index, name := range taskItem.outputChans {
-		outputChans[index] = conveyer.getOrCreate(name)
+		outputChans[index] = conveyer.ensureChan(name)
 	}
 
-	inputChan := conveyer.getOrCreate(taskItem.inputChans[0])
+	inputChan := conveyer.ensureChan(taskItem.inputChans[0])
 
 	return separatorFunc(ctx, inputChan, outputChans)
 }

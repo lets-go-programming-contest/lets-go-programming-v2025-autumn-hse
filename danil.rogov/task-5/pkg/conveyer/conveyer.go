@@ -23,7 +23,7 @@ type Conveyer struct {
 	channels map[string]chan string
 	size     int
 	tasks    []task
-	mutex    sync.Mutex
+	mutex    sync.RWMutex
 }
 
 type task struct {
@@ -38,7 +38,7 @@ func New(size int) *Conveyer {
 		channels: make(map[string]chan string),
 		size:     size,
 		tasks:    make([]task, 0),
-		mutex:    sync.Mutex{},
+		mutex:    sync.RWMutex{},
 	}
 }
 
@@ -77,7 +77,8 @@ func (conveyer *Conveyer) Run(ctx context.Context) error {
 
 	errGroup, _ := errgroup.WithContext(ctx)
 
-	for _, task := range conveyer.tasks {
+	for _, t := range conveyer.tasks {
+		task := t
 		errGroup.Go(func() error {
 			switch task.name {
 			case "decorator":

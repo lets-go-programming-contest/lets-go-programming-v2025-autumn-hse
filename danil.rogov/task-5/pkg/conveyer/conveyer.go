@@ -27,10 +27,10 @@ type Conveyer struct {
 }
 
 type task struct {
-	name    string
-	fn      any
-	inputs  []string
-	outputs []string
+	name        string
+	function    any
+	inputChans  []string
+	outputChans []string
 }
 
 func New(size int) *Conveyer {
@@ -43,8 +43,8 @@ func New(size int) *Conveyer {
 }
 
 func (conveyer *Conveyer) get(name string) (chan string, bool) {
-	conveyer.mutex.Lock()
-	defer conveyer.mutex.Unlock()
+	conveyer.mutex.RLock()
+	defer conveyer.mutex.RUnlock()
 
 	channel, found := conveyer.channels[name]
 
@@ -52,33 +52,30 @@ func (conveyer *Conveyer) get(name string) (chan string, bool) {
 }
 
 func (conveyer *Conveyer) getOrCreate(name string) chan string {
-	conveyer.mutex.Lock()
-	defer conveyer.mutex.Unlock()
+	conveyer.mutex.RLock()
+	defer conveyer.mutex.RUnlock()
 
 	channel, found := conveyer.channels[name]
-	if found {
-		return channel
+	if !found {
+		channel = make(chan string, conveyer.size)
+		conveyer.channels[name] = channel
 	}
-
-	channel = make(chan string, conveyer.size)
-	conveyer.channels[name] = channel
 
 	return channel
 }
 
 func (conveyer *Conveyer) Run(ctx context.Context) error {
 	defer func() {
-		conveyer.mutex.Lock()
+		conveyer.mutex.RLock()
 		for _, ch := range conveyer.channels {
 			close(ch)
 		}
-		conveyer.mutex.Unlock()
+		conveyer.mutex.RUnlock()
 	}()
 
 	errGroup, _ := errgroup.WithContext(ctx)
 
-	for _, t := range conveyer.tasks {
-		task := t
+	for _, task := range conveyer.tasks {
 		errGroup.Go(func() error {
 			switch task.name {
 			case "decorator":
@@ -125,54 +122,4 @@ func (conveyer *Conveyer) Recv(name string) (string, error) {
 	}
 
 	return val, nil
-}
-
-func (conveyer *Conveyer) executeDecorator(ctx context.Context, task task) error {
-	if len(task.inputs) == 0 || len(task.outputs) == 0 {
-		return ErrChanNotFound
-	}
-
-	decoratorFunc, ok := task.fn.(func(context.Context, chan string, chan string) error)
-	if !ok {
-		return ErrInvalidDecoratorType
-	}
-
-	inputChan := conveyer.getOrCreate(task.inputs[0])
-	outputChan := conveyer.getOrCreate(task.outputs[0])
-
-	return decoratorFunc(ctx, inputChan, outputChan)
-}
-
-func (conveyer *Conveyer) executeMultiplexer(ctx context.Context, task task) error {
-	multiplexerFunc, ok := task.fn.(func(context.Context, []chan string, chan string) error)
-	if !ok {
-		return ErrInvalidMultiplexerType
-	}
-
-	inputChans := make([]chan string, len(task.inputs))
-
-	for index, name := range task.inputs {
-		inputChans[index] = conveyer.getOrCreate(name)
-	}
-
-	outputChan := conveyer.getOrCreate(task.outputs[0])
-
-	return multiplexerFunc(ctx, inputChans, outputChan)
-}
-
-func (conveyer *Conveyer) executeSeparator(ctx context.Context, taskItem task) error {
-	separatorFunc, ok := taskItem.fn.(func(context.Context, chan string, []chan string) error)
-	if !ok {
-		return ErrInvalidSeparatorType
-	}
-
-	outputChans := make([]chan string, len(taskItem.outputs))
-
-	for index, name := range taskItem.outputs {
-		outputChans[index] = conveyer.getOrCreate(name)
-	}
-
-	inputChan := conveyer.getOrCreate(taskItem.inputs[0])
-
-	return separatorFunc(ctx, inputChan, outputChans)
 }

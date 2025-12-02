@@ -8,6 +8,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	DefaultDirPerm  = 0o755
+	DefaultFilePerm = 0o644
+)
+
 func Load(configPath *string) (*models.Config, error) {
 	data, err := os.ReadFile(*configPath)
 	if err != nil {
@@ -20,11 +25,11 @@ func Load(configPath *string) (*models.Config, error) {
 	}
 
 	if cfg.DirPerm == 0 {
-		cfg.DirPerm = 0o755
+		cfg.DirPerm = DefaultDirPerm
 	}
 
 	if cfg.FilePerm == 0 {
-		cfg.FilePerm = 0o644
+		cfg.FilePerm = DefaultFilePerm
 	}
 
 	return &cfg, nil

@@ -3,7 +3,10 @@ package conveyer
 import "context"
 
 func (c *Conveyer) RegisterDecorator(
-	decoratorFunc func(context.Context, chan string, chan string) error, input string, output string) {
+	decoratorFunc func(context.Context, chan string, chan string) error,
+	input string,
+	output string,
+) {
 	c.getOrCreate(input)
 	c.getOrCreate(output)
 
@@ -16,10 +19,14 @@ func (c *Conveyer) RegisterDecorator(
 }
 
 func (c *Conveyer) RegisterMultiplexer(
-	multiplexerFunc func(context.Context, []chan string, chan string) error, inputs []string, output string) {
+	multiplexerFunc func(context.Context, []chan string, chan string) error,
+	inputs []string,
+	output string,
+) {
 	for _, name := range inputs {
 		c.getOrCreate(name)
 	}
+
 	c.getOrCreate(output)
 
 	c.tasks = append(c.tasks, task{
@@ -31,10 +38,13 @@ func (c *Conveyer) RegisterMultiplexer(
 }
 
 func (c *Conveyer) RegisterSeparator(
-	separatorFunc func(context.Context, chan string, []chan string) error, input string, outputs []string) {
+	separatorFunc func(context.Context, chan string, []chan string) error,
+	input string,
+	outputs []string,
+) {
 	c.getOrCreate(input)
-	for _, name := range outputs {
-		c.getOrCreate(name)
+	for _, chanName := range outputs {
+		c.getOrCreate(chanName)
 	}
 
 	c.tasks = append(c.tasks, task{

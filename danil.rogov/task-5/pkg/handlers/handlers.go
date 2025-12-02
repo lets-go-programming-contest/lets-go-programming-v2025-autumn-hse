@@ -32,7 +32,6 @@ func PrefixDecoratorFunc(ctx context.Context, inputChan, outputChan chan string)
 			select {
 			case outputChan <- value:
 				continue
-
 			case <-ctx.Done():
 				return nil
 			}
@@ -58,8 +57,8 @@ func SeparatorFunc(ctx context.Context, inputChan chan string, outputChans []cha
 			select {
 			case outputChans[chanIndex] <- value:
 				chanIndex = (chanIndex + 1) % chanCount
-				continue
 
+				continue
 			case <-ctx.Done():
 				return nil
 			}
@@ -86,7 +85,6 @@ func MultiplexerFunc(ctx context.Context, inputChans []chan string, outputChan c
 				outputChan <- value
 			default:
 				continue
-
 			}
 		}
 	}

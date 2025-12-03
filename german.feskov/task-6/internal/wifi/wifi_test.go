@@ -1,4 +1,3 @@
-// nolint: testpackage
 package wifi
 
 import (
@@ -13,7 +12,6 @@ import (
 
 //go:generate mockery --dir=. --name=WiFiHandle --output=./../mocks/wifi --outpkg=wifimocks
 
-// nolint: paralleltest
 func TestGetAddresses(t *testing.T) {
 	t.Run("no error, one addr", func(t *testing.T) {
 		handle := wifimocks.NewWiFiHandle(t)
@@ -83,7 +81,6 @@ func TestGetAddresses(t *testing.T) {
 	})
 }
 
-// nolint: paralleltest
 func TestGetNames(t *testing.T) {
 	t.Run("no error, one name", func(t *testing.T) {
 		handle := wifimocks.NewWiFiHandle(t)

@@ -1,4 +1,3 @@
-// nolint: testpackage
 package db
 
 import (
@@ -10,7 +9,6 @@ import (
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
-// nolint: paralleltest
 func TestGetNames(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -98,7 +96,6 @@ func TestGetNames(t *testing.T) {
 	})
 }
 
-// nolint: paralleltest
 func TestGetUniqueNames(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {

@@ -31,7 +31,8 @@ func (service DBService) GetNames() ([]string, error) {
 	for rows.Next() {
 		var name string
 
-		if err := rows.Scan(&name); err != nil {
+		err := rows.Scan(&name)
+		if err != nil {
 			return nil, fmt.Errorf("rows scanning: %w", err)
 		}
 
@@ -59,7 +60,8 @@ func (service DBService) GetUniqueNames() ([]string, error) {
 	for rows.Next() {
 		var value string
 
-		if err := rows.Scan(&value); err != nil {
+		err := rows.Scan(&value)
+		if err != nil {
 			return nil, fmt.Errorf("rows scanning: %w", err)
 		}
 

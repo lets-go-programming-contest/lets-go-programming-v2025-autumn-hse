@@ -16,6 +16,7 @@ type Conveyer struct {
 	mu       sync.Mutex
 	channels map[string]chan string
 	bufSize  int
+
 	handlers []func(context.Context) error
 }
 
@@ -69,14 +70,13 @@ func (c *Conveyer) Run(ctx context.Context) error {
 	defer c.closeAllChannels()
 
 	if len(c.handlers) == 0 {
-		<-ctx.Done()
-		return ctx.Err()
+		return nil
 	}
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	errCh := make(chan error, 1)
+	errCh := make(chan error, len(c.handlers))
 	var wg sync.WaitGroup
 
 	for _, h := range c.handlers {
@@ -96,18 +96,15 @@ func (c *Conveyer) Run(ctx context.Context) error {
 		}()
 	}
 
-	var runErr error
-
-	select {
-	case <-ctx.Done():
-		runErr = ctx.Err()
-	case err := <-errCh:
-		runErr = err
-	}
-
 	wg.Wait()
 
-	return runErr
+	select {
+	case err := <-errCh:
+		return err
+	default:
+	}
+
+	return nil
 }
 
 func (c *Conveyer) Send(name, data string) error {
@@ -122,11 +119,7 @@ func (c *Conveyer) Send(name, data string) error {
 
 func (c *Conveyer) Recv(name string) (string, error) {
 	ch, ok := c.getChannel(name)
-	if !ok {
-		return Undefined, ErrChannelNotFound
-	}
-
-	if ch == nil {
+	if !ok || ch == nil {
 		return Undefined, ErrChannelNotFound
 	}
 

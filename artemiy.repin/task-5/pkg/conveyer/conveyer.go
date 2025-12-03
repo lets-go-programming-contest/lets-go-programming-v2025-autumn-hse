@@ -58,10 +58,9 @@ func (c *Conveyer) closeAllChannels() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	for name, ch := range c.channels {
+	for _, ch := range c.channels {
 		if ch != nil {
 			close(ch)
-			c.channels[name] = nil
 		}
 	}
 }

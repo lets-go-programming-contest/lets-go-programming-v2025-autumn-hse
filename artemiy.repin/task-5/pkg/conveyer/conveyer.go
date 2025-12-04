@@ -66,7 +66,7 @@ func (c *Conveyer) closeAllChannels() {
 	}
 }
 
-// Небольшой костыль 😊
+// Небольшой костыль 😊.
 func safeCloseChannel(channel chan string) {
 	defer func() {
 		_ = recover()

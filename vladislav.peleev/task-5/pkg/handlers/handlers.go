@@ -87,7 +87,7 @@ func MultiplexerFunc(ctx context.Context, inputChans []chan string, outputChan c
 						continue
 					}
 					select {
-					case outputChan <- msg
+					case outputChan <- msg:
 					case <-ctx.Done():
 						return
 					}

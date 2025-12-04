@@ -4,51 +4,56 @@ import (
 	"context"
 	"errors"
 	"strings"
-	"sync"
 )
 
+var ErrCantBeDecorated = errors.New("can't be decorated")
+
 func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {
+	defer close(output)
+
 	for {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return nil
 		case data, ok := <-input:
 			if !ok {
 				return nil
 			}
+
 			if strings.Contains(data, "no decorator") {
-				return errors.New("can't be decorated")
+				return ErrCantBeDecorated
 			}
+
 			if !strings.HasPrefix(data, "decorated: ") {
 				data = "decorated: " + data
 			}
-			select {
-			case output <- data:
-			case <-ctx.Done():
-				return ctx.Err()
-			}
+
+			output <- data
 		}
 	}
 }
 
 func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string) error {
+	defer func() {
+		for _, ch := range outputs {
+			close(ch)
+		}
+	}()
+
 	counter := 0
 	for {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return nil
 		case data, ok := <-input:
 			if !ok {
-				for _, ch := range outputs {
-					close(ch)
-				}
 				return nil
 			}
 			idx := counter % len(outputs)
 			select {
 			case outputs[idx] <- data:
 			case <-ctx.Done():
-				return ctx.Err()
+				return nil
 			}
 			counter++
 		}
@@ -56,12 +61,14 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 }
 
 func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
-	var wg sync.WaitGroup
+	defer close(output)
 
+	type chDone struct {
+		ch <-chan string
+	}
+	done := make(chan struct{})
 	for _, ch := range inputs {
-		wg.Add(1)
 		go func(ch chan string) {
-			defer wg.Done()
 			for {
 				select {
 				case <-ctx.Done():
@@ -83,6 +90,7 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 		}(ch)
 	}
 
-	wg.Wait()
+	<-ctx.Done()
+	close(done)
 	return nil
 }

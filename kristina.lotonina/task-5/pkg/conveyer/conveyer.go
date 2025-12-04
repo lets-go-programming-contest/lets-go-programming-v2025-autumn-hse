@@ -6,13 +6,16 @@ import (
 	"sync"
 )
 
+var ErrChanNotFound = errors.New("chan not found")
+
 type handlerFunc func(ctx context.Context) error
 
 type Conveyer struct {
 	size int
 
 	chans map[string]chan string
-	mu    sync.Mutex
+
+	mu sync.RWMutex
 
 	handlers []handlerFunc
 }
@@ -26,6 +29,9 @@ func New(size int) *Conveyer {
 }
 
 func (c *Conveyer) getOrCreate(id string) chan string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	ch, ok := c.chans[id]
 	if !ok {
 		ch = make(chan string, c.size)
@@ -101,6 +107,8 @@ func (c *Conveyer) Run(ctx context.Context) error {
 
 	err := <-errCh
 
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	for _, ch := range c.chans {
 		close(ch)
 	}
@@ -109,18 +117,25 @@ func (c *Conveyer) Run(ctx context.Context) error {
 }
 
 func (c *Conveyer) Send(id string, data string) error {
+	c.mu.RLock()
 	ch, ok := c.chans[id]
+	c.mu.RUnlock()
+
 	if !ok {
-		return errors.New("chan not found")
+		return ErrChanNotFound
 	}
+
 	ch <- data
 	return nil
 }
 
 func (c *Conveyer) Recv(id string) (string, error) {
+	c.mu.RLock()
 	ch, ok := c.chans[id]
+	c.mu.RUnlock()
+
 	if !ok {
-		return "", errors.New("chan not found")
+		return "", ErrChanNotFound
 	}
 
 	v, ok := <-ch

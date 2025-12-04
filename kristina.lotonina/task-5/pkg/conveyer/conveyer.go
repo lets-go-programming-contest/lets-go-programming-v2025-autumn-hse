@@ -94,15 +94,19 @@ func (c *Conveyer) Run(ctx context.Context) error {
 
 	for _, handler := range c.handlers {
 		waitGroup.Add(1)
-		go func(handler handlerFunc) {
+
+		handlerCopy := handler
+
+		go func() {
 			defer waitGroup.Done()
 
-		err := handlerCopy(ctx)
-        if err != nil {
-            errorChannel <- err
-        }
+			err := handlerCopy(ctx)
+			if err != nil {
+				errorCh <- err
+			}
 		}()
 	}
+
 
 	go func() {
 		waitGroup.Wait()

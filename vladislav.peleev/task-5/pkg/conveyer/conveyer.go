@@ -3,6 +3,7 @@ package conveyer
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 
 	"golang.org/x/sync/errgroup"
@@ -35,7 +36,10 @@ type conveyerImpl struct {
 
 func New(size int) Conveyer {
 	return &conveyerImpl{
+		mu:       sync.RWMutex{},
 		channels: make(map[string]chan string),
+		handlers: nil,
+		started:  false,
 		bufSize:  size,
 	}
 }
@@ -136,14 +140,21 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 
 	for _, handler := range c.handlers {
 		h := handler
-		group.Go(func() error { return h(groupCtx) })
+
+		group.Go(func() error {
+			return h(groupCtx)
+		})
 	}
 
 	err := group.Wait()
 
 	c.close()
 
-	return err
+	if err != nil {
+		return fmt.Errorf("errgroup wait: %w", err)
+	}
+
+	return nil
 }
 
 func (c *conveyerImpl) close() {
@@ -152,7 +163,7 @@ func (c *conveyerImpl) close() {
 
 	for _, channel := range c.channels {
 		func(ch chan string) {
-			defer func() { recover() }()
+			defer func() { _ = recover() }()
 			close(ch)
 		}(channel)
 	}
@@ -160,10 +171,10 @@ func (c *conveyerImpl) close() {
 
 func (c *conveyerImpl) Send(input, data string) error {
 	c.mu.RLock()
-	channel, ok := c.channels[input]
+	channel, exists := c.channels[input]
 	c.mu.RUnlock()
 
-	if !ok {
+	if !exists {
 		return ErrChanNotFound
 	}
 
@@ -174,10 +185,10 @@ func (c *conveyerImpl) Send(input, data string) error {
 
 func (c *conveyerImpl) Recv(output string) (string, error) {
 	c.mu.RLock()
-	channel, ok := c.channels[output]
+	channel, exists := c.channels[output]
 	c.mu.RUnlock()
 
-	if !ok {
+	if !exists {
 		return "", ErrChanNotFound
 	}
 

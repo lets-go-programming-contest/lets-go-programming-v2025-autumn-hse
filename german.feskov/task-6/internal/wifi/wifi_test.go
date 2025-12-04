@@ -1,4 +1,4 @@
-package wifi
+package wifi_test
 
 import (
 	"errors"
@@ -7,151 +7,148 @@ import (
 	"testing"
 
 	wifimocks "github.com/6ermvH/german.feskov/task-6/internal/mocks/wifi"
+	wifiModule "github.com/6ermvH/german.feskov/task-6/internal/wifi"
 	"github.com/mdlayher/wifi"
 )
 
 //go:generate mockery --dir=. --name=WiFiHandle --output=./../mocks/wifi --outpkg=wifimocks
 
-func TestGetAddresses(t *testing.T) {
-	t.Run("no error, one addr", func(t *testing.T) {
-		handle := wifimocks.NewWiFiHandle(t)
-		service := New(handle)
-		want := []net.HardwareAddr{[]byte("addr")}
+func TestGetAddressesNoErrorOneAddr(t *testing.T) {
+	t.Parallel()
 
-		handle.
-			On("Interfaces").
-			Return(func() ([]*wifi.Interface, error) {
-				return []*wifi.Interface{
-					{
-						HardwareAddr: want[0],
-					},
-				}, nil
-			})
+	handle := wifimocks.NewWiFiHandle(t)
+	service := wifiModule.New(handle)
+	want := []net.HardwareAddr{[]byte("addr")}
 
-		have, err := service.GetAddresses()
-		if err != nil {
-			t.Fatalf("return error: %s", err.Error())
-		}
-
-		checkHardwareAddressesEqual(t, want, have)
+	handle.On("Interfaces").Return(func() ([]*wifi.Interface, error) {
+		return []*wifi.Interface{
+			{
+				HardwareAddr: want[0],
+			},
+		}, nil
 	})
 
-	t.Run("no error, more addrs", func(t *testing.T) {
-		handle := wifimocks.NewWiFiHandle(t)
-		service := New(handle)
-		want := []net.HardwareAddr{[]byte("ade"), []byte("addr2"), []byte("addr3")}
+	have, err := service.GetAddresses()
+	if err != nil {
+		t.Fatalf("return error: %s", err.Error())
+	}
 
-		handle.
-			On("Interfaces").
-			Return(func() ([]*wifi.Interface, error) {
-				return []*wifi.Interface{
-					{
-						HardwareAddr: want[0],
-					},
-					{
-						HardwareAddr: want[1],
-					},
-					{
-						HardwareAddr: want[2],
-					},
-				}, nil
-			})
-
-		have, err := service.GetAddresses()
-		if err != nil {
-			t.Fatalf("return error: %s", err.Error())
-		}
-
-		checkHardwareAddressesEqual(t, want, have)
-	})
-
-	t.Run("error on Interfaces", func(t *testing.T) {
-		handle := wifimocks.NewWiFiHandle(t)
-		service := New(handle)
-		handle.
-			On("Interfaces").
-			Return(func() ([]*wifi.Interface, error) {
-				return nil, errors.ErrUnsupported
-			})
-
-		_, err := service.GetAddresses()
-		if err == nil {
-			t.Fatalf("return no error")
-		}
-	})
+	checkHardwareAddressesEqual(t, want, have)
 }
 
-func TestGetNames(t *testing.T) {
-	t.Run("no error, one name", func(t *testing.T) {
-		handle := wifimocks.NewWiFiHandle(t)
-		service := New(handle)
-		want := []string{"german"}
+func TestGetAddressesNoErrorMoreAddrs(t *testing.T) {
+	t.Parallel()
 
-		handle.
-			On("Interfaces").
-			Return(func() ([]*wifi.Interface, error) {
-				return []*wifi.Interface{
-					{
-						Name: want[0],
-					},
-				}, nil
-			})
+	handle := wifimocks.NewWiFiHandle(t)
+	service := wifiModule.New(handle)
+	want := []net.HardwareAddr{[]byte("ade"), []byte("addr2"), []byte("addr3")}
 
-		have, err := service.GetNames()
-		if err != nil {
-			t.Fatalf("return error: %s", err.Error())
-		}
-
-		if !slices.Equal(want, have) {
-			t.Fatalf("want: %v, have: %v", want, have)
-		}
+	handle.On("Interfaces").Return(func() ([]*wifi.Interface, error) {
+		return []*wifi.Interface{
+			{
+				HardwareAddr: want[0],
+			},
+			{
+				HardwareAddr: want[1],
+			},
+			{
+				HardwareAddr: want[2],
+			},
+		}, nil
 	})
 
-	t.Run("no error, more names", func(t *testing.T) {
-		handle := wifimocks.NewWiFiHandle(t)
-		service := New(handle)
-		want := []string{"german", "anthon", "vitaly"}
+	have, err := service.GetAddresses()
+	if err != nil {
+		t.Fatalf("return error: %s", err.Error())
+	}
 
-		handle.
-			On("Interfaces").
-			Return(func() ([]*wifi.Interface, error) {
-				return []*wifi.Interface{
-					{
-						Name: want[0],
-					},
-					{
-						Name: want[1],
-					},
-					{
-						Name: want[2],
-					},
-				}, nil
-			})
+	checkHardwareAddressesEqual(t, want, have)
+}
 
-		have, err := service.GetNames()
-		if err != nil {
-			t.Fatalf("return error: %s", err.Error())
-		}
+func TestGetAddressesErrorOnInterfaces(t *testing.T) {
+	t.Parallel()
 
-		if !slices.Equal(want, have) {
-			t.Fatalf("want: %v, have: %v", want, have)
-		}
+	handle := wifimocks.NewWiFiHandle(t)
+	service := wifiModule.New(handle)
+	handle.On("Interfaces").Return(func() ([]*wifi.Interface, error) {
+		return nil, errors.ErrUnsupported
 	})
 
-	t.Run("error on Interfaces", func(t *testing.T) {
-		handle := wifimocks.NewWiFiHandle(t)
-		service := New(handle)
-		handle.
-			On("Interfaces").
-			Return(func() ([]*wifi.Interface, error) {
-				return nil, errors.ErrUnsupported
-			})
+	_, err := service.GetAddresses()
+	if err == nil {
+		t.Fatalf("return no error")
+	}
+}
 
-		_, err := service.GetNames()
-		if err == nil {
-			t.Fatalf("return no error")
-		}
+func TestGetNamesNoErrorOneName(t *testing.T) {
+	t.Parallel()
+
+	handle := wifimocks.NewWiFiHandle(t)
+	service := wifiModule.New(handle)
+	want := []string{"german"}
+
+	handle.On("Interfaces").Return(func() ([]*wifi.Interface, error) {
+		return []*wifi.Interface{
+			{
+				Name: want[0],
+			},
+		}, nil
 	})
+
+	have, err := service.GetNames()
+	if err != nil {
+		t.Fatalf("return error: %s", err.Error())
+	}
+
+	if !slices.Equal(want, have) {
+		t.Fatalf("want: %v, have: %v", want, have)
+	}
+}
+
+func TestGetNamesNoErrorMoreNames(t *testing.T) {
+	t.Parallel()
+
+	handle := wifimocks.NewWiFiHandle(t)
+	service := wifiModule.New(handle)
+	want := []string{"german", "anthon", "vitaly"}
+
+	handle.On("Interfaces").Return(func() ([]*wifi.Interface, error) {
+		return []*wifi.Interface{
+			{
+				Name: want[0],
+			},
+			{
+				Name: want[1],
+			},
+			{
+				Name: want[2],
+			},
+		}, nil
+	})
+
+	have, err := service.GetNames()
+	if err != nil {
+		t.Fatalf("return error: %s", err.Error())
+	}
+
+	if !slices.Equal(want, have) {
+		t.Fatalf("want: %v, have: %v", want, have)
+	}
+}
+
+func TestGetNamesErrorOnInterfaces(t *testing.T) {
+	t.Parallel()
+
+	handle := wifimocks.NewWiFiHandle(t)
+	service := wifiModule.New(handle)
+	handle.On("Interfaces").Return(func() ([]*wifi.Interface, error) {
+		return nil, errors.ErrUnsupported
+	})
+
+	_, err := service.GetNames()
+	if err == nil {
+		t.Fatalf("return no error")
+	}
 }
 
 func checkHardwareAddressesEqual(t *testing.T, want, have []net.HardwareAddr) {

@@ -8,34 +8,42 @@ import (
 
 func MultiplexerFunc(
 	ctx context.Context,
-	inputs []chan string,
-	output chan string,
+	inputChannels []chan string,
+	outputChannel chan string,
 ) error {
-	if len(inputs) == 0 {
-		<-ctx.Done()
+	if len(inputChannels) == 0 {
+		close(outputChannel)
 
 		return nil
 	}
 
-	var wgroup sync.WaitGroup
+	return multiplexerHelper(ctx, inputChannels, outputChannel)
+}
 
-	for _, channel := range inputs {
-		if channel == nil {
+func multiplexerHelper(
+	ctx context.Context,
+	inputChannels []chan string,
+	outputChannel chan string,
+) error {
+	var waitGroup sync.WaitGroup
+
+	for _, inputChannel := range inputChannels {
+		if inputChannel == nil {
 			continue
 		}
 
-		wgroup.Add(1)
+		waitGroup.Add(1)
 
-		go func(inChan chan string) {
-			defer wgroup.Done()
+		worker := func(channel chan string) {
+			defer waitGroup.Done()
 
 			for {
 				select {
 				case <-ctx.Done():
 					return
 
-				case data, ok := <-inChan:
-					if !ok {
+				case data, receivedOk := <-channel:
+					if !receivedOk {
 						return
 					}
 
@@ -46,24 +54,17 @@ func MultiplexerFunc(
 					select {
 					case <-ctx.Done():
 						return
-					case output <- data:
+					case outputChannel <- data:
 					}
 				}
 			}
-		}(channel)
+		}
+
+		go worker(inputChannel)
 	}
 
-	done := make(chan struct{})
+	waitGroup.Wait()
+	close(outputChannel)
 
-	go func() {
-		wgroup.Wait()
-		close(done)
-	}()
-
-	select {
-	case <-ctx.Done():
-		return nil
-	case <-done:
-		return nil
-	}
+	return nil
 }

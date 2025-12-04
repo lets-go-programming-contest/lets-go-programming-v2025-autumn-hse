@@ -8,9 +8,7 @@ import (
 
 const Undefined = "undefined"
 
-var (
-	ErrChannelNotFound = errors.New("chan not found")
-)
+var ErrChannelNotFound = errors.New("chan not found")
 
 type Conveyer struct {
 	mu       sync.Mutex

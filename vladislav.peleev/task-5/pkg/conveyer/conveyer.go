@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"sync"
+
+	"golang.org/x/sync/errgroup"
 )
 
 const Undefined = "undefined"
@@ -18,16 +20,11 @@ type Conveyer interface {
 }
 
 type conveyerImpl struct {
-	mu sync.RWMutex
-
+	mu       sync.RWMutex
 	channels map[string]chan string
-
 	handlers []func(context.Context) error
-
-	started bool
-	stopped bool
-
-	bufSize int
+	started  bool
+	bufSize  int
 }
 
 func New(size int) Conveyer {
@@ -71,7 +68,6 @@ func (c *conveyerImpl) RegisterSeparator(
 	fn func(context.Context, chan string, []chan string) error,
 	input string, outputs []string,
 ) error {
-
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -80,9 +76,9 @@ func (c *conveyerImpl) RegisterSeparator(
 	}
 
 	inCh := c.ensureChannel(input)
-	var outChs []chan string
-	for _, o := range outputs {
-		outChs = append(outChs, c.ensureChannel(o))
+	outChs := make([]chan string, len(outputs))
+	for i, name := range outputs {
+		outChs[i] = c.ensureChannel(name)
 	}
 
 	c.handlers = append(c.handlers, func(ctx context.Context) error {
@@ -96,7 +92,6 @@ func (c *conveyerImpl) RegisterMultiplexer(
 	fn func(context.Context, []chan string, chan string) error,
 	inputs []string, output string,
 ) error {
-
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -104,11 +99,10 @@ func (c *conveyerImpl) RegisterMultiplexer(
 		return errors.New("cannot register after Run")
 	}
 
-	var inChs []chan string
-	for _, inp := range inputs {
-		inChs = append(inChs, c.ensureChannel(inp))
+	inChs := make([]chan string, len(inputs))
+	for i, name := range inputs {
+		inChs[i] = c.ensureChannel(name)
 	}
-
 	outCh := c.ensureChannel(output)
 
 	c.handlers = append(c.handlers, func(ctx context.Context) error {
@@ -122,57 +116,25 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 	c.mu.Lock()
 	if c.started {
 		c.mu.Unlock()
-		return errors.New("Run already started")
+		return errors.New("already started")
 	}
 	c.started = true
 	c.mu.Unlock()
 
-	var wg sync.WaitGroup
-	errChan := make(chan error, len(c.handlers))
-
+	g, gCtx := errgroup.WithContext(ctx)
 	for _, h := range c.handlers {
-		wg.Add(1)
-		go func(hh func(context.Context) error) {
-			defer wg.Done()
-			if err := hh(ctx); err != nil {
-				select {
-				case errChan <- err:
-				default:
-				}
-			}
-		}(h)
+		h := h
+		g.Go(func() error { return h(gCtx) })
 	}
 
-	done := make(chan struct{})
-	go func() {
-		wg.Wait()
-		close(done)
-	}()
-
-	select {
-	case <-ctx.Done():
-		c.stop()
-		return ctx.Err()
-
-	case err := <-errChan:
-		c.stop()
-		return err
-
-	case <-done:
-		c.stop()
-		return nil
-	}
+	err := g.Wait()
+	c.close()
+	return err
 }
 
-func (c *conveyerImpl) stop() {
+func (c *conveyerImpl) close() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-
-	if c.stopped {
-		return
-	}
-	c.stopped = true
-
 	for _, ch := range c.channels {
 		close(ch)
 	}
@@ -181,10 +143,6 @@ func (c *conveyerImpl) stop() {
 func (c *conveyerImpl) Send(input, data string) error {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-
-	if c.stopped {
-		return errors.New("conveyer stopped")
-	}
 
 	ch, ok := c.channels[input]
 	if !ok {
@@ -211,6 +169,5 @@ func (c *conveyerImpl) Recv(output string) (string, error) {
 	if !ok {
 		return Undefined, nil
 	}
-
 	return data, nil
 }

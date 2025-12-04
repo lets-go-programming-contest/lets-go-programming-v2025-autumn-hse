@@ -123,7 +123,7 @@ func (c *conveyor) Recv(channelID string) (string, error) {
 
 	data, ok := <-ch
 	if !ok {
-		return "", nil
+		return "undefind`", nil
 	}
 
 	return data, nil

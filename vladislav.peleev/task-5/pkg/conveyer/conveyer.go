@@ -130,7 +130,6 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(c.handlers))
 
-	// запуск обработчиков
 	for _, h := range c.handlers {
 		wg.Add(1)
 		go func(hh func(context.Context) error) {
@@ -144,7 +143,6 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 		}(h)
 	}
 
-	// ожидание завершения
 	done := make(chan struct{})
 	go func() {
 		wg.Wait()
@@ -195,7 +193,7 @@ func (c *conveyerImpl) Send(input, data string) error {
 
 	select {
 	case ch <- data:
-	default: // по заданию — если буфер заполнен, молча игнорировать
+	default:
 	}
 	return nil
 }
@@ -211,7 +209,6 @@ func (c *conveyerImpl) Recv(output string) (string, error) {
 
 	data, ok := <-ch
 	if !ok {
-		// канал закрыт, данных больше нет
 		return Undefined, nil
 	}
 

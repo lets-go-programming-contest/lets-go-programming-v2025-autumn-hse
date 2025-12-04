@@ -18,17 +18,14 @@ func PrefixDecoratorFunc(ctx context.Context, inputChan chan string, outputChan 
 				return nil
 			}
 
-			// проверка условия
-			if strings.Contains(msg, "no decorator") { // ← по условию задачи
+			if strings.Contains(msg, "no decorator") {
 				return errors.New("can't be decorated")
 			}
 
-			// добавление префикса, если его нет
 			if !strings.HasPrefix(msg, "decorated: ") {
 				msg = "decorated: " + msg
 			}
 
-			// отправка результата
 			select {
 			case outputChan <- msg:
 			case <-ctx.Done():
@@ -74,30 +71,23 @@ func MultiplexerFunc(ctx context.Context, inputChans []chan string, outputChan c
 	}
 
 	var wg sync.WaitGroup
-
 	for _, ch := range inputChans {
 		wg.Add(1)
-
 		go func(in chan string) {
 			defer wg.Done()
-
 			for {
 				select {
 				case <-ctx.Done():
 					return
-
 				case msg, ok := <-in:
 					if !ok {
 						return
 					}
-
-					// фильтрация
 					if strings.Contains(msg, "no multiplexer") {
 						continue
 					}
-
 					select {
-					case outputChan <- msg:
+					case outputChan <- msg
 					case <-ctx.Done():
 						return
 					}
@@ -106,11 +96,16 @@ func MultiplexerFunc(ctx context.Context, inputChans []chan string, outputChan c
 		}(ch)
 	}
 
-	// ожидание завершения всех горутин
+	done := make(chan struct{})
 	go func() {
 		wg.Wait()
+		close(done)
 	}()
 
-	<-ctx.Done()
-	return ctx.Err()
+	select {
+	case <-done:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }

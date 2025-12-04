@@ -58,6 +58,7 @@ func TestGetNamesErrorOnQuery(t *testing.T) {
 
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	dbService := database.New(db)
 
 	mock.ExpectQuery(queryNames).WillReturnError(errors.ErrUnsupported)
@@ -165,6 +166,7 @@ func TestGetUniqueNamesErrorOnScanRow(t *testing.T) {
 
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	dbService := database.New(db)
 
 	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)

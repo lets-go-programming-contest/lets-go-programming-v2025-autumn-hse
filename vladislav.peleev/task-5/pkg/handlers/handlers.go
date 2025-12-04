@@ -51,12 +51,14 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 				}
 				return nil
 			}
+
 			idx := counter % len(outputs)
 			select {
 			case outputs[idx] <- data:
 			case <-ctx.Done():
 				return nil
 			}
+
 			counter++
 		}
 	}
@@ -69,6 +71,7 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 		wg.Add(1)
 		go func(rc chan string) {
 			defer wg.Done()
+
 			for {
 				select {
 				case <-ctx.Done():
@@ -77,6 +80,7 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 					if !ok {
 						return
 					}
+
 					if strings.Contains(data, "no multiplexer") {
 						continue
 					}

@@ -2,11 +2,10 @@ package db_test
 
 import (
 	"errors"
-	"slices"
-	"strings"
 	"testing"
 
 	database "github.com/6ermvH/german.feskov/task-6/internal/db"
+	"github.com/stretchr/testify/require"
 
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
@@ -20,9 +19,7 @@ func TestGetNamesNoErrorOneRow(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("initialize mock db: %s", err.Error())
-	}
+	require.NoError(t, err)
 
 	dbService := database.New(db)
 
@@ -32,22 +29,16 @@ func TestGetNamesNoErrorOneRow(t *testing.T) {
 	want := []string{"german"}
 
 	have, err := dbService.GetNames()
-	if err != nil {
-		t.Fatalf("return error: %s", err.Error())
-	}
+	require.NoError(t, err)
 
-	if !slices.Equal(have, want) {
-		t.Fatalf("slices not equal: have: %v, want: %v", have, want)
-	}
+	require.Equal(t, want, have)
 }
 
 func TestGetNamesNoErrorMoreRows(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("initialize mock db: %s", err.Error())
-	}
+	require.NoError(t, err)
 
 	dbService := database.New(db)
 
@@ -57,45 +48,32 @@ func TestGetNamesNoErrorMoreRows(t *testing.T) {
 	want := []string{"german", "anthon", "vitaly"}
 
 	have, err := dbService.GetNames()
-	if err != nil {
-		t.Fatalf("return error: %s", err.Error())
-	}
+	require.NoError(t, err)
 
-	if !slices.Equal(have, want) {
-		t.Fatalf("slices not equal: have: %v, want: %v", have, want)
-	}
+	require.Equal(t, want, have)
 }
 
 func TestGetNamesErrorOnQuery(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("initialize mock db: %s", err.Error())
-	}
-
+	require.NoError(t, err)
 	dbService := database.New(db)
 
 	mock.ExpectQuery(queryNames).WillReturnError(errors.ErrUnsupported)
 
 	_, err = dbService.GetNames()
-	if err == nil {
-		t.Fatalf("return no error")
-	}
+	require.Error(t, err)
 
 	prefix := "db query: "
-	if !strings.HasPrefix(err.Error(), prefix) {
-		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-	}
+	require.ErrorContains(t, err, prefix)
 }
 
 func TestGetNamesErrorOnScanRow(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("initialize mock db: %s", err.Error())
-	}
+	require.NoError(t, err)
 
 	dbService := database.New(db)
 
@@ -103,23 +81,17 @@ func TestGetNamesErrorOnScanRow(t *testing.T) {
 	mock.ExpectQuery(queryNames).WillReturnRows(rows)
 
 	_, err = dbService.GetNames()
-	if err == nil {
-		t.Fatalf("return no error")
-	}
+	require.Error(t, err)
 
 	prefix := "rows scanning: "
-	if !strings.HasPrefix(err.Error(), prefix) {
-		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-	}
+	require.ErrorContains(t, err, prefix)
 }
 
 func TestGetNamesErrorOnCloseRow(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("initialize mock db: %s", err.Error())
-	}
+	require.NoError(t, err)
 
 	dbService := database.New(db)
 
@@ -127,23 +99,17 @@ func TestGetNamesErrorOnCloseRow(t *testing.T) {
 	mock.ExpectQuery(queryNames).WillReturnRows(rows)
 
 	_, err = dbService.GetNames()
-	if err == nil {
-		t.Fatalf("return no error")
-	}
+	require.Error(t, err)
 
 	prefix := "rows error: "
-	if !strings.HasPrefix(err.Error(), prefix) {
-		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-	}
+	require.ErrorContains(t, err, prefix)
 }
 
 func TestGetUniqueNamesNoErrorOneRow(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("initialize mock db: %s", err.Error())
-	}
+	require.NoError(t, err)
 
 	dbService := database.New(db)
 
@@ -153,22 +119,16 @@ func TestGetUniqueNamesNoErrorOneRow(t *testing.T) {
 	want := []string{"german"}
 
 	have, err := dbService.GetUniqueNames()
-	if err != nil {
-		t.Fatalf("return error: %s", err.Error())
-	}
+	require.NoError(t, err)
 
-	if !slices.Equal(have, want) {
-		t.Fatalf("slices not equal: have: %v, want: %v", have, want)
-	}
+	require.Equal(t, want, have)
 }
 
 func TestGetUniqueNamesNoErrorMoreRows(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("initialize mock db: %s", err.Error())
-	}
+	require.NoError(t, err)
 
 	dbService := database.New(db)
 
@@ -178,69 +138,50 @@ func TestGetUniqueNamesNoErrorMoreRows(t *testing.T) {
 	want := []string{"german", "anthon", "vitaly"}
 
 	have, err := dbService.GetUniqueNames()
-	if err != nil {
-		t.Fatalf("return error: %s", err.Error())
-	}
+	require.NoError(t, err)
 
-	if !slices.Equal(have, want) {
-		t.Fatalf("slices not equal: have: %v, want: %v", have, want)
-	}
+	require.Equal(t, want, have)
 }
 
 func TestGetUniqueNamesErrorOnQuery(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("initialize mock db: %s", err.Error())
-	}
+	require.NoError(t, err)
 
 	dbService := database.New(db)
 
 	mock.ExpectQuery(queryUniqueNames).WillReturnError(errors.ErrUnsupported)
 
 	_, err = dbService.GetUniqueNames()
-	if err == nil {
-		t.Fatalf("return no error")
-	}
+	require.Error(t, err)
 
 	prefix := "db query: "
-	if !strings.HasPrefix(err.Error(), prefix) {
-		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-	}
+	require.ErrorContains(t, err, prefix)
 }
 
 func TestGetUniqueNamesErrorOnScanRow(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("initialize mock db: %s", err.Error())
-	}
-
+	require.NoError(t, err)
 	dbService := database.New(db)
 
 	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
 	mock.ExpectQuery(queryUniqueNames).WillReturnRows(rows)
 
 	_, err = dbService.GetUniqueNames()
-	if err == nil {
-		t.Fatalf("return no error")
-	}
+	require.Error(t, err)
 
 	prefix := "rows scanning: "
-	if !strings.HasPrefix(err.Error(), prefix) {
-		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-	}
+	require.ErrorContains(t, err, prefix)
 }
 
 func TestGetUniqueNamesErrorOnCloseRow(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("initialize mock db: %s", err.Error())
-	}
+	require.NoError(t, err)
 
 	dbService := database.New(db)
 
@@ -248,12 +189,8 @@ func TestGetUniqueNamesErrorOnCloseRow(t *testing.T) {
 	mock.ExpectQuery(queryUniqueNames).WillReturnRows(rows)
 
 	_, err = dbService.GetUniqueNames()
-	if err == nil {
-		t.Fatalf("return no error")
-	}
+	require.Error(t, err)
 
 	prefix := "rows error: "
-	if !strings.HasPrefix(err.Error(), prefix) {
-		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-	}
+	require.ErrorContains(t, err, prefix)
 }

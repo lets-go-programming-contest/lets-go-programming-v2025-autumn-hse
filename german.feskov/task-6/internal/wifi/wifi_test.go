@@ -3,12 +3,12 @@ package wifi_test
 import (
 	"errors"
 	"net"
-	"slices"
 	"testing"
 
 	wifimocks "github.com/6ermvH/german.feskov/task-6/internal/mocks/wifi"
 	wifiModule "github.com/6ermvH/german.feskov/task-6/internal/wifi"
 	"github.com/mdlayher/wifi"
+	"github.com/stretchr/testify/require"
 )
 
 //go:generate mockery --dir=. --name=WiFiHandle --output=./../mocks/wifi --outpkg=wifimocks
@@ -29,11 +29,9 @@ func TestGetAddressesNoErrorOneAddr(t *testing.T) {
 	})
 
 	have, err := service.GetAddresses()
-	if err != nil {
-		t.Fatalf("return error: %s", err.Error())
-	}
+	require.NoError(t, err)
 
-	checkHardwareAddressesEqual(t, want, have)
+	require.Equal(t, want, have)
 }
 
 func TestGetAddressesNoErrorMoreAddrs(t *testing.T) {
@@ -58,11 +56,9 @@ func TestGetAddressesNoErrorMoreAddrs(t *testing.T) {
 	})
 
 	have, err := service.GetAddresses()
-	if err != nil {
-		t.Fatalf("return error: %s", err.Error())
-	}
+	require.NoError(t, err)
 
-	checkHardwareAddressesEqual(t, want, have)
+	require.Equal(t, want, have)
 }
 
 func TestGetAddressesErrorOnInterfaces(t *testing.T) {
@@ -75,9 +71,7 @@ func TestGetAddressesErrorOnInterfaces(t *testing.T) {
 	})
 
 	_, err := service.GetAddresses()
-	if err == nil {
-		t.Fatalf("return no error")
-	}
+	require.Error(t, err)
 }
 
 func TestGetNamesNoErrorOneName(t *testing.T) {
@@ -96,13 +90,9 @@ func TestGetNamesNoErrorOneName(t *testing.T) {
 	})
 
 	have, err := service.GetNames()
-	if err != nil {
-		t.Fatalf("return error: %s", err.Error())
-	}
+	require.NoError(t, err)
 
-	if !slices.Equal(want, have) {
-		t.Fatalf("want: %v, have: %v", want, have)
-	}
+	require.Equal(t, want, have)
 }
 
 func TestGetNamesNoErrorMoreNames(t *testing.T) {
@@ -127,13 +117,9 @@ func TestGetNamesNoErrorMoreNames(t *testing.T) {
 	})
 
 	have, err := service.GetNames()
-	if err != nil {
-		t.Fatalf("return error: %s", err.Error())
-	}
+	require.NoError(t, err)
 
-	if !slices.Equal(want, have) {
-		t.Fatalf("want: %v, have: %v", want, have)
-	}
+	require.Equal(t, want, have)
 }
 
 func TestGetNamesErrorOnInterfaces(t *testing.T) {
@@ -146,21 +132,5 @@ func TestGetNamesErrorOnInterfaces(t *testing.T) {
 	})
 
 	_, err := service.GetNames()
-	if err == nil {
-		t.Fatalf("return no error")
-	}
-}
-
-func checkHardwareAddressesEqual(t *testing.T, want, have []net.HardwareAddr) {
-	t.Helper()
-
-	if len(want) != len(have) {
-		t.Fatalf("slices of addresses 'want' has %d size, 'have' has %d size", len(want), len(have))
-	}
-
-	for i := range want {
-		if !slices.Equal(want[i], have[i]) {
-			t.Fatalf("hardware addreses %d, want: %q, have: %q", i, want[i], have[i])
-		}
-	}
+	require.Error(t, err)
 }

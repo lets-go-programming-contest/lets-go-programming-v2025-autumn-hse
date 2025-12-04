@@ -18,20 +18,20 @@ func PrefixDecoratorFunc(
 		case <-ctx.Done():
 			return nil
 
-		case v, ok := <-input:
+		case value, ok := <-input:
 			if !ok {
 				return nil
 			}
 
-			if strings.Contains(v, "no decorator") {
+			if strings.Contains(value, "no decorator") {
 				return ErrCantDecorate
 			}
 
-			if !strings.HasPrefix(v, "decorated: ") {
-				v = "decorated: " + v
+			if !strings.HasPrefix(value, "decorated: ") {
+				value = "decorated: " + value
 			}
 
-			output <- v
+			output <- value
 		}
 	}
 }

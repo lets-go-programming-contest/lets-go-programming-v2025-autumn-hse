@@ -17,22 +17,25 @@ func MultiplexerFunc(
 
 		default:
 			received := false
+
 			for _, channelRef := range inputs {
 				select {
-				case v, ok := <-channelRef:
+				case value, ok := <-channelRef:
 					if !ok {
 						continue
 					}
+
 					received = true
 
-					if strings.Contains(v, "no multiplexer") {
+					if strings.Contains(value, "no multiplexer") {
 						continue
 					}
 
-					output <- v
+					output <- value
 				default:
 				}
 			}
+
 			if !received {
 				continue
 			}

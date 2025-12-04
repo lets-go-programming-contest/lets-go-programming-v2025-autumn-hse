@@ -32,6 +32,7 @@ func New(size int) *Conveyer {
 func (c *Conveyer) getOrCreate(id string) chan string {
 	c.mu.Lock()
 	channelRef, ok := c.chans[id]
+
 	if !ok {
 		channelRef = make(chan string, c.size)
 		c.chans[id] = channelRef
@@ -42,7 +43,7 @@ func (c *Conveyer) getOrCreate(id string) chan string {
 }
 
 func (c *Conveyer) RegisterDecorator(
-	fn func(ctx context.Context, input chan string, output chan string) error,
+	handlerFunction func(ctx context.Context, input chan string, output chan string) error,
 	input string,
 	output string,
 ) {
@@ -50,7 +51,7 @@ func (c *Conveyer) RegisterDecorator(
 	outcome := c.getOrCreate(output)
 
 	c.handlers = append(c.handlers, func(ctx context.Context) error {
-		return fn(ctx, income, outcome)
+		return handlerFunction(ctx, income, outcome)
 	})
 }
 
@@ -71,7 +72,7 @@ func (c *Conveyer) RegisterMultiplexer(
 }
 
 func (c *Conveyer) RegisterSeparator(
-	fn func(ctx context.Context, input chan string, outputs []chan string) error,
+	handlerFunction func(ctx context.Context, input chan string, outputs []chan string) error,
 	input string,
 	outputs []string,
 ) {
@@ -83,7 +84,7 @@ func (c *Conveyer) RegisterSeparator(
 	}
 
 	c.handlers = append(c.handlers, func(ctx context.Context) error {
-		return fn(ctx, income, outcome)
+		return handlerFunction(ctx, income, outcome)
 	})
 }
 
@@ -91,14 +92,16 @@ func (c *Conveyer) Run(ctx context.Context) error {
 	var waitGroup sync.WaitGroup
 	errorCh := make(chan error, 1)
 
-	for _, h := range c.handlers {
+	for _, handler := range c.handlers {
 		waitGroup.Add(1)
-		go func(h handlerFunc) {
+		go func(handler handlerFunc) {
 			defer waitGroup.Done()
-			if err := h(ctx); err != nil {
-				errorCh <- err
-			}
-		}(h)
+
+		err := handlerCopy(ctx)
+        if err != nil {
+            errorChannel <- err
+        }
+		}()
 	}
 
 	go func() {
@@ -133,15 +136,15 @@ func (c *Conveyer) Send(id string, data string) error {
 
 func (c *Conveyer) Recv(id string) (string, error) {
 	c.mu.RLock()
-	channelRef, ok := c.chans[id]
+	channelRef, isOpen := c.chans[id]
 	c.mu.RUnlock()
 
-	if !ok {
+	if !isOpen {
 		return "", ErrChanNotFound
 	}
 
-	v, ok := <-channelRef
-	if !ok {
+	v, isOpen := <-channelRef
+	if !isOpen {
 		return "undefined", nil
 	}
 

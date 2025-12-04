@@ -17,6 +17,7 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 		case data, ok := <-input:
 			if !ok {
 				close(output)
+
 				return nil
 			}
 
@@ -46,6 +47,7 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 				for _, out := range outputs {
 					close(out)
 				}
+
 				return nil
 			}
 
@@ -95,4 +97,3 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 		}
 	}
 }
-

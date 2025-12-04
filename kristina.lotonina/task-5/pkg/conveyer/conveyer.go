@@ -31,7 +31,7 @@ func New(size int) *Conveyer {
 
 func (c *Conveyer) getOrCreate(ident string) chan string {
 	c.mu.Lock()
-	channelRef, ok := c.chans[id]
+	channelRef, ok := c.chans[ident]
 
 	if !ok {
 		channelRef = make(chan string, c.size)

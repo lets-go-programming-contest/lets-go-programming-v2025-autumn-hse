@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"sync"
+
+	"golang.org/x/sync/errgroup"
 )
 
 type conveyor struct {
@@ -107,20 +109,25 @@ func (c *conveyor) RegisterSeparator(
 
 func (c *conveyor) Run(ctx context.Context) error {
 	c.mu.RLock()
-	defer c.mu.RUnlock()
+	tasks := c.tasks
+	c.mu.RUnlock()
 
-	for _, task := range c.tasks {
-		go func(t func(context.Context) error) {
-			if err := t(ctx); err != nil {
-				fmt.Printf("Task failed: %v\n", err)
-			}
-		}(task)
+	if len(tasks) == 0 {
+		<-ctx.Done()
+		return ctx.Err()
 	}
 
-	<-ctx.Done()
-	return ctx.Err()
-}
+	g, gCtx := errgroup.WithContext(ctx)
 
+	for _, task := range tasks {
+		t := task
+		g.Go(func() error {
+			return t(gCtx)
+		})
+	}
+
+	return g.Wait()
+}
 func (c *conveyor) Send(inputID string, data string) error {
 	c.mu.RLock()
 	ch, exists := c.inputs[inputID]

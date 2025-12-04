@@ -38,6 +38,7 @@ func (c *conveyerImpl) ensureChannel(name string) chan string {
 	if ch, ok := c.channels[name]; ok {
 		return ch
 	}
+
 	ch := make(chan string, c.bufSize)
 	c.channels[name] = ch
 
@@ -77,6 +78,7 @@ func (c *conveyerImpl) RegisterSeparator(
 	}
 
 	inCh := c.ensureChannel(input)
+
 	outChs := make([]chan string, len(outputs))
 	for i, name := range outputs {
 		outChs[i] = c.ensureChannel(name)
@@ -104,6 +106,7 @@ func (c *conveyerImpl) RegisterMultiplexer(
 	for i, name := range inputs {
 		inChs[i] = c.ensureChannel(name)
 	}
+
 	outCh := c.ensureChannel(output)
 
 	c.handlers = append(c.handlers, func(ctx context.Context) error {
@@ -119,16 +122,19 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 		c.mu.Unlock()
 		return errors.New("already started")
 	}
+
 	c.started = true
 	c.mu.Unlock()
 
 	g, gCtx := errgroup.WithContext(ctx)
+
 	for _, h := range c.handlers {
-		h := h
+
 		g.Go(func() error { return h(gCtx) })
 	}
 
 	err := g.Wait()
+
 	c.close()
 
 	return err

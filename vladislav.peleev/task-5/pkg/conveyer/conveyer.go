@@ -10,6 +10,12 @@ import (
 
 const Undefined = "undefined"
 
+var (
+	ErrCannotRegisterAfterRun = errors.New("cannot register after Run")
+	ErrAlreadyStarted         = errors.New("already started")
+	ErrChanNotFound           = errors.New("chan not found")
+)
+
 type Conveyer interface {
 	RegisterDecorator(fn func(context.Context, chan string, chan string) error, input, output string) error
 	RegisterMultiplexer(fn func(context.Context, []chan string, chan string) error, inputs []string, output string) error
@@ -35,14 +41,14 @@ func New(size int) Conveyer {
 }
 
 func (c *conveyerImpl) ensureChannel(name string) chan string {
-	if ch, ok := c.channels[name]; ok {
-		return ch
+	if channel, ok := c.channels[name]; ok {
+		return channel
 	}
 
-	ch := make(chan string, c.bufSize)
-	c.channels[name] = ch
+	channel := make(chan string, c.bufSize)
+	c.channels[name] = channel
 
-	return ch
+	return channel
 }
 
 func (c *conveyerImpl) RegisterDecorator(
@@ -53,14 +59,14 @@ func (c *conveyerImpl) RegisterDecorator(
 	defer c.mu.Unlock()
 
 	if c.started {
-		return errors.New("cannot register after Run")
+		return ErrCannotRegisterAfterRun
 	}
 
-	inCh := c.ensureChannel(input)
-	outCh := c.ensureChannel(output)
+	inChannel := c.ensureChannel(input)
+	outChannel := c.ensureChannel(output)
 
 	c.handlers = append(c.handlers, func(ctx context.Context) error {
-		return fn(ctx, inCh, outCh)
+		return fn(ctx, inChannel, outChannel)
 	})
 
 	return nil
@@ -74,18 +80,18 @@ func (c *conveyerImpl) RegisterSeparator(
 	defer c.mu.Unlock()
 
 	if c.started {
-		return errors.New("cannot register after Run")
+		return ErrCannotRegisterAfterRun
 	}
 
-	inCh := c.ensureChannel(input)
+	inChannel := c.ensureChannel(input)
 
-	outChs := make([]chan string, len(outputs))
+	outChannels := make([]chan string, len(outputs))
 	for i, name := range outputs {
-		outChs[i] = c.ensureChannel(name)
+		outChannels[i] = c.ensureChannel(name)
 	}
 
 	c.handlers = append(c.handlers, func(ctx context.Context) error {
-		return fn(ctx, inCh, outChs)
+		return fn(ctx, inChannel, outChannels)
 	})
 
 	return nil
@@ -99,18 +105,18 @@ func (c *conveyerImpl) RegisterMultiplexer(
 	defer c.mu.Unlock()
 
 	if c.started {
-		return errors.New("cannot register after Run")
+		return ErrCannotRegisterAfterRun
 	}
 
-	inChs := make([]chan string, len(inputs))
+	inChannels := make([]chan string, len(inputs))
 	for i, name := range inputs {
-		inChs[i] = c.ensureChannel(name)
+		inChannels[i] = c.ensureChannel(name)
 	}
 
-	outCh := c.ensureChannel(output)
+	outChannel := c.ensureChannel(output)
 
 	c.handlers = append(c.handlers, func(ctx context.Context) error {
-		return fn(ctx, inChs, outCh)
+		return fn(ctx, inChannels, outChannel)
 	})
 
 	return nil
@@ -120,20 +126,20 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 	c.mu.Lock()
 	if c.started {
 		c.mu.Unlock()
-		return errors.New("already started")
+		return ErrAlreadyStarted
 	}
 
 	c.started = true
 	c.mu.Unlock()
 
-	g, gCtx := errgroup.WithContext(ctx)
+	group, groupCtx := errgroup.WithContext(ctx)
 
-	for _, h := range c.handlers {
-
-		g.Go(func() error { return h(gCtx) })
+	for _, handler := range c.handlers {
+		h := handler
+		group.Go(func() error { return h(groupCtx) })
 	}
 
-	err := g.Wait()
+	err := group.Wait()
 
 	c.close()
 
@@ -144,38 +150,38 @@ func (c *conveyerImpl) close() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	for _, ch := range c.channels {
-		func(cch chan string) {
+	for _, channel := range c.channels {
+		func(ch chan string) {
 			defer func() { recover() }()
-			close(cch)
-		}(ch)
+			close(ch)
+		}(channel)
 	}
 }
 
 func (c *conveyerImpl) Send(input, data string) error {
 	c.mu.RLock()
-	ch, ok := c.channels[input]
+	channel, ok := c.channels[input]
 	c.mu.RUnlock()
 
 	if !ok {
-		return errors.New("chan not found")
+		return ErrChanNotFound
 	}
 
-	ch <- data
+	channel <- data
 
 	return nil
 }
 
 func (c *conveyerImpl) Recv(output string) (string, error) {
 	c.mu.RLock()
-	ch, ok := c.channels[output]
+	channel, ok := c.channels[output]
 	c.mu.RUnlock()
 
 	if !ok {
-		return "", errors.New("chan not found")
+		return "", ErrChanNotFound
 	}
 
-	data, ok := <-ch
+	data, ok := <-channel
 	if !ok {
 		return Undefined, nil
 	}

@@ -26,6 +26,7 @@ func New(size int) *Conveyer {
 	}
 
 	return &Conveyer{
+		mu:       sync.Mutex{},
 		channels: make(map[string]chan string),
 		bufSize:  size,
 		handlers: make([]func(context.Context) error, 0),
@@ -78,6 +79,7 @@ func (c *Conveyer) Run(ctx context.Context) error {
 	defer cancel()
 
 	errCh := make(chan error, len(c.handlers))
+
 	var wgroup sync.WaitGroup
 
 	for _, h := range c.handlers {
@@ -120,8 +122,8 @@ func (c *Conveyer) Send(name, data string) error {
 }
 
 func (c *Conveyer) Recv(name string) (string, error) {
-	channel, ok := c.getChannel(name)
-	if !ok || channel == nil {
+	channel, channelExist := c.getChannel(name)
+	if !channelExist || channel == nil {
 		return Undefined, ErrChannelNotFound
 	}
 
@@ -163,17 +165,18 @@ func (c *Conveyer) RegisterMultiplexer(
 }
 
 func (c *Conveyer) RegisterSeparator(
-	SeparatorFunction func(context.Context, chan string, []chan string) error,
+	separatorFunction func(context.Context, chan string, []chan string) error,
 	input string,
 	outputs []string,
 ) {
 	inCh := c.ensureChannel(input)
 	outChans := make([]chan string, len(outputs))
+
 	for i, name := range outputs {
 		outChans[i] = c.ensureChannel(name)
 	}
 
 	c.handlers = append(c.handlers, func(ctx context.Context) error {
-		return SeparatorFunction(ctx, inCh, outChans)
+		return separatorFunction(ctx, inCh, outChans)
 	})
 }

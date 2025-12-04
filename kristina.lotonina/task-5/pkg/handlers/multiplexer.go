@@ -17,9 +17,9 @@ func MultiplexerFunc(
 
 		default:
 			received := false
-			for _, ch := range inputs {
+			for _, channelRef := range inputs {
 				select {
-				case v, ok := <-ch:
+				case v, ok := <-channelRef:
 					if !ok {
 						continue
 					}

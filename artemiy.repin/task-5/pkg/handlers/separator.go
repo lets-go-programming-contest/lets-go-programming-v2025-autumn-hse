@@ -6,46 +6,66 @@ import (
 
 func SeparatorFunc(
 	ctx context.Context,
-	input chan string,
-	outputs []chan string,
+	inputChannel chan string,
+	outputChannels []chan string,
 ) error {
-	if len(outputs) == 0 {
-		for {
-			select {
-			case <-ctx.Done():
+	if len(outputChannels) == 0 {
+		return separatorReadHelper(ctx, inputChannel)
+	}
+
+	return separatorHelper(ctx, inputChannel, outputChannels)
+}
+
+func separatorReadHelper(
+	ctx context.Context,
+	inputChannel chan string,
+) error {
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+
+		case _, receivedOk := <-inputChannel:
+			if !receivedOk {
 				return nil
-			case _, ok := <-input:
-				if !ok {
-					return nil
-				}
 			}
 		}
 	}
+}
 
+func separatorHelper(
+	ctx context.Context,
+	inputChannel chan string,
+	outputChannels []chan string,
+) error {
 	index := 0
-	total := len(outputs)
+	totalOutputs := len(outputChannels)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 
-		case data, ok := <-input:
-			if !ok {
+		case data, receivedOk := <-inputChannel:
+			if !receivedOk {
+				for _, outputChannel := range outputChannels {
+					close(outputChannel)
+				}
+
 				return nil
 			}
 
-			out := outputs[index]
+			currentOutput := outputChannels[index]
 
 			index++
-			if index >= total {
+			if index >= totalOutputs {
 				index = 0
 			}
 
 			select {
 			case <-ctx.Done():
 				return nil
-			case out <- data:
+			case currentOutput <- data:
 			}
 		}
 	}

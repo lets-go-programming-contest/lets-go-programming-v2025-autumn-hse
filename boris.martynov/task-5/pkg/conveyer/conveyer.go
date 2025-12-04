@@ -3,7 +3,6 @@ package conveyer
 import (
 	"context"
 	"fmt"
-
 	"golang.org/x/sync/errgroup"
 )
 
@@ -64,14 +63,18 @@ func (c *conveyor) RegisterSeparator(fn func(ctx context.Context, input chan str
 }
 
 func (c *conveyor) Run(ctx context.Context) error {
+	defer c.close()
+
+	g, gCtx := errgroup.WithContext(ctx)
 	for _, task := range c.tasks {
-		go task(ctx)
+		t := task
+		g.Go(func() error { return t(gCtx) })
 	}
-	<-ctx.Done()
-	for _, ch := range c.channels {
-		close(ch)
+	err := g.Wait()
+	if err != nil {
+		return fmt.Errorf("error groyp return: %w", err)
 	}
-	return ctx.Err()
+	return nil
 }
 
 func (c *conveyor) Send(channelID string, data string) error {
@@ -95,3 +98,8 @@ func (c *conveyor) Recv(channelID string) (string, error) {
 	return data, nil
 }
 
+func (c *conveyor) close() {
+	for _, ch := range c.channels {
+		close(ch)
+	}
+}

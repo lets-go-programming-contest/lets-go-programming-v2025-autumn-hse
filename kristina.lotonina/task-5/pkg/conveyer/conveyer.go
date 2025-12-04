@@ -29,13 +29,13 @@ func New(size int) *Conveyer {
 	}
 }
 
-func (c *Conveyer) getOrCreate(id string) chan string {
+func (c *Conveyer) getOrCreate(ident string) chan string {
 	c.mu.Lock()
 	channelRef, ok := c.chans[id]
 
 	if !ok {
 		channelRef = make(chan string, c.size)
-		c.chans[id] = channelRef
+		c.chans[ident] = channelRef
 	}
 	c.mu.Unlock()
 
@@ -56,7 +56,7 @@ func (c *Conveyer) RegisterDecorator(
 }
 
 func (c *Conveyer) RegisterMultiplexer(
-	fn func(ctx context.Context, inputs []chan string, output chan string) error,
+	handlerFunction func(ctx context.Context, inputs []chan string, output chan string) error,
 	inputs []string,
 	output string,
 ) {
@@ -64,10 +64,11 @@ func (c *Conveyer) RegisterMultiplexer(
 	for _, id := range inputs {
 		income = append(income, c.getOrCreate(id))
 	}
+
 	outcome := c.getOrCreate(output)
 
 	c.handlers = append(c.handlers, func(ctx context.Context) error {
-		return fn(ctx, income, outcome)
+		return handlerFunction(ctx, income, outcome)
 	})
 }
 
@@ -90,6 +91,7 @@ func (c *Conveyer) RegisterSeparator(
 
 func (c *Conveyer) Run(ctx context.Context) error {
 	var waitGroup sync.WaitGroup
+
 	errorCh := make(chan error, 1)
 
 	for _, handler := range c.handlers {
@@ -106,7 +108,6 @@ func (c *Conveyer) Run(ctx context.Context) error {
 			}
 		}()
 	}
-
 
 	go func() {
 		waitGroup.Wait()

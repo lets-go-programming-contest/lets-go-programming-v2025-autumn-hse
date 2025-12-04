@@ -21,6 +21,7 @@ func SeparatorFunc(
 
 			out := outputs[index%len(outputs)]
 			out <- value
+
 			index++
 		}
 	}

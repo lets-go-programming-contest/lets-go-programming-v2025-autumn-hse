@@ -127,9 +127,20 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 		g.Go(func() error { return h(gCtx) })
 	}
 
-	err := g.Wait()
-	c.close()
-	return err
+	done := make(chan error, 1)
+	go func() {
+		done <- g.Wait()
+	}()
+
+	select {
+	case err := <-done:
+		c.close()
+		return err
+	case <-ctx.Done():
+		c.close()
+		<-done
+		return ctx.Err()
+	}
 }
 
 func (c *conveyerImpl) close() {

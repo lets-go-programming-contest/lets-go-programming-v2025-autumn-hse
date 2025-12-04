@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+var ErrCantDecorate = errors.New("can't be decorated")
+
 func PrefixDecoratorFunc(
 	ctx context.Context,
 	input chan string,
@@ -15,13 +17,14 @@ func PrefixDecoratorFunc(
 		select {
 		case <-ctx.Done():
 			return nil
+
 		case v, ok := <-input:
 			if !ok {
 				return nil
 			}
 
 			if strings.Contains(v, "no decorator") {
-				return errors.New("can't be decorated")
+				return ErrCantDecorate
 			}
 
 			if !strings.HasPrefix(v, "decorated: ") {

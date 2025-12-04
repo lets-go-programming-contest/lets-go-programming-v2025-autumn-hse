@@ -24,19 +24,20 @@ func New(size int) *Conveyer {
 	return &Conveyer{
 		size:     size,
 		chans:    make(map[string]chan string),
+		mu:       sync.RWMutex{},
 		handlers: make([]handlerFunc, 0),
 	}
 }
 
 func (c *Conveyer) getOrCreate(id string) chan string {
 	c.mu.Lock()
-	defer c.mu.Unlock()
-
 	ch, ok := c.chans[id]
 	if !ok {
 		ch = make(chan string, c.size)
 		c.chans[id] = ch
 	}
+	c.mu.Unlock()
+
 	return ch
 }
 
@@ -87,13 +88,13 @@ func (c *Conveyer) RegisterSeparator(
 }
 
 func (c *Conveyer) Run(ctx context.Context) error {
-	var wg sync.WaitGroup
+	var waitGroup sync.WaitGroup
 	errCh := make(chan error, 1)
 
 	for _, h := range c.handlers {
-		wg.Add(1)
+		waitGroup.Add(1)
 		go func(h handlerFunc) {
-			defer wg.Done()
+			defer waitGroup.Done()
 			if err := h(ctx); err != nil {
 				errCh <- err
 			}
@@ -101,17 +102,17 @@ func (c *Conveyer) Run(ctx context.Context) error {
 	}
 
 	go func() {
-		wg.Wait()
+		waitGroup.Wait()
 		errCh <- nil
 	}()
 
 	err := <-errCh
 
 	c.mu.RLock()
-	defer c.mu.RUnlock()
 	for _, ch := range c.chans {
 		close(ch)
 	}
+	c.mu.RUnlock()
 
 	return err
 }
@@ -142,5 +143,6 @@ func (c *Conveyer) Recv(id string) (string, error) {
 	if !ok {
 		return "undefined", nil
 	}
+
 	return v, nil
 }

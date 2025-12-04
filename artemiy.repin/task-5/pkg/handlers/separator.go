@@ -37,7 +37,7 @@ func SeparatorFunc(
 
 			out := outputs[index]
 
-			index = index + 1
+			index++
 			if index >= total {
 				index = 0
 			}

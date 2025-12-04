@@ -59,11 +59,20 @@ func (c *Conveyer) closeAllChannels() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	for _, ch := range c.channels {
-		if ch != nil {
-			close(ch)
+	for _, channel := range c.channels {
+		if channel != nil {
+			safeCloseChannel(channel)
 		}
 	}
+}
+
+// Небольшой костыль 😊
+func safeCloseChannel(channel chan string) {
+	defer func() {
+		_ = recover()
+	}()
+
+	close(channel)
 }
 
 func (c *Conveyer) Run(ctx context.Context) error {

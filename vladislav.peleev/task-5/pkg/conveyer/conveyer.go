@@ -127,20 +127,9 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 		g.Go(func() error { return h(gCtx) })
 	}
 
-	done := make(chan error, 1)
-	go func() {
-		done <- g.Wait()
-	}()
-
-	select {
-	case err := <-done:
-		c.close()
-		return err
-	case <-ctx.Done():
-		c.close()
-		<-done
-		return ctx.Err()
-	}
+	err := g.Wait()
+	c.close()
+	return err
 }
 
 func (c *conveyerImpl) close() {
@@ -153,17 +142,14 @@ func (c *conveyerImpl) close() {
 
 func (c *conveyerImpl) Send(input, data string) error {
 	c.mu.RLock()
-	defer c.mu.RUnlock()
-
 	ch, ok := c.channels[input]
+	c.mu.RUnlock()
+
 	if !ok {
 		return errors.New("chan not found")
 	}
 
-	select {
-	case ch <- data:
-	default:
-	}
+	ch <- data
 	return nil
 }
 

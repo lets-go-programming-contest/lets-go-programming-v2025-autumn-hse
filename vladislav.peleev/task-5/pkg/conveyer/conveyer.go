@@ -135,8 +135,12 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 func (c *conveyerImpl) close() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
 	for _, ch := range c.channels {
-		close(ch)
+		func(cch chan string) {
+			defer func() { recover() }()
+			close(cch)
+		}(ch)
 	}
 }
 

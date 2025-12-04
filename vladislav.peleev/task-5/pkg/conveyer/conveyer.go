@@ -18,9 +18,23 @@ var (
 )
 
 type Conveyer interface {
-	RegisterDecorator(handlerFunc func(context.Context, chan string, chan string) error, input, output string) error
-	RegisterMultiplexer(handlerFunc func(context.Context, []chan string, chan string) error, inputs []string, output string) error
-	RegisterSeparator(handlerFunc func(context.Context, chan string, []chan string) error, input string, outputs []string) error
+	RegisterDecorator(
+		handlerFunc func(context.Context, chan string, chan string) error,
+		input, output string,
+	) error
+
+	RegisterMultiplexer(
+		handlerFunc func(context.Context, []chan string, chan string) error,
+		inputs []string,
+		output string,
+	) error
+
+	RegisterSeparator(
+		handlerFunc func(context.Context, chan string, []chan string) error,
+		input string,
+		outputs []string,
+	) error
+
 	Run(ctx context.Context) error
 	Send(input, data string) error
 	Recv(output string) (string, error)

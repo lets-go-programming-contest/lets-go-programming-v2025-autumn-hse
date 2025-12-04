@@ -13,27 +13,28 @@ func MultiplexerFunc(
 ) error {
 	if len(inputs) == 0 {
 		<-ctx.Done()
+
 		return nil
 	}
 
-	var wg sync.WaitGroup
+	var wgroup sync.WaitGroup
 
-	for _, ch := range inputs {
-		if ch == nil {
+	for _, channel := range inputs {
+		if channel == nil {
 			continue
 		}
 
-		wg.Add(1)
+		wgroup.Add(1)
 
-		go func(in chan string) {
-			defer wg.Done()
+		go func(inChan chan string) {
+			defer wgroup.Done()
 
 			for {
 				select {
 				case <-ctx.Done():
 					return
 
-				case data, ok := <-in:
+				case data, ok := <-inChan:
 					if !ok {
 						return
 					}
@@ -49,13 +50,13 @@ func MultiplexerFunc(
 					}
 				}
 			}
-		}(ch)
+		}(channel)
 	}
 
 	done := make(chan struct{})
 
 	go func() {
-		wg.Wait()
+		wgroup.Wait()
 		close(done)
 	}()
 

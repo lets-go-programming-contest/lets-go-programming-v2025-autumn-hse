@@ -24,19 +24,8 @@ func New(size int) *conveyor {
 	}
 }
 
-func (c *conveyor) ensure(name string) chan string {
-	if ch, exists := c.channels[name]; exists {
-		return ch
-	}
-
-	ch := make(chan string, c.size)
-	c.channels[name] = ch
-
-	return ch
-}
-
 func (c *conveyor) RegisterDecorator(
-	fn func(ctx context.Context, input chan string, output chan string) error,
+	fnDecorator func(ctx context.Context, input chan string, output chan string) error,
 	inputID string,
 	outputID string,
 ) error {
@@ -44,14 +33,14 @@ func (c *conveyor) RegisterDecorator(
 	outputCh := c.ensure(outputID)
 
 	c.tasks = append(c.tasks, func(ctx context.Context) error {
-		return fn(ctx, inputCh, outputCh)
+		return fnDecorator(ctx, inputCh, outputCh)
 	})
 
 	return nil
 }
 
 func (c *conveyor) RegisterMultiplexer(
-	fn func(ctx context.Context, inputs []chan string, output chan string) error,
+	fnMultiplexer func(ctx context.Context, inputs []chan string, output chan string) error,
 	inputIDs []string,
 	outputID string,
 ) error {
@@ -63,25 +52,26 @@ func (c *conveyor) RegisterMultiplexer(
 	outputCh := c.ensure(outputID)
 
 	c.tasks = append(c.tasks, func(ctx context.Context) error {
-		return fn(ctx, inputChans, outputCh)
+		return fnMultiplexer(ctx, inputChans, outputCh)
 	})
 
 	return nil
 }
 
 func (c *conveyor) RegisterSeparator(
-	fn func(ctx context.Context, input chan string, outputs []chan string) error,
+	fnSeparator func(ctx context.Context, input chan string, outputs []chan string) error,
 	inputID string,
 	outputIDs []string,
 ) error {
 	inputCh := c.ensure(inputID)
+
 	outputChans := make([]chan string, len(outputIDs))
 	for i, id := range outputIDs {
 		outputChans[i] = c.ensure(id)
 	}
 
 	c.tasks = append(c.tasks, func(ctx context.Context) error {
-		return fn(ctx, inputCh, outputChans)
+		return fnSeparator(ctx, inputCh, outputChans)
 	})
 
 	return nil
@@ -90,13 +80,15 @@ func (c *conveyor) RegisterSeparator(
 func (c *conveyor) Run(ctx context.Context) error {
 	defer c.close()
 
-	g, gCtx := errgroup.WithContext(ctx)
+	group, gCtx := errgroup.WithContext(ctx)
+
 	for _, task := range c.tasks {
 		t := task
-		g.Go(func() error { return t(gCtx) })
+
+		group.Go(func() error { return t(gCtx) })
 	}
 
-	err := g.Wait()
+	err := group.Wait()
 	if err != nil {
 		return fmt.Errorf("error groyp return: %w", err)
 	}
@@ -129,9 +121,19 @@ func (c *conveyor) Recv(channelID string) (string, error) {
 	return data, nil
 }
 
+func (c *conveyor) ensure(name string) chan string {
+	if ch, exists := c.channels[name]; exists {
+		return ch
+	}
+
+	ch := make(chan string, c.size)
+	c.channels[name] = ch
+
+	return ch
+}
+
 func (c *conveyor) close() {
 	for _, ch := range c.channels {
 		close(ch)
 	}
 }
-

@@ -82,21 +82,24 @@ func (c *Conveyer) Run(ctx context.Context) error {
 
 	var wgroup sync.WaitGroup
 
-	for _, h := range c.handlers {
-		handler := h
+	for _, handlerFunc := range c.handlers {
+		localHandler := handlerFunc
 
 		wgroup.Add(1)
-		go func() {
+
+		runner := func() {
 			defer wgroup.Done()
 
-			if err := handler(ctx); err != nil {
+			if err := localHandler(ctx); err != nil {
 				select {
 				case errCh <- err:
 					cancel()
 				default:
 				}
 			}
-		}()
+		}
+
+		go runner()
 	}
 
 	wgroup.Wait()
@@ -157,6 +160,7 @@ func (c *Conveyer) RegisterMultiplexer(
 	for i, name := range inputs {
 		inChans[i] = c.ensureChannel(name)
 	}
+
 	outCh := c.ensureChannel(output)
 
 	c.handlers = append(c.handlers, func(ctx context.Context) error {

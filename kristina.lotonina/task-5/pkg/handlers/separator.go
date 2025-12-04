@@ -10,6 +10,7 @@ func SeparatorFunc(
 	outputs []chan string,
 ) error {
 	index := 0
+
 	for {
 		select {
 		case <-ctx.Done():

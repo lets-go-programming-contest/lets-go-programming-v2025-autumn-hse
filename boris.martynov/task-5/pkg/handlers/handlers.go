@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"strings"
 )
+
+var ErrCantBeDecorated = errors.New("can't be decorated")
 
 func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {
 	for {
@@ -19,7 +21,7 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 			}
 
 			if strings.Contains(data, "no decorator") {
-				return fmt.Errorf("can't be decorated")
+				return ErrCantBeDecorated
 			}
 
 			if !strings.HasPrefix(data, "decorated: ") {
@@ -65,10 +67,12 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 	for i, in := range inputs {
 		channels[i] = in
 	}
+
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
+
 		default:
 			for _, ch := range channels {
 				select {
@@ -81,14 +85,14 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 						select {
 						case output <- data:
 						case <-ctx.Done():
-							return ctx.Err()
+							return nil
 						}
 					}
 				default:
 					continue
 				}
 			}
-
 		}
 	}
 }
+

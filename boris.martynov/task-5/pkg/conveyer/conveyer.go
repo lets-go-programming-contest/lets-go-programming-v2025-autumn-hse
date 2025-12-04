@@ -134,7 +134,7 @@ func (c *conveyor) Send(inputID string, data string) error {
 	c.mu.RUnlock()
 
 	if !exists {
-		return fmt.Errorf("input channel '%s' not found", inputID)
+		return fmt.Errorf("chan not found")
 	}
 
 	select {
@@ -151,16 +151,12 @@ func (c *conveyor) Recv(outputID string) (string, error) {
 	c.mu.RUnlock()
 
 	if !exists {
-		return "", fmt.Errorf("output channel '%s' not found", outputID)
+		return "", fmt.Errorf("chan not found")
 	}
 
-	select {
-	case data, ok := <-ch:
-		if !ok {
-			return "undefined", nil
-		}
-		return data, nil
-	default:
-		return "", fmt.Errorf("no data in output channel '%s'", outputID)
+	data, ok := <-ch
+	if !ok {
+		return "undefined", nil
 	}
+	return data, nil
 }

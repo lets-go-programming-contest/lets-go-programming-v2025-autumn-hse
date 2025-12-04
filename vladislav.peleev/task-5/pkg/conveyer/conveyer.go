@@ -40,6 +40,7 @@ func (c *conveyerImpl) ensureChannel(name string) chan string {
 	}
 	ch := make(chan string, c.bufSize)
 	c.channels[name] = ch
+
 	return ch
 }
 
@@ -129,6 +130,7 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 
 	err := g.Wait()
 	c.close()
+
 	return err
 }
 
@@ -154,6 +156,7 @@ func (c *conveyerImpl) Send(input, data string) error {
 	}
 
 	ch <- data
+
 	return nil
 }
 
@@ -170,5 +173,6 @@ func (c *conveyerImpl) Recv(output string) (string, error) {
 	if !ok {
 		return Undefined, nil
 	}
+
 	return data, nil
 }

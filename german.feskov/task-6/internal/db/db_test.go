@@ -1,4 +1,4 @@
-package db
+package db_test
 
 import (
 	"errors"
@@ -6,179 +6,254 @@ import (
 	"strings"
 	"testing"
 
+	database "github.com/6ermvH/german.feskov/task-6/internal/db"
+
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
-func TestGetNames(t *testing.T) {
+const (
+	queryNames       = "SELECT name FROM users"
+	queryUniqueNames = "SELECT DISTINCT name FROM users"
+)
+
+func TestGetNamesNoErrorOneRow(t *testing.T) {
+	t.Parallel()
+
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("initialize mock db: %s", err.Error())
 	}
 
-	dbService := New(db)
+	dbService := database.New(db)
 
-	query := "SELECT name FROM users"
+	rows := sqlmock.NewRows([]string{"name"}).AddRow("german")
+	mock.ExpectQuery(queryNames).WillReturnRows(rows)
 
-	t.Run("no error, one row", func(t *testing.T) {
-		rows := sqlmock.NewRows([]string{"name"}).AddRow("german")
-		mock.ExpectQuery(query).WillReturnRows(rows)
+	want := []string{"german"}
 
-		want := []string{"german"}
+	have, err := dbService.GetNames()
+	if err != nil {
+		t.Fatalf("return error: %s", err.Error())
+	}
 
-		have, err := dbService.GetNames()
-		if err != nil {
-			t.Fatalf("return error: %s", err.Error())
-		}
-
-		if !slices.Equal(have, want) {
-			t.Fatalf("slices not equal: have: %v, want: %v", have, want)
-		}
-	})
-
-	t.Run("no error, more rows", func(t *testing.T) {
-		rows := sqlmock.NewRows([]string{"name"}).AddRow("german").AddRow("anthon").AddRow("vitaly")
-		mock.ExpectQuery(query).WillReturnRows(rows)
-
-		want := []string{"german", "anthon", "vitaly"}
-
-		have, err := dbService.GetNames()
-		if err != nil {
-			t.Fatalf("return error: %s", err.Error())
-		}
-
-		if !slices.Equal(have, want) {
-			t.Fatalf("slices not equal: have: %v, want: %v", have, want)
-		}
-	})
-
-	t.Run("error on query", func(t *testing.T) {
-		mock.ExpectQuery(query).WillReturnError(errors.ErrUnsupported)
-
-		_, err := dbService.GetNames()
-		if err == nil {
-			t.Fatalf("return no error")
-		}
-
-		prefix := "db query: "
-		if !strings.HasPrefix(err.Error(), prefix) {
-			t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-		}
-	})
-
-	t.Run("error on scan row", func(t *testing.T) {
-		rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
-		mock.ExpectQuery(query).WillReturnRows(rows)
-
-		_, err := dbService.GetNames()
-		if err == nil {
-			t.Fatalf("return no error")
-		}
-
-		prefix := "rows scanning: "
-		if !strings.HasPrefix(err.Error(), prefix) {
-			t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-		}
-	})
-
-	t.Run("error on close row", func(t *testing.T) {
-		rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.ErrUnsupported)
-		mock.ExpectQuery(query).WillReturnRows(rows)
-
-		_, err := dbService.GetNames()
-		if err == nil {
-			t.Fatalf("return no error")
-		}
-
-		prefix := "rows error: "
-		if !strings.HasPrefix(err.Error(), prefix) {
-			t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-		}
-	})
+	if !slices.Equal(have, want) {
+		t.Fatalf("slices not equal: have: %v, want: %v", have, want)
+	}
 }
 
-func TestGetUniqueNames(t *testing.T) {
+func TestGetNamesNoErrorMoreRows(t *testing.T) {
+	t.Parallel()
+
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("initialize mock db: %s", err.Error())
 	}
 
-	dbService := New(db)
+	dbService := database.New(db)
 
-	query := "SELECT DISTINCT name FROM users"
+	rows := sqlmock.NewRows([]string{"name"}).AddRow("german").AddRow("anthon").AddRow("vitaly")
+	mock.ExpectQuery(queryNames).WillReturnRows(rows)
 
-	t.Run("no error, one row", func(t *testing.T) {
-		rows := sqlmock.NewRows([]string{"name"}).AddRow("german")
-		mock.ExpectQuery(query).WillReturnRows(rows)
+	want := []string{"german", "anthon", "vitaly"}
 
-		want := []string{"german"}
+	have, err := dbService.GetNames()
+	if err != nil {
+		t.Fatalf("return error: %s", err.Error())
+	}
 
-		have, err := dbService.GetUniqueNames()
-		if err != nil {
-			t.Fatalf("return error: %s", err.Error())
-		}
+	if !slices.Equal(have, want) {
+		t.Fatalf("slices not equal: have: %v, want: %v", have, want)
+	}
+}
 
-		if !slices.Equal(have, want) {
-			t.Fatalf("slices not equal: have: %v, want: %v", have, want)
-		}
-	})
+func TestGetNamesErrorOnQuery(t *testing.T) {
+	t.Parallel()
 
-	t.Run("no error, more rows", func(t *testing.T) {
-		rows := sqlmock.NewRows([]string{"name"}).AddRow("german").AddRow("anthon").AddRow("vitaly")
-		mock.ExpectQuery(query).WillReturnRows(rows)
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("initialize mock db: %s", err.Error())
+	}
 
-		want := []string{"german", "anthon", "vitaly"}
+	dbService := database.New(db)
 
-		have, err := dbService.GetUniqueNames()
-		if err != nil {
-			t.Fatalf("return error: %s", err.Error())
-		}
+	mock.ExpectQuery(queryNames).WillReturnError(errors.ErrUnsupported)
 
-		if !slices.Equal(have, want) {
-			t.Fatalf("slices not equal: have: %v, want: %v", have, want)
-		}
-	})
+	_, err = dbService.GetNames()
+	if err == nil {
+		t.Fatalf("return no error")
+	}
 
-	t.Run("error on query", func(t *testing.T) {
-		mock.ExpectQuery(query).WillReturnError(errors.ErrUnsupported)
+	prefix := "db query: "
+	if !strings.HasPrefix(err.Error(), prefix) {
+		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
+	}
+}
 
-		_, err := dbService.GetUniqueNames()
-		if err == nil {
-			t.Fatalf("return no error")
-		}
+func TestGetNamesErrorOnScanRow(t *testing.T) {
+	t.Parallel()
 
-		prefix := "db query: "
-		if !strings.HasPrefix(err.Error(), prefix) {
-			t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-		}
-	})
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("initialize mock db: %s", err.Error())
+	}
 
-	t.Run("error on scan row", func(t *testing.T) {
-		rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
-		mock.ExpectQuery(query).WillReturnRows(rows)
+	dbService := database.New(db)
 
-		_, err := dbService.GetUniqueNames()
-		if err == nil {
-			t.Fatalf("return no error")
-		}
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
+	mock.ExpectQuery(queryNames).WillReturnRows(rows)
 
-		prefix := "rows scanning: "
-		if !strings.HasPrefix(err.Error(), prefix) {
-			t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-		}
-	})
+	_, err = dbService.GetNames()
+	if err == nil {
+		t.Fatalf("return no error")
+	}
 
-	t.Run("error on close row", func(t *testing.T) {
-		rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.ErrUnsupported)
-		mock.ExpectQuery(query).WillReturnRows(rows)
+	prefix := "rows scanning: "
+	if !strings.HasPrefix(err.Error(), prefix) {
+		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
+	}
+}
 
-		_, err := dbService.GetUniqueNames()
-		if err == nil {
-			t.Fatalf("return no error")
-		}
+func TestGetNamesErrorOnCloseRow(t *testing.T) {
+	t.Parallel()
 
-		prefix := "rows error: "
-		if !strings.HasPrefix(err.Error(), prefix) {
-			t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
-		}
-	})
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("initialize mock db: %s", err.Error())
+	}
+
+	dbService := database.New(db)
+
+	rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.ErrUnsupported)
+	mock.ExpectQuery(queryNames).WillReturnRows(rows)
+
+	_, err = dbService.GetNames()
+	if err == nil {
+		t.Fatalf("return no error")
+	}
+
+	prefix := "rows error: "
+	if !strings.HasPrefix(err.Error(), prefix) {
+		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
+	}
+}
+
+func TestGetUniqueNamesNoErrorOneRow(t *testing.T) {
+	t.Parallel()
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("initialize mock db: %s", err.Error())
+	}
+
+	dbService := database.New(db)
+
+	rows := sqlmock.NewRows([]string{"name"}).AddRow("german")
+	mock.ExpectQuery(queryUniqueNames).WillReturnRows(rows)
+
+	want := []string{"german"}
+
+	have, err := dbService.GetUniqueNames()
+	if err != nil {
+		t.Fatalf("return error: %s", err.Error())
+	}
+
+	if !slices.Equal(have, want) {
+		t.Fatalf("slices not equal: have: %v, want: %v", have, want)
+	}
+}
+
+func TestGetUniqueNamesNoErrorMoreRows(t *testing.T) {
+	t.Parallel()
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("initialize mock db: %s", err.Error())
+	}
+
+	dbService := database.New(db)
+
+	rows := sqlmock.NewRows([]string{"name"}).AddRow("german").AddRow("anthon").AddRow("vitaly")
+	mock.ExpectQuery(queryUniqueNames).WillReturnRows(rows)
+
+	want := []string{"german", "anthon", "vitaly"}
+
+	have, err := dbService.GetUniqueNames()
+	if err != nil {
+		t.Fatalf("return error: %s", err.Error())
+	}
+
+	if !slices.Equal(have, want) {
+		t.Fatalf("slices not equal: have: %v, want: %v", have, want)
+	}
+}
+
+func TestGetUniqueNamesErrorOnQuery(t *testing.T) {
+	t.Parallel()
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("initialize mock db: %s", err.Error())
+	}
+
+	dbService := database.New(db)
+
+	mock.ExpectQuery(queryUniqueNames).WillReturnError(errors.ErrUnsupported)
+
+	_, err = dbService.GetUniqueNames()
+	if err == nil {
+		t.Fatalf("return no error")
+	}
+
+	prefix := "db query: "
+	if !strings.HasPrefix(err.Error(), prefix) {
+		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
+	}
+}
+
+func TestGetUniqueNamesErrorOnScanRow(t *testing.T) {
+	t.Parallel()
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("initialize mock db: %s", err.Error())
+	}
+
+	dbService := database.New(db)
+
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
+	mock.ExpectQuery(queryUniqueNames).WillReturnRows(rows)
+
+	_, err = dbService.GetUniqueNames()
+	if err == nil {
+		t.Fatalf("return no error")
+	}
+
+	prefix := "rows scanning: "
+	if !strings.HasPrefix(err.Error(), prefix) {
+		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
+	}
+}
+
+func TestGetUniqueNamesErrorOnCloseRow(t *testing.T) {
+	t.Parallel()
+
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("initialize mock db: %s", err.Error())
+	}
+
+	dbService := database.New(db)
+
+	rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.ErrUnsupported)
+	mock.ExpectQuery(queryUniqueNames).WillReturnRows(rows)
+
+	_, err = dbService.GetUniqueNames()
+	if err == nil {
+		t.Fatalf("return no error")
+	}
+
+	prefix := "rows error: "
+	if !strings.HasPrefix(err.Error(), prefix) {
+		t.Fatalf("error: %q, don't has prefix: %q", err.Error(), prefix)
+	}
 }

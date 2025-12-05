@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+const (
+	noDecorator     = "no decorator"
+	decoratedPrefix = "decorated: "
+)
+
 var ErrCantBeDecorated = errors.New("can't be decorated")
 
 func PrefixDecoratorFunc(
@@ -23,12 +28,12 @@ func PrefixDecoratorFunc(
 				return nil
 			}
 
-			if strings.Contains(data, "no decorator") {
+			if strings.Contains(data, noDecorator) {
 				return ErrCantBeDecorated
 			}
 
-			if !strings.HasPrefix(data, "decorated: ") {
-				data = "decorated: " + data
+			if !strings.HasPrefix(data, decoratedPrefix) {
+				data = decoratedPrefix + data
 			}
 
 			select {

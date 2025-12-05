@@ -6,7 +6,9 @@ import (
 	"sync"
 )
 
-const Undefined = "undefined"
+const (
+	undefinedChannel = "undefined"
+)
 
 var ErrChannelNotFound = errors.New("chan not found")
 
@@ -134,12 +136,12 @@ func (c *Conveyer) Send(name, data string) error {
 func (c *Conveyer) Recv(name string) (string, error) {
 	channel, channelExist := c.getChannel(name)
 	if !channelExist || channel == nil {
-		return Undefined, ErrChannelNotFound
+		return undefinedChannel, ErrChannelNotFound
 	}
 
 	val, ok := <-channel
 	if !ok {
-		return Undefined, nil
+		return undefinedChannel, nil
 	}
 
 	return val, nil

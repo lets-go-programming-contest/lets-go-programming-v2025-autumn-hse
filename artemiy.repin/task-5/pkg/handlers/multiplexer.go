@@ -6,6 +6,10 @@ import (
 	"sync"
 )
 
+const (
+	noMultiplexer = "no multiplexer"
+)
+
 func MultiplexerFunc(
 	ctx context.Context,
 	inputChannels []chan string,
@@ -47,7 +51,7 @@ func multiplexerHelper(
 						return
 					}
 
-					if strings.Contains(data, "no multiplexer") {
+					if strings.Contains(data, noMultiplexer) {
 						continue
 					}
 

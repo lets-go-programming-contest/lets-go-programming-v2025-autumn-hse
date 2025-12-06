@@ -5,9 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/OlesiaOl/task-6/internal/db"
-
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/OlesiaOl/task-6/internal/db"
 	"github.com/stretchr/testify/require"
 )
 

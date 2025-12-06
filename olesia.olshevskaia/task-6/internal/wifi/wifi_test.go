@@ -5,8 +5,8 @@ import (
 	"net"
 	"testing"
 
+	"github.com/OlesiaOl/task-6/internal/mocks"
 	"github.com/OlesiaOl/task-6/internal/wifi"
-	"github.com/OlesiaOl/task-6/internal/wifi/mocks"
 
 	wifipkg "github.com/mdlayher/wifi"
 	"github.com/stretchr/testify/require"

@@ -18,7 +18,7 @@ var (
 	ErrInvalidSeparatorType   = errors.New("invalid separator function type")
 )
 
-const undefined = "undefined"
+const chanIsClosedAndEmpty = "undefined"
 
 type Conveyer struct {
 	channels map[string]chan string
@@ -53,8 +53,8 @@ func (conveyer *Conveyer) findChan(name string) (chan string, bool) {
 }
 
 func (conveyer *Conveyer) ensureChan(name string) chan string {
-	conveyer.mutex.RLock()
-	defer conveyer.mutex.RUnlock()
+	conveyer.mutex.Lock()
+	defer conveyer.mutex.Unlock()
 
 	channel, found := conveyer.channels[name]
 	if !found {
@@ -67,11 +67,11 @@ func (conveyer *Conveyer) ensureChan(name string) chan string {
 
 func (conveyer *Conveyer) Run(ctx context.Context) error {
 	defer func() {
-		conveyer.mutex.RLock()
+		conveyer.mutex.Lock()
 		for _, ch := range conveyer.channels {
 			close(ch)
 		}
-		conveyer.mutex.RUnlock()
+		conveyer.mutex.Unlock()
 	}()
 
 	errGroup, _ := errgroup.WithContext(ctx)
@@ -117,12 +117,12 @@ func (conveyer *Conveyer) Send(name, data string) error {
 func (conveyer *Conveyer) Recv(name string) (string, error) {
 	channel, found := conveyer.findChan(name)
 	if !found {
-		return undefined, ErrChanNotFound
+		return chanIsClosedAndEmpty, ErrChanNotFound
 	}
 
 	val, ok := <-channel
 	if !ok {
-		return undefined, nil
+		return chanIsClosedAndEmpty, nil
 	}
 
 	return val, nil

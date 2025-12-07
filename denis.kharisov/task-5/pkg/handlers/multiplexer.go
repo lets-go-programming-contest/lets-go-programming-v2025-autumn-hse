@@ -1,12 +1,47 @@
 package handlers
+
 import (
 	"context"
+	"sync"
+	"strings"
 )
+
+const subStrNoMultiplexer = "no multiplexer"
 
 func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
 	if len(inputs) == 0 {
 		_ = <-ctx.Done()
 		return nil
 	}
-	
+
+	var wg sync.WaitGroup
+	for _, ch := range inputs {
+		wg.Add(1)
+		go func(inputCh chan string) {
+			defer wg.Done()
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case data, ok := <-inputCh:
+					if !ok {
+						return
+					}
+
+					if strings.Contains(data, subStrNoMultiplexer) {
+						continue
+					}
+
+					select {
+					case output <-data:
+					case <-ctx.Done():
+						return
+					}
+				}
+			}
+		} (ch)
+	}
+	wg.Wait()
+	close(output)
+	return nil
 }

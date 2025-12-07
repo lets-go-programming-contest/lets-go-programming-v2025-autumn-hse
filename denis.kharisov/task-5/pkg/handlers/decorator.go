@@ -6,11 +6,11 @@ import (
 	"strings"
 )
 
-var ErrCantBeDecorated = errors.New("can`t be decorated")
+var errCantBeDecorated = errors.New("can`t be decorated")
 
 const (
-	SubStrNoDecorator = "no decorator"
-	PrefixDecorated = "decorated: "
+	subStrNoDecorator = "no decorator"
+	prefixDecorated = "decorated: "
 )
 
 func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {
@@ -22,11 +22,11 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 			if !ok {
 				return nil
 			}
-			if strings.Contains(data, SubStrNoDecorator) {
-				return ErrCantBeDecorated
+			if strings.Contains(data, subStrNoDecorator) {
+				return errCantBeDecorated
 			}
-			if !strings.HasPrefix(data, PrefixDecorated) {
-				data = PrefixDecorated + data
+			if !strings.HasPrefix(data, prefixDecorated) {
+				data = prefixDecorated + data
 			}
 			select {
 			case <-ctx.Done():

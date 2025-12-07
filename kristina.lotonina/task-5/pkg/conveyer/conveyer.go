@@ -8,12 +8,16 @@ import (
 
 var ErrChanNotFound = errors.New("chan not found")
 
+const (
+	ErrChanClosed = "undefined"
+)
+
 type handlerFunc func(ctx context.Context) error
 
 type Conveyer struct {
-	size int
-	chans map[string]chan string
-	mu sync.RWMutex
+	size     int
+	chans    map[string]chan string
+	mu       sync.RWMutex
 	handlers []handlerFunc
 }
 
@@ -147,7 +151,7 @@ func (c *Conveyer) Recv(id string) (string, error) {
 
 	v, isOpen := <-channelRef
 	if !isOpen {
-		return "undefined", nil
+		return ErrChanClosed, nil
 	}
 
 	return v, nil

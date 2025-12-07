@@ -107,12 +107,12 @@ func (c *Conveyer) Send(name, data string) error {
 func (c *Conveyer) Recv(name string) (string, error) {
 	channel, found := c.get(name)
 	if !found {
-		return undefined_channel, ErrChanNotFound
+		return undefinedChannel, ErrChanNotFound
 	}
 
 	val, ok := <-channel
 	if !ok {
-		return undefined_channel, nil
+		return undefinedChannel, nil
 	}
 
 	return val, nil

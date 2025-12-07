@@ -30,7 +30,7 @@ var (
 	ErrInvalidTaskFunc = errors.New("invalid task function")
 )
 
-const undefined = "undefined"
+const undefined_channel = "undefined_channel"
 
 func New(size int) *Conveyer {
 	return &Conveyer{
@@ -50,7 +50,7 @@ func (c *Conveyer) get(name string) (chan string, bool) {
 	return channel, found
 }
 
-func (c *Conveyer) registr(name string) chan string {
+func (c *Conveyer) registration(name string) chan string {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -107,12 +107,12 @@ func (c *Conveyer) Send(name, data string) error {
 func (c *Conveyer) Recv(name string) (string, error) {
 	channel, found := c.get(name)
 	if !found {
-		return undefined, ErrChanNotFound
+		return undefined_channel, ErrChanNotFound
 	}
 
 	val, ok := <-channel
 	if !ok {
-		return undefined, nil
+		return undefined_channel, nil
 	}
 
 	return val, nil
@@ -130,8 +130,8 @@ func (c *Conveyer) exec(ctx context.Context, taskItem task) error {
 			return ErrInvalidTaskFunc
 		}
 
-		inputChannel := c.registr(taskItem.inputs[0])
-		outputChannel := c.registr(taskItem.outputs[0])
+		inputChannel := c.registration(taskItem.inputs[0])
+		outputChannel := c.registration(taskItem.outputs[0])
 
 		return decoratorFn(ctx, inputChannel, outputChannel)
 
@@ -144,10 +144,10 @@ func (c *Conveyer) exec(ctx context.Context, taskItem task) error {
 		ins := make([]chan string, len(taskItem.inputs))
 
 		for index, name := range taskItem.inputs {
-			ins[index] = c.registr(name)
+			ins[index] = c.registration(name)
 		}
 
-		outputChannel := c.registr(taskItem.outputs[0])
+		outputChannel := c.registration(taskItem.outputs[0])
 
 		return multiplexerFn(ctx, ins, outputChannel)
 
@@ -160,10 +160,10 @@ func (c *Conveyer) exec(ctx context.Context, taskItem task) error {
 		outs := make([]chan string, len(taskItem.outputs))
 
 		for index, name := range taskItem.outputs {
-			outs[index] = c.registr(name)
+			outs[index] = c.registration(name)
 		}
 
-		inputChannel := c.registr(taskItem.inputs[0])
+		inputChannel := c.registration(taskItem.inputs[0])
 
 		return separatorFn(ctx, inputChannel, outs)
 	}
@@ -176,8 +176,8 @@ func (c *Conveyer) RegisterDecorator(
 	input string,
 	output string,
 ) {
-	c.registr(input)
-	c.registr(output)
+	c.registration(input)
+	c.registration(output)
 
 	c.tasks = append(c.tasks, task{
 		kind:    "decorator",
@@ -193,10 +193,10 @@ func (c *Conveyer) RegisterMultiplexer(
 	output string,
 ) {
 	for _, name := range inputs {
-		c.registr(name)
+		c.registration(name)
 	}
 
-	c.registr(output)
+	c.registration(output)
 
 	c.tasks = append(c.tasks, task{
 		kind:    "multiplexer",
@@ -211,10 +211,10 @@ func (c *Conveyer) RegisterSeparator(
 	input string,
 	outputs []string,
 ) {
-	c.registr(input)
+	c.registration(input)
 
 	for _, name := range outputs {
-		c.registr(name)
+		c.registration(name)
 	}
 
 	c.tasks = append(c.tasks, task{

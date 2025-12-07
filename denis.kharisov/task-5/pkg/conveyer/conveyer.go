@@ -111,6 +111,7 @@ func (c *conveyor) Run(ctx context.Context) error {
 
 	for _, task := range tasks {
 		t := task
+
 		group.Go(func() error {
 			return t(gCtx)
 		})

@@ -22,6 +22,7 @@ type conveyor struct {
 
 func New(size int) *conveyor {
 	return &conveyor{
+		mu:       sync.Mutex{},
 		channels: make(map[string]chan string),
 		tasks:    make([]func(context.Context) error, 0),
 		size:     size,
@@ -29,16 +30,17 @@ func New(size int) *conveyor {
 }
 
 func (c *conveyor) ensure(name string) chan string {
-	if ch, exists := c.channels[name]; exists {
-		return ch
+	if channel, exists := c.channels[name]; exists {
+		return channel
 	}
-	ch := make(chan string, c.size)
-	c.channels[name] = ch
-	return ch
+	channel := make(chan string, c.size)
+	c.channels[name] = channel
+
+	return channel
 }
 
 func (c *conveyor) RegisterDecorator(
-	fn func(ctx context.Context, input chan string, output chan string) error,
+	taskFn func(ctx context.Context, input chan string, output chan string) error,
 	inputID, outputID string,
 ) error {
 	c.mu.Lock()
@@ -48,13 +50,14 @@ func (c *conveyor) RegisterDecorator(
 	outputCh := c.ensure(outputID)
 
 	c.tasks = append(c.tasks, func(ctx context.Context) error {
-		return fn(ctx, inputCh, outputCh)
+		return taskFn(ctx, inputCh, outputCh)
 	})
+
 	return nil
 }
 
 func (c *conveyor) RegisterMultiplexer(
-	fn func(ctx context.Context, inputs []chan string, output chan string) error,
+	taskFn func(ctx context.Context, inputs []chan string, output chan string) error,
 	inputIDs []string,
 	outputID string,
 ) error {
@@ -68,13 +71,14 @@ func (c *conveyor) RegisterMultiplexer(
 	outputCh := c.ensure(outputID)
 
 	c.tasks = append(c.tasks, func(ctx context.Context) error {
-		return fn(ctx, inputChans, outputCh)
+		return taskFn(ctx, inputChans, outputCh)
 	})
+
 	return nil
 }
 
 func (c *conveyor) RegisterSeparator(
-	fn func(ctx context.Context, input chan string, outputs []chan string) error,
+	taskFn func(ctx context.Context, input chan string, outputs []chan string) error,
 	inputID string,
 	outputIDs []string,
 ) error {
@@ -88,8 +92,9 @@ func (c *conveyor) RegisterSeparator(
 	}
 
 	c.tasks = append(c.tasks, func(ctx context.Context) error {
-		return fn(ctx, inputCh, outputChans)
+		return taskFn(ctx, inputCh, outputChans)
 	})
+
 	return nil
 }
 
@@ -113,41 +118,44 @@ func (c *conveyor) Run(ctx context.Context) error {
 	}
 
 	c.closeAll()
+
 	return nil
 }
 
 func (c *conveyor) Send(channelID string, data string) error {
 	c.mu.Lock()
-	ch, exists := c.channels[channelID]
+	channel, exists := c.channels[channelID]
 	c.mu.Unlock()
 
 	if !exists {
 		return errChanNotFound
 	}
-	ch <- data
+	channel <- data
+
 	return nil
 }
 
 func (c *conveyor) Recv(channelID string) (string, error) {
 	c.mu.Lock()
-	ch, exists := c.channels[channelID]
+	channel, exists := c.channels[channelID]
 	c.mu.Unlock()
 
 	if !exists {
 		return "", errChanNotFound
 	}
 
-	data, ok := <-ch
+	data, ok := <-channel
 	if !ok {
 		return undefined, nil
 	}
+
 	return data, nil
 }
 
 func (c *conveyor) closeAll() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	for _, ch := range c.channels {
-		close(ch)
+	for _, channel := range c.channels {
+		close(channel)
 	}
 }

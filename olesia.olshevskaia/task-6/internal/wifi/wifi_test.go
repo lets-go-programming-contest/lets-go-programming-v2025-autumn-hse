@@ -12,7 +12,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var (
+	errWiFiDisabled = errors.New("WiFi disabled")
+)
+
 func TestWiFiGetNamesOneNoError(t *testing.T) {
+	t.Parallel()
+
 	wifiHandler := mocks.NewWiFiHandle(t)
 	service := wifi.New(wifiHandler)
 	expectedResult := []string{"nevergivup"}
@@ -32,6 +38,8 @@ func TestWiFiGetNamesOneNoError(t *testing.T) {
 }
 
 func TestWiFiGetNamesMultipleNoError(t *testing.T) {
+	t.Parallel()
+
 	wifiHandler := mocks.NewWiFiHandle(t)
 	service := wifi.New(wifiHandler)
 	expectedResult := []string{"Naf-Naf", "Nuf-Nuf", "Nif-Nif"}
@@ -57,6 +65,8 @@ func TestWiFiGetNamesMultipleNoError(t *testing.T) {
 }
 
 func TestWiFIGetNamesWithError(t *testing.T) {
+	t.Parallel()
+
 	wifiHandler := mocks.NewWiFiHandle(t)
 	service := wifi.New(wifiHandler)
 	expectedErr := errors.New("not exist")
@@ -74,6 +84,8 @@ func TestWiFIGetNamesWithError(t *testing.T) {
 }
 
 func TestWiFiGetAddressesOneNoError(t *testing.T) {
+	t.Parallel()
+
 	mockHandler := mocks.NewWiFiHandle(t)
 	service := wifi.New(mockHandler)
 
@@ -96,6 +108,8 @@ func TestWiFiGetAddressesOneNoError(t *testing.T) {
 }
 
 func TestWiFiGetAddressesMultipleNoError(t *testing.T) {
+	t.Parallel()
+
 	mockHandler := mocks.NewWiFiHandle(t)
 	service := wifi.New(mockHandler)
 
@@ -130,10 +144,12 @@ func TestWiFiGetAddressesMultipleNoError(t *testing.T) {
 }
 
 func TestWiFiGetAddressesWithError(t *testing.T) {
+	t.Parallel()
+
 	mockHandler := mocks.NewWiFiHandle(t)
 	service := wifi.New(mockHandler)
 
-	expectedErr := errors.New("WiFi disabled")
+	expectedErr := errWiFiDisabled
 	mockHandler.On("Interfaces").Return(nil, expectedErr)
 
 	actualAddresses, err := service.GetAddresses()

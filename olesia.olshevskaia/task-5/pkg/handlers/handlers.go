@@ -17,6 +17,8 @@ const (
 func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 	for {
 		select {
+		case <-ctx.Done():
+			return nil
 		case data, ok := <-input:
 			if !ok {
 				return nil
@@ -31,15 +33,10 @@ func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 			}
 
 			select {
-			case output <- data:
 			case <-ctx.Done():
 				return nil
+			case output <- data:
 			}
-
-		case <-ctx.Done():
-			for range input {
-			}
-			return nil
 		}
 	}
 }

@@ -27,6 +27,7 @@ func New(size int) *conveyor {
 		channels: make(map[string]chan string),
 		tasks:    make([]func(context.Context) error, 0),
 		size:     size,
+		closed: false,
 	}
 }
 
@@ -170,5 +171,6 @@ func (c *conveyor) closeAll() {
 	for _, ch := range c.channels {
 		close(ch)
 	}
+
 	c.closed = true
 }

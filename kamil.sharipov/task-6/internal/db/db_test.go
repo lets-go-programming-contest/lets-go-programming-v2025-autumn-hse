@@ -1,4 +1,4 @@
-package db
+package db_test
 
 import (
 	"errors"
@@ -7,11 +7,18 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	d "github.com/kamilSharipov/task-6/internal/db"
 )
 
 const (
 	queryName       = "SELECT name FROM users"
 	queryUniqueName = "SELECT DISTINCT name FROM users"
+)
+
+var (
+	errQueryError = errors.New("query error")
+	errDropped    = errors.New("dropped")
 )
 
 func TestGetNamesSuccess(t *testing.T) {
@@ -26,7 +33,7 @@ func TestGetNamesSuccess(t *testing.T) {
 	mock.ExpectQuery(queryName).WillReturnRows(rows)
 
 	want := []string{"Kamil"}
-	database := New(db)
+	database := d.New(db)
 	have, err := database.GetNames()
 
 	require.NoError(t, err)
@@ -42,9 +49,9 @@ func TestGetNamesQueryError(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	mock.ExpectQuery(queryName).WillReturnError(errors.New("query error"))
+	mock.ExpectQuery(queryName).WillReturnError(errQueryError)
 
-	database := New(db)
+	database := d.New(db)
 	have, err := database.GetNames()
 
 	require.Error(t, err)
@@ -67,7 +74,7 @@ func TestGetNamesScanError(t *testing.T) {
 
 	mock.ExpectQuery(queryName).WillReturnRows(rows)
 
-	database := New(db)
+	database := d.New(db)
 	have, err := database.GetNames()
 
 	require.Error(t, err)
@@ -84,11 +91,11 @@ func TestGetNamesRowCloseError(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.New("dropped"))
+	rows := sqlmock.NewRows([]string{"name"}).CloseError(errDropped)
 
 	mock.ExpectQuery(queryName).WillReturnRows(rows)
 
-	database := New(db)
+	database := d.New(db)
 	have, err := database.GetNames()
 
 	require.Error(t, err)
@@ -110,7 +117,7 @@ func TestGetUniqueNamesSuccess(t *testing.T) {
 	mock.ExpectQuery(queryUniqueName).WillReturnRows(rows)
 
 	want := []string{"Kamil"}
-	database := New(db)
+	database := d.New(db)
 	have, err := database.GetUniqueNames()
 
 	require.NoError(t, err)
@@ -126,9 +133,9 @@ func TestGetUniqueNamesQueryError(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	mock.ExpectQuery(queryUniqueName).WillReturnError(errors.New("query error"))
+	mock.ExpectQuery(queryUniqueName).WillReturnError(errQueryError)
 
-	database := New(db)
+	database := d.New(db)
 	have, err := database.GetUniqueNames()
 
 	require.Error(t, err)
@@ -151,7 +158,7 @@ func TestGetUniqueNamesScanError(t *testing.T) {
 
 	mock.ExpectQuery(queryUniqueName).WillReturnRows(rows)
 
-	database := New(db)
+	database := d.New(db)
 	have, err := database.GetUniqueNames()
 
 	require.Error(t, err)
@@ -168,11 +175,11 @@ func TestGetUniqueNamesRowCloseError(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.New("dropped"))
+	rows := sqlmock.NewRows([]string{"name"}).CloseError(errDropped)
 
 	mock.ExpectQuery(queryUniqueName).WillReturnRows(rows)
 
-	database := New(db)
+	database := d.New(db)
 	have, err := database.GetUniqueNames()
 
 	require.Error(t, err)

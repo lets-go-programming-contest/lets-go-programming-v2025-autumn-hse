@@ -1,4 +1,4 @@
-package wifi
+package wifi_test
 
 import (
 	"errors"
@@ -8,6 +8,13 @@ import (
 	"github.com/mdlayher/wifi"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	w "github.com/kamilSharipov/task-6/internal/wifi"
+)
+
+var (
+	errInterfacesError = errors.New("interfaces error")
+	errNamesError      = errors.New("names error")
 )
 
 func TestGetAddressesSuccess(t *testing.T) {
@@ -23,9 +30,10 @@ func TestGetAddressesSuccess(t *testing.T) {
 	}
 
 	want := []net.HardwareAddr{hwAddr}
+
 	mock.On("Interfaces").Return(interfaces, nil)
 
-	service := New(mock)
+	service := w.New(mock)
 	have, err := service.GetAddresses()
 
 	require.NoError(t, err)
@@ -39,9 +47,9 @@ func TestGetAddressesError(t *testing.T) {
 
 	mock := new(MockWiFiHandle)
 
-	mock.On("Interfaces").Return(nil, errors.New("interfaces error"))
+	mock.On("Interfaces").Return(nil, errInterfacesError)
 
-	service := New(mock)
+	service := w.New(mock)
 	have, err := service.GetAddresses()
 
 	require.Error(t, err)
@@ -64,7 +72,7 @@ func TestGetNamesSuccess(t *testing.T) {
 	mock.On("Interfaces").Return(interfaces, nil)
 
 	want := []string{wifiInterfaceName}
-	service := New(mock)
+	service := w.New(mock)
 	have, err := service.GetNames()
 
 	require.NoError(t, err)
@@ -78,9 +86,9 @@ func TestGetNamesError(t *testing.T) {
 
 	mock := new(MockWiFiHandle)
 
-	mock.On("Interfaces").Return(nil, errors.New("names error"))
+	mock.On("Interfaces").Return(nil, errNamesError)
 
-	service := New(mock)
+	service := w.New(mock)
 	have, err := service.GetNames()
 
 	require.Error(t, err)

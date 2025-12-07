@@ -1,6 +1,7 @@
 package wifi_test
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/mdlayher/wifi"
@@ -10,6 +11,8 @@ import (
 type MockWiFiHandle struct {
 	mock.Mock
 }
+
+var errMockTypeMismatch = errors.New("mock Interfaces() returned unexpected type, expected []*wifi.Interface")
 
 func (m *MockWiFiHandle) Interfaces() ([]*wifi.Interface, error) {
 	args := m.Called()
@@ -28,5 +31,5 @@ func (m *MockWiFiHandle) Interfaces() ([]*wifi.Interface, error) {
 		return interfaceSlice, nil
 	}
 
-	return nil, fmt.Errorf("mock Interfaces() returned unexpected type %T, expected []*wifi.Interface", raw)
+	return nil, fmt.Errorf("%w: %T", errMockTypeMismatch, raw)
 }

@@ -23,6 +23,7 @@ func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 		}
 
 		var data string
+
 		select {
 		case <-ctx.Done():
 			return nil

@@ -8,6 +8,11 @@ import (
 
 var ErrCantDecorate = errors.New("can't be decorated")
 
+const (
+	nonDecorate = "no decorator"
+	prefixDecorated = "decorated: "
+)
+
 func PrefixDecoratorFunc(
 	ctx context.Context,
 	input chan string,
@@ -23,12 +28,12 @@ func PrefixDecoratorFunc(
 				return nil
 			}
 
-			if strings.Contains(value, "no decorator") {
+			if strings.Contains(value, nonDecorated) {
 				return ErrCantDecorate
 			}
 
-			if !strings.HasPrefix(value, "decorated: ") {
-				value = "decorated: " + value
+			if !strings.HasPrefix(value, prefixDecorated) {
+				value = prefixDecorated + value
 			}
 
 			output <- value

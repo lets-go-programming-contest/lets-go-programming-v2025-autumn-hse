@@ -33,6 +33,7 @@ func (c *conveyor) ensure(name string) chan string {
 	if channel, exists := c.channels[name]; exists {
 		return channel
 	}
+
 	channel := make(chan string, c.size)
 	c.channels[name] = channel
 
@@ -68,6 +69,7 @@ func (c *conveyor) RegisterMultiplexer(
 	for i, id := range inputIDs {
 		inputChans[i] = c.ensure(id)
 	}
+
 	outputCh := c.ensure(outputID)
 
 	c.tasks = append(c.tasks, func(ctx context.Context) error {
@@ -87,6 +89,7 @@ func (c *conveyor) RegisterSeparator(
 
 	inputCh := c.ensure(inputID)
 	outputChans := make([]chan string, len(outputIDs))
+
 	for i, id := range outputIDs {
 		outputChans[i] = c.ensure(id)
 	}
@@ -105,6 +108,7 @@ func (c *conveyor) Run(ctx context.Context) error {
 	c.mu.Unlock()
 
 	group, gCtx := errgroup.WithContext(ctx)
+
 	for _, task := range tasks {
 		t := task
 		group.Go(func() error {
@@ -114,6 +118,7 @@ func (c *conveyor) Run(ctx context.Context) error {
 
 	if err := group.Wait(); err != nil {
 		c.closeAll()
+
 		return fmt.Errorf("conveyor failed: %w", err)
 	}
 
@@ -155,6 +160,7 @@ func (c *conveyor) Recv(channelID string) (string, error) {
 func (c *conveyor) closeAll() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
 	for _, channel := range c.channels {
 		close(channel)
 	}

@@ -11,14 +11,17 @@ const subStrNoMultiplexer = "no multiplexer"
 func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan string) error {
 	if len(inputs) == 0 {
 		<-ctx.Done()
+
 		return nil
 	}
 
 	var waitGroup sync.WaitGroup
-	for _, ch := range inputs {
+	for _, channel := range inputs {
 		waitGroup.Add(1)
+
 		go func(inputCh chan string) {
 			defer waitGroup.Done()
+
 			for {
 				select {
 				case <-ctx.Done():
@@ -39,9 +42,10 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 					}
 				}
 			}
-		}(ch)
+		}(channel)
 	}
 	waitGroup.Wait()
 	close(output)
+
 	return nil
 }

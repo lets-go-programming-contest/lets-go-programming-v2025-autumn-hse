@@ -31,6 +31,7 @@ func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 			if !ok {
 				return nil
 			}
+
 			data = v
 		}
 

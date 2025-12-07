@@ -30,7 +30,7 @@ var (
 	ErrInvalidTaskFunc = errors.New("invalid task function")
 )
 
-const undefined_channel = "undefined"
+const undefinedChannel = "undefined"
 
 func New(size int) *Conveyer {
 	return &Conveyer{

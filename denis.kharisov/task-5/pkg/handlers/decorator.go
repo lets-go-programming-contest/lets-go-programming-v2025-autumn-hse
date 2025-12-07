@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var errCantBeDecorated = errors.New("can`t be decorated")
+var errCantBeDecorated = errors.New("can't be decorated")
 
 const (
 	subStrNoDecorator = "no decorator"

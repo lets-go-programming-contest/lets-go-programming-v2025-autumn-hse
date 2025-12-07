@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
-	"sync"
 	"strings"
+	"sync"
 )
 
 const subStrNoMultiplexer = "no multiplexer"
@@ -33,13 +33,13 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 					}
 
 					select {
-					case output <-data:
+					case output <- data:
 					case <-ctx.Done():
 						return
 					}
 				}
 			}
-		} (ch)
+		}(ch)
 	}
 	wg.Wait()
 	close(output)

@@ -10,7 +10,7 @@ var errCantBeDecorated = errors.New("can`t be decorated")
 
 const (
 	subStrNoDecorator = "no decorator"
-	prefixDecorated = "decorated: "
+	prefixDecorated   = "decorated: "
 )
 
 func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {

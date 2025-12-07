@@ -26,13 +26,13 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 			if !ok {
 				return nil
 			}
-		select {
-		case outputs[index] <-data:
-		case <-ctx.Done():
-			return nil
-		}
+			select {
+			case outputs[index] <- data:
+			case <-ctx.Done():
+				return nil
+			}
 
-		index = (index + 1) % len(outputs)
+			index = (index + 1) % len(outputs)
 		}
 	}
 }

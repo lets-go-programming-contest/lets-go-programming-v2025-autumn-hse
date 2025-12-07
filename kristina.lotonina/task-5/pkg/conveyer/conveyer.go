@@ -12,11 +12,8 @@ type handlerFunc func(ctx context.Context) error
 
 type Conveyer struct {
 	size int
-
 	chans map[string]chan string
-
 	mu sync.RWMutex
-
 	handlers []handlerFunc
 }
 

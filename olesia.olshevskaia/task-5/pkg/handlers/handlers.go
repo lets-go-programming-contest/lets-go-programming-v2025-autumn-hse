@@ -19,24 +19,32 @@ func PrefixDecoratorFunc(ctx context.Context, input, output chan string) error {
 		select {
 		case <-ctx.Done():
 			return nil
-		case data, ok := <-input:
+		default:
+		}
+
+		var data string
+		select {
+		case <-ctx.Done():
+			return nil
+		case v, ok := <-input:
 			if !ok {
 				return nil
 			}
+			data = v
+		}
 
-			if strings.Contains(data, skipDecorator) {
-				return errCantBeDecorated
-			}
+		if strings.Contains(data, skipDecorator) {
+			return errCantBeDecorated
+		}
 
-			if !strings.HasPrefix(data, decoratedPrefix) {
-				data = decoratedPrefix + data
-			}
+		if !strings.HasPrefix(data, decoratedPrefix) {
+			data = decoratedPrefix + data
+		}
 
-			select {
-			case <-ctx.Done():
-				return nil
-			case output <- data:
-			}
+		select {
+		case <-ctx.Done():
+			return nil
+		case output <- data:
 		}
 	}
 }

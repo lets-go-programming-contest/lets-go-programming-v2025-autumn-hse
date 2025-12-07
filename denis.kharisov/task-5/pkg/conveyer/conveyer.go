@@ -27,7 +27,7 @@ func New(size int) *conveyor {
 		channels: make(map[string]chan string),
 		tasks:    make([]func(context.Context) error, 0),
 		size:     size,
-		closed: false,
+		closed:   false,
 	}
 }
 

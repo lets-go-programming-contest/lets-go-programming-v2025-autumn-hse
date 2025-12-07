@@ -10,8 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const ()
-
 var (
 	errLostConnection = errors.New("connection lost")
 	errRowBroken      = errors.New("row broken")

@@ -14,6 +14,7 @@ import (
 
 var (
 	errWiFiDisabled = errors.New("WiFi disabled")
+	errNoExit       = errors.New("not exist")
 )
 
 func TestWiFiGetNamesOneNoError(t *testing.T) {
@@ -69,7 +70,7 @@ func TestWiFIGetNamesWithError(t *testing.T) {
 
 	wifiHandler := mocks.NewWiFiHandle(t)
 	service := wifi.New(wifiHandler)
-	expectedErr := errors.New("not exist")
+	expectedErr := errNoExit
 
 	wifiHandler.On("Interfaces").Return(nil, expectedErr)
 

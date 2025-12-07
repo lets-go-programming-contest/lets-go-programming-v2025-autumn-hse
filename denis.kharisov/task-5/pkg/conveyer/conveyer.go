@@ -18,6 +18,7 @@ type conveyor struct {
 	channels map[string]chan string
 	tasks    []func(context.Context) error
 	size     int
+	closed   bool
 }
 
 func New(size int) *conveyor {
@@ -162,7 +163,12 @@ func (c *conveyor) closeAll() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	for _, channel := range c.channels {
-		close(channel)
+	if c.closed {
+		return
 	}
+
+	for _, ch := range c.channels {
+		close(ch)
+	}
+	c.closed = true
 }

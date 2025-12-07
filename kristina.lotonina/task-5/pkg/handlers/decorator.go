@@ -28,7 +28,7 @@ func PrefixDecoratorFunc(
 				return nil
 			}
 
-			if strings.Contains(value, nonDecorated) {
+			if strings.Contains(value, nonDecorate) {
 				return ErrCantDecorate
 			}
 

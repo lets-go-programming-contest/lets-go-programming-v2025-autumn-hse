@@ -15,13 +15,19 @@ func SeparatorFunc(
 		select {
 		case <-ctx.Done():
 			return nil
+		default:
+		}
+
+		select {
 		case data, ok := <-input:
 			if !ok {
 				return nil
 			}
 
 			outputs[ind] <- data
+
 			ind = (ind + 1) % len(outputs)
+		default:
 		}
 	}
 }

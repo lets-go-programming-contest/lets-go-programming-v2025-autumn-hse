@@ -10,7 +10,7 @@ const (
 	undefinedChannel = "undefined"
 )
 
-var ErrChannelNotFound = errors.New("chan not found")
+var errChannelNotFound = errors.New("chan not found")
 
 type Conveyer struct {
 	mu       sync.Mutex
@@ -125,7 +125,7 @@ func (c *Conveyer) Run(ctx context.Context) error {
 func (c *Conveyer) Send(name, data string) error {
 	ch, ok := c.getChannel(name)
 	if !ok || ch == nil {
-		return ErrChannelNotFound
+		return errChannelNotFound
 	}
 
 	ch <- data
@@ -136,7 +136,7 @@ func (c *Conveyer) Send(name, data string) error {
 func (c *Conveyer) Recv(name string) (string, error) {
 	channel, channelExist := c.getChannel(name)
 	if !channelExist || channel == nil {
-		return undefinedChannel, ErrChannelNotFound
+		return undefinedChannel, errChannelNotFound
 	}
 
 	val, ok := <-channel

@@ -9,20 +9,25 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type rowTestDb struct {
+var (
+	errExpected = errors.New("ExpectedError")
+	errRows     = errors.New("rows error")
+)
+
+type rowTestDB struct {
 	names       []string
 	errExpected error
 	scanError   bool
 	rowsError   bool
 }
 
-var testTable = []rowTestDb{
+var testTable = []rowTestDB{
 	{
 		names: []string{"Ivan", "Gena228"},
 	},
 	{
 		names:       nil,
-		errExpected: errors.New("ExpectedError"),
+		errExpected: errExpected,
 	},
 	{
 		names:     []string{"Ivan"},
@@ -35,6 +40,7 @@ var testTable = []rowTestDb{
 }
 
 func TestNew(t *testing.T) {
+	t.Parallel()
 	mockDB, _, _ := sqlmock.New()
 	dbService := db.New(mockDB)
 
@@ -43,14 +49,16 @@ func TestNew(t *testing.T) {
 }
 
 func TestGetName(t *testing.T) {
+	t.Parallel()
 	mockDB, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when marshaling expected json data", err)
 	}
+
 	dbService := db.DBService{DB: mockDB}
 
 	for i, row := range testTable {
-		rows := mockDbRows(row)
+		rows := mockDBRows(row)
 		mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows).WillReturnError(row.errExpected)
 
 		names, err := dbService.GetNames()
@@ -65,14 +73,16 @@ func TestGetName(t *testing.T) {
 }
 
 func TestGetUniqueName(t *testing.T) {
+	t.Parallel()
 	mockDB, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when marshaling expected json data", err)
 	}
+
 	dbService := db.DBService{DB: mockDB}
 
 	for i, row := range testTable {
-		rows := mockDbRows(row)
+		rows := mockDBRows(row)
 		mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows).WillReturnError(row.errExpected)
 
 		values, err := dbService.GetUniqueNames()
@@ -86,7 +96,7 @@ func TestGetUniqueName(t *testing.T) {
 	}
 }
 
-func mockDbRows(row rowTestDb) *sqlmock.Rows {
+func mockDBRows(row rowTestDB) *sqlmock.Rows {
 	rows := sqlmock.NewRows([]string{"name"})
 
 	if row.scanError {
@@ -98,7 +108,7 @@ func mockDbRows(row rowTestDb) *sqlmock.Rows {
 	}
 
 	if row.rowsError {
-		rows = rows.RowError(0, errors.New("rows error"))
+		rows = rows.RowError(0, errRows)
 	}
 
 	return rows

@@ -22,14 +22,16 @@ type rowTestSysInfo struct {
 	errExpected error
 }
 
-var testTable = []rowTestSysInfo{
-	{
-		addrs: []string{"00:11:22:33:44:55", "aa:bb:cc:dd:ee:ff"},
-		names: []string{"wlan0", "wlan1"},
-	},
-	{
-		errExpected: errExpected,
-	},
+func getTestTable() []rowTestSysInfo {
+	return []rowTestSysInfo{
+		{
+			addrs: []string{"00:11:22:33:44:55", "aa:bb:cc:dd:ee:ff"},
+			names: []string{"wlan0", "wlan1"},
+		},
+		{
+			errExpected: errExpected,
+		},
+	}
 }
 
 func TestNew(t *testing.T) {
@@ -46,7 +48,7 @@ func TestGetAddress(t *testing.T) {
 	mockWifi := NewWiFiHandle(t)
 	wifiService := myWifi.WiFiService{WiFi: mockWifi}
 
-	for i, row := range testTable {
+	for i, row := range getTestTable() {
 		mockWifi.On("Interfaces").Unset()
 		mockWifi.On("Interfaces").Return(mockIfaces(row.addrs), row.errExpected)
 
@@ -70,7 +72,7 @@ func TestGetName(t *testing.T) {
 	mockWifi := NewWiFiHandle(t)
 	wifiService := myWifi.WiFiService{WiFi: mockWifi}
 
-	for i, row := range testTable {
+	for i, row := range getTestTable() {
 		mockWifi.On("Interfaces").Unset()
 		mockWifi.On("Interfaces").Return(mockIfacesForNames(row.names), row.errExpected)
 
@@ -88,7 +90,7 @@ func TestGetName(t *testing.T) {
 }
 
 func mockIfacesForNames(names []string) []*wifi.Interface {
-	var interfaces []*wifi.Interface
+	interfaces := make([]*wifi.Interface, 0, len(names))
 
 	for i, name := range names {
 		iface := &wifi.Interface{
@@ -107,7 +109,7 @@ func mockIfacesForNames(names []string) []*wifi.Interface {
 }
 
 func mockIfaces(addrs []string) []*wifi.Interface {
-	var interfaces []*wifi.Interface
+	interfaces := make([]*wifi.Interface, 0, len(addrs))
 
 	for i, addrStr := range addrs {
 		hwAddr := parseMAC(addrStr)
@@ -131,7 +133,7 @@ func mockIfaces(addrs []string) []*wifi.Interface {
 }
 
 func parseMACs(macStr []string) []net.HardwareAddr {
-	var addrs []net.HardwareAddr
+	addrs := make([]net.HardwareAddr, 0, len(macStr))
 
 	for _, addr := range macStr {
 		addrs = append(addrs, parseMAC(addr))
@@ -145,5 +147,6 @@ func parseMAC(macStr string) net.HardwareAddr {
 	if err != nil {
 		return nil
 	}
+
 	return hwAddr
 }

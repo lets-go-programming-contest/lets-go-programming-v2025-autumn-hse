@@ -21,26 +21,29 @@ type rowTestDB struct {
 	rowsError   bool
 }
 
-var testTable = []rowTestDB{
-	{
-		names: []string{"Ivan", "Gena228"},
-	},
-	{
-		names:       nil,
-		errExpected: errExpected,
-	},
-	{
-		names:     []string{"Ivan"},
-		scanError: true,
-	},
-	{
-		names:     []string{"Ivan", "Gena228"},
-		rowsError: true,
-	},
+func getTestTable() []rowTestDB {
+	return []rowTestDB{
+		{
+			names: []string{"Ivan", "Gena228"},
+		},
+		{
+			names:       nil,
+			errExpected: errExpected,
+		},
+		{
+			names:     []string{"Ivan"},
+			scanError: true,
+		},
+		{
+			names:     []string{"Ivan", "Gena228"},
+			rowsError: true,
+		},
+	}
 }
 
 func TestNew(t *testing.T) {
 	t.Parallel()
+
 	mockDB, _, _ := sqlmock.New()
 	dbService := db.New(mockDB)
 
@@ -50,6 +53,7 @@ func TestNew(t *testing.T) {
 
 func TestGetName(t *testing.T) {
 	t.Parallel()
+
 	mockDB, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when marshaling expected json data", err)
@@ -57,7 +61,7 @@ func TestGetName(t *testing.T) {
 
 	dbService := db.DBService{DB: mockDB}
 
-	for i, row := range testTable {
+	for i, row := range getTestTable() {
 		rows := mockDBRows(row)
 		mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows).WillReturnError(row.errExpected)
 
@@ -74,6 +78,7 @@ func TestGetName(t *testing.T) {
 
 func TestGetUniqueName(t *testing.T) {
 	t.Parallel()
+
 	mockDB, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when marshaling expected json data", err)
@@ -81,7 +86,7 @@ func TestGetUniqueName(t *testing.T) {
 
 	dbService := db.DBService{DB: mockDB}
 
-	for i, row := range testTable {
+	for i, row := range getTestTable() {
 		rows := mockDBRows(row)
 		mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows).WillReturnError(row.errExpected)
 

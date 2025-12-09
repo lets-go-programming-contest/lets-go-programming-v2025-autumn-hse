@@ -9,7 +9,7 @@ import (
 var ErrCantDecorate = errors.New("can't be decorated")
 
 const (
-	nonDecorate	    = "no decorator"
+	nonDecorate     = "no decorator"
 	prefixDecorated = "decorated: "
 )
 

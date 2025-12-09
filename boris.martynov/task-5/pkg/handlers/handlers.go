@@ -12,7 +12,11 @@ const (
 	alreadyDecorated = "decorated: "
 )
 
-var ErrCantBeDecorated = errors.New("can't be decorated")
+var (
+	errCantBeDecorated = errors.New("can't be decorated")
+	errSeparator       = errors.New("error in separator")
+	errPrefixDecorator = errors.New("error in prefdecorator")
+)
 
 func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {
 	for {
@@ -22,20 +26,23 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 
 		case data, ok := <-input:
 			if !ok {
-				close(output)
 
-				return nil
+				return errPrefixDecorator
 			}
 
 			if strings.Contains(data, noDecorator) {
-				return ErrCantBeDecorated
+				return errCantBeDecorated
 			}
 
 			if !strings.HasPrefix(data, alreadyDecorated) {
 				data = "decorated: " + data
 			}
 
-			output <- data
+			select {
+			case output <- data:
+			case <-ctx.Done():
+				return nil
+			}
 		}
 	}
 }
@@ -50,11 +57,8 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 
 		case data, ok := <-input:
 			if !ok {
-				for _, out := range outputs {
-					close(out)
-				}
 
-				return nil
+				return errSeparator
 			}
 
 			index := counter % len(outputs)

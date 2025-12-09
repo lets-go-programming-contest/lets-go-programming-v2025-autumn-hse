@@ -1,0 +1,47 @@
+package conveyer
+
+import (
+	"context"
+	"errors"
+)
+
+var errInvalidMultiplexerFnType = errors.New("invalid multiplexer function type")
+
+func (c *Conveyer) RegisterMultiplexer(
+	multiplexerfn func(
+		ctx context.Context,
+		inputs []chan string,
+		output chan string,
+	) error,
+	inputs []string,
+	output string,
+) {
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
+
+	for _, inputName := range inputs {
+		c.prepareChannel(inputName)
+	}
+
+	c.prepareChannel(output)
+	c.handlers = append(c.handlers, handlerConfig{
+		handlerType: handlerMultiplexer,
+		fn:          multiplexerfn,
+		inputs:      inputs,
+		outputs:     []string{output},
+	})
+}
+
+func (c *Conveyer) runMultiplexer(
+	ctx context.Context,
+	handler handlerConfig,
+	inputs []chan string,
+	outputs []chan string,
+) error {
+	multiplexerfn, ok := handler.fn.(func(ctx context.Context, inputs []chan string, output chan string) error)
+	if !ok {
+		return errInvalidMultiplexerFnType
+	}
+
+	return multiplexerfn(ctx, inputs, outputs[0])
+}

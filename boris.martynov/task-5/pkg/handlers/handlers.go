@@ -26,7 +26,6 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 
 		case data, ok := <-input:
 			if !ok {
-
 				return errPrefixDecorator
 			}
 
@@ -57,7 +56,6 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 
 		case data, ok := <-input:
 			if !ok {
-
 				return errSeparator
 			}
 

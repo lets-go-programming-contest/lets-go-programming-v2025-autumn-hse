@@ -5,6 +5,10 @@ import (
 	"strings"
 )
 
+const (
+	noMultiplexer = "no multiplexer"
+)
+
 func MultiplexerFunc(
 	ctx context.Context,
 	inputs []chan string,
@@ -27,7 +31,7 @@ func MultiplexerFunc(
 
 					received = true
 
-					if strings.Contains(value, "no multiplexer") {
+					if strings.Contains(value, noMultiplexer) {
 						continue
 					}
 

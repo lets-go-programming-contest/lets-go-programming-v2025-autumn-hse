@@ -8,6 +8,8 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+const undefinedChan = "undefined"
+
 var ErrChanNotFound = errors.New("chan not found")
 
 type conveyor struct {
@@ -115,7 +117,7 @@ func (c *conveyor) Recv(channelID string) (string, error) {
 
 	data, ok := <-ch
 	if !ok {
-		return "undefined", nil
+		return undefinedChan, nil
 	}
 
 	return data, nil

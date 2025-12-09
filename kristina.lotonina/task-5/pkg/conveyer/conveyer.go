@@ -9,7 +9,7 @@ import (
 var ErrChanNotFound = errors.New("chan not found")
 
 const (
-	errChanClosed = "undefined"
+	chanClosed = "undefined"
 )
 
 type handlerFunc func(ctx context.Context) error
@@ -151,7 +151,7 @@ func (c *Conveyer) Recv(id string) (string, error) {
 
 	v, isOpen := <-channelRef
 	if !isOpen {
-		return errChanClosed, nil
+		return chanClosed, nil
 	}
 
 	return v, nil

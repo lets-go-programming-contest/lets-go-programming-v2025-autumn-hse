@@ -10,23 +10,23 @@ import (
 
 const undefinedChan = "undefined"
 
-var ErrChanNotFound = errors.New("chan not found")
+var errChanNotFound = errors.New("chan not found")
 
-type conveyor struct {
+type conveyer struct {
 	channels map[string]chan string
 	tasks    []func(context.Context) error
 	size     int
 }
 
-func New(size int) *conveyor {
-	return &conveyor{
+func New(size int) *conveyer {
+	return &conveyer{
 		channels: make(map[string]chan string),
 		tasks:    make([]func(context.Context) error, 0),
 		size:     size,
 	}
 }
 
-func (c *conveyor) RegisterDecorator(
+func (c *conveyer) RegisterDecorator(
 	fnDecorator func(ctx context.Context, input chan string, output chan string) error,
 	inputID string,
 	outputID string,
@@ -41,7 +41,7 @@ func (c *conveyor) RegisterDecorator(
 	return nil
 }
 
-func (c *conveyor) RegisterMultiplexer(
+func (c *conveyer) RegisterMultiplexer(
 	fnMultiplexer func(ctx context.Context, inputs []chan string, output chan string) error,
 	inputIDs []string,
 	outputID string,
@@ -60,7 +60,7 @@ func (c *conveyor) RegisterMultiplexer(
 	return nil
 }
 
-func (c *conveyor) RegisterSeparator(
+func (c *conveyer) RegisterSeparator(
 	fnSeparator func(ctx context.Context, input chan string, outputs []chan string) error,
 	inputID string,
 	outputIDs []string,
@@ -79,7 +79,7 @@ func (c *conveyor) RegisterSeparator(
 	return nil
 }
 
-func (c *conveyor) Run(ctx context.Context) error {
+func (c *conveyer) Run(ctx context.Context) error {
 	defer c.close()
 
 	group, gCtx := errgroup.WithContext(ctx)
@@ -98,10 +98,10 @@ func (c *conveyor) Run(ctx context.Context) error {
 	return nil
 }
 
-func (c *conveyor) Send(channelID string, data string) error {
+func (c *conveyer) Send(channelID string, data string) error {
 	ch, exists := c.channels[channelID]
 	if !exists {
-		return ErrChanNotFound
+		return errChanNotFound
 	}
 
 	ch <- data
@@ -109,10 +109,10 @@ func (c *conveyor) Send(channelID string, data string) error {
 	return nil
 }
 
-func (c *conveyor) Recv(channelID string) (string, error) {
+func (c *conveyer) Recv(channelID string) (string, error) {
 	ch, exists := c.channels[channelID]
 	if !exists {
-		return "", ErrChanNotFound
+		return "", errChanNotFound
 	}
 
 	data, ok := <-ch
@@ -123,7 +123,7 @@ func (c *conveyor) Recv(channelID string) (string, error) {
 	return data, nil
 }
 
-func (c *conveyor) ensure(name string) chan string {
+func (c *conveyer) ensure(name string) chan string {
 	if ch, exists := c.channels[name]; exists {
 		return ch
 	}
@@ -134,7 +134,7 @@ func (c *conveyor) ensure(name string) chan string {
 	return ch
 }
 
-func (c *conveyor) close() {
+func (c *conveyer) close() {
 	for _, ch := range c.channels {
 		close(ch)
 	}

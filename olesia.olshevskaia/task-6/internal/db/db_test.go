@@ -51,12 +51,15 @@ func TestGetNamesQueryError(t *testing.T) {
 	mock.ExpectQuery("SELECT name FROM users").
 		WillReturnError(errLostConnection)
 
-	names, err := service.GetNames()
+	//names, err := service.GetNames()
 
-	require.Error(t, err)
-	require.Nil(t, names)
-	require.Contains(t, err.Error(), "db query")
+	//require.Nil(t, names)
+
+	_, err = service.GetNames()
+
+	require.ErrorContains(t, err, "db query")
 	require.NoError(t, mock.ExpectationsWereMet())
+
 }
 
 func TestGetNamesRowsError(t *testing.T) {

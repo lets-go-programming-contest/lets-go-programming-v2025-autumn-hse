@@ -15,6 +15,11 @@ var (
 	errRow            = errors.New("some rows error")
 )
 
+const (
+	nameTom   = "Tom"
+	nameJerry = "Jerry"
+)
+
 func TestGetNamesOK(t *testing.T) {
 	t.Parallel()
 
@@ -25,8 +30,8 @@ func TestGetNamesOK(t *testing.T) {
 	service := db.New(sqlDB)
 
 	rows := sqlmock.NewRows([]string{"name"}).
-		AddRow("OlesyainWonderland").
-		AddRow("Olesyainthelandofnightmares")
+		AddRow(nameTom).
+		AddRow(nameJerry)
 
 	mock.ExpectQuery("SELECT name FROM users").
 		WillReturnRows(rows)
@@ -34,7 +39,7 @@ func TestGetNamesOK(t *testing.T) {
 	names, err := service.GetNames()
 
 	require.NoError(t, err)
-	require.Equal(t, []string{"OlesyainWonderland", "Olesyainthelandofnightmares"}, names)
+	require.Equal(t, []string{nameTom, nameJerry}, names)
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -66,8 +71,8 @@ func TestGetNamesRowsError(t *testing.T) {
 	service := db.New(sqlDB)
 
 	rows := sqlmock.NewRows([]string{"name"}).
-		AddRow("Alice").
-		AddRow("Bob").
+		AddRow(nameTom).
+		AddRow(nameJerry).
 		RowError(1, errRowBroken)
 
 	mock.ExpectQuery("SELECT name FROM users").
@@ -110,7 +115,7 @@ func TestGetUniqueNamesRowsErr(t *testing.T) {
 	service := db.New(sqlDB)
 
 	rows := sqlmock.NewRows([]string{"name"}).
-		AddRow("Hedgehoginthefog").
+		AddRow(nameTom).
 		RowError(0, errRow)
 
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").
@@ -132,8 +137,8 @@ func TestGetUniqueNamesOK(t *testing.T) {
 	service := db.New(sqlDB)
 
 	rows := sqlmock.NewRows([]string{"name"}).
-		AddRow("Tom").
-		AddRow("Jerry")
+		AddRow(nameTom).
+		AddRow(nameJerry)
 
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").
 		WillReturnRows(rows)
@@ -141,7 +146,7 @@ func TestGetUniqueNamesOK(t *testing.T) {
 	names, err := service.GetUniqueNames()
 
 	require.NoError(t, err)
-	require.Equal(t, []string{"Tom", "Jerry"}, names)
+	require.Equal(t, []string{nameTom, nameJerry}, names)
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -194,7 +199,7 @@ func TestGetUniqueNamesRowsError(t *testing.T) {
 	service := db.New(sqlDB)
 
 	rows := sqlmock.NewRows([]string{"name"}).
-		AddRow("Aliceandmyelophone").
+		AddRow(nameJerry).
 		RowError(0, errRow)
 
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").

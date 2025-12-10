@@ -2,7 +2,6 @@ package db_test
 
 import (
 	"errors"
-	"strings"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -55,7 +54,6 @@ func TestGetNamesQueryError(t *testing.T) {
 
 	require.ErrorContains(t, err, "db query")
 	require.NoError(t, mock.ExpectationsWereMet())
-
 }
 
 func TestGetNamesRowsError(t *testing.T) {
@@ -106,9 +104,7 @@ func TestGetUniqueNamesRowsErr(t *testing.T) {
 	t.Parallel()
 
 	sqlDB, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("failed to create sqlmock: %v", err)
-	}
+	require.NoError(t, err)
 	defer sqlDB.Close()
 
 	service := db.New(sqlDB)
@@ -121,13 +117,9 @@ func TestGetUniqueNamesRowsErr(t *testing.T) {
 		WillReturnRows(rows)
 
 	_, err = service.GetUniqueNames()
-	if err == nil {
-		t.Fatalf("expected error, got nil")
-	}
 
-	if !strings.Contains(err.Error(), "rows error") {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	require.ErrorContains(t, err, "rows error")
+	require.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestGetUniqueNamesOK(t *testing.T) {

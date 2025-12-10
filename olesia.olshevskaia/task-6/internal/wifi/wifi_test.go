@@ -1,3 +1,4 @@
+//go:generate mockery --name=WiFiHandle --dir=. --output . --outpkg=wifi
 package wifi_test
 
 import (

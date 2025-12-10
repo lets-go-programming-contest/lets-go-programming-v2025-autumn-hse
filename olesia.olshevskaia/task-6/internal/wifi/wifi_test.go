@@ -1,4 +1,4 @@
-//go:generate mockery --name=WiFiHandle --dir=. --output . --outpkg=wifi
+//go:generate mockery --name=WiFiHandle --testonly --quiet --outpkg wifi_test --output .
 package wifi_test
 
 import (
@@ -20,7 +20,7 @@ var (
 func TestWiFiGetNamesOneNoError(t *testing.T) {
 	t.Parallel()
 
-	wifiHandler := wifi.NewWiFiHandle(t)
+	wifiHandler := NewWiFiHandle(t)
 	service := wifi.New(wifiHandler)
 	expectedResult := []string{"nevergivup"}
 
@@ -41,7 +41,7 @@ func TestWiFiGetNamesOneNoError(t *testing.T) {
 func TestWiFiGetNamesMultipleNoError(t *testing.T) {
 	t.Parallel()
 
-	wifiHandler := wifi.NewWiFiHandle(t)
+	wifiHandler := NewWiFiHandle(t)
 	service := wifi.New(wifiHandler)
 	expectedResult := []string{"Naf-Naf", "Nuf-Nuf", "Nif-Nif"}
 
@@ -68,7 +68,7 @@ func TestWiFiGetNamesMultipleNoError(t *testing.T) {
 func TestWiFIGetNamesWithError(t *testing.T) {
 	t.Parallel()
 
-	wifiHandler := wifi.NewWiFiHandle(t)
+	wifiHandler := NewWiFiHandle(t)
 	service := wifi.New(wifiHandler)
 	expectedErr := errNoExit
 
@@ -85,7 +85,7 @@ func TestWiFIGetNamesWithError(t *testing.T) {
 func TestWiFiGetAddressesOneNoError(t *testing.T) {
 	t.Parallel()
 
-	mockHandler := wifi.NewWiFiHandle(t)
+	mockHandler := NewWiFiHandle(t)
 	service := wifi.New(mockHandler)
 
 	mac, _ := net.ParseMAC("00:11:22:33:44:55")
@@ -109,7 +109,7 @@ func TestWiFiGetAddressesOneNoError(t *testing.T) {
 func TestWiFiGetAddressesMultipleNoError(t *testing.T) {
 	t.Parallel()
 
-	mockHandler := wifi.NewWiFiHandle(t)
+	mockHandler := NewWiFiHandle(t)
 	service := wifi.New(mockHandler)
 
 	mac1, _ := net.ParseMAC("00:11:22:33:44:55")
@@ -145,7 +145,7 @@ func TestWiFiGetAddressesMultipleNoError(t *testing.T) {
 func TestWiFiGetAddressesWithError(t *testing.T) {
 	t.Parallel()
 
-	mockHandler := wifi.NewWiFiHandle(t)
+	mockHandler := NewWiFiHandle(t)
 	service := wifi.New(mockHandler)
 
 	expectedErr := errWiFiDisabled

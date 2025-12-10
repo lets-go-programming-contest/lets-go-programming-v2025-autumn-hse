@@ -51,10 +51,6 @@ func TestGetNamesQueryError(t *testing.T) {
 	mock.ExpectQuery("SELECT name FROM users").
 		WillReturnError(errLostConnection)
 
-	//names, err := service.GetNames()
-
-	//require.Nil(t, names)
-
 	_, err = service.GetNames()
 
 	require.ErrorContains(t, err, "db query")
@@ -79,11 +75,9 @@ func TestGetNamesRowsError(t *testing.T) {
 	mock.ExpectQuery("SELECT name FROM users").
 		WillReturnRows(rows)
 
-	names, err := service.GetNames()
+	_, err = service.GetNames()
 
-	require.Error(t, err)
-	require.Nil(t, names)
-	require.Contains(t, err.Error(), "rows error")
+	require.ErrorContains(t, err, "rows error")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -102,10 +96,9 @@ func TestGetNamesScanError(t *testing.T) {
 	mock.ExpectQuery("SELECT name FROM users").
 		WillReturnRows(rows)
 
-	names, err := service.GetNames()
-	require.Error(t, err)
-	require.Nil(t, names)
-	require.Contains(t, err.Error(), "rows scanning")
+	_, err = service.GetNames()
+
+	require.ErrorContains(t, err, "rows scanning")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -172,10 +165,9 @@ func TestGetUniqueNamesQueryError(t *testing.T) {
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").
 		WillReturnError(errLostConnection)
 
-	names, err := service.GetUniqueNames()
-	require.Error(t, err)
-	require.Nil(t, names)
-	require.Contains(t, err.Error(), "db query")
+	_, err = service.GetUniqueNames()
+
+	require.ErrorContains(t, err, "db query")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -194,10 +186,9 @@ func TestGetUniqueNamesScanError(t *testing.T) {
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").
 		WillReturnRows(rows)
 
-	names, err := service.GetUniqueNames()
-	require.Error(t, err)
-	require.Nil(t, names)
-	require.Contains(t, err.Error(), "rows scanning")
+	_, err = service.GetUniqueNames()
+
+	require.ErrorContains(t, err, "rows scanning")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -217,9 +208,8 @@ func TestGetUniqueNamesRowsError(t *testing.T) {
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").
 		WillReturnRows(rows)
 
-	names, err := service.GetUniqueNames()
-	require.Error(t, err)
-	require.Nil(t, names)
-	require.Contains(t, err.Error(), "rows error")
+	_, err = service.GetUniqueNames()
+
+	require.ErrorContains(t, err, "rows error")
 	require.NoError(t, mock.ExpectationsWereMet())
 }

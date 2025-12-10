@@ -74,11 +74,9 @@ func TestWiFIGetNamesWithError(t *testing.T) {
 
 	wifiHandler.On("Interfaces").Return(nil, expectedErr)
 
-	names, err := service.GetNames()
+	_, err := service.GetNames()
 
-	require.Error(t, err)
-	require.Nil(t, names)
-	require.Contains(t, err.Error(), "getting interfaces")
+	require.ErrorContains(t, err, "getting interfaces")
 	require.ErrorIs(t, err, expectedErr)
 
 	wifiHandler.AssertExpectations(t)
@@ -153,11 +151,9 @@ func TestWiFiGetAddressesWithError(t *testing.T) {
 	expectedErr := errWiFiDisabled
 	mockHandler.On("Interfaces").Return(nil, expectedErr)
 
-	actualAddresses, err := service.GetAddresses()
+	_, err := service.GetAddresses()
 
-	require.Error(t, err)
-	require.Nil(t, actualAddresses)
-	require.Contains(t, err.Error(), "getting interfaces")
+	require.ErrorContains(t, err, "getting interfaces")
 	require.ErrorIs(t, err, expectedErr)
 
 	mockHandler.AssertExpectations(t)

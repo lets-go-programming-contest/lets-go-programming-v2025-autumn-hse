@@ -13,8 +13,20 @@ import (
 )
 
 var (
-	errWiFiDisabled = errors.New("WiFi disabled")
-	errNoExit       = errors.New("not exist")
+	errTest = errors.New("test error")
+)
+
+const (
+	interfaceName1 = "nevergivup"
+	interfaceName2 = "Naf-Naf"
+	interfaceName3 = "Nuf-Nuf"
+	interfaceName4 = "Nif-Nif"
+)
+
+var (
+	mac1, _ = net.ParseMAC("00:11:22:33:44:55")
+	mac2, _ = net.ParseMAC("AA:BB:CC:DD:EE:FF")
+	mac3, _ = net.ParseMAC("11:22:33:44:55:66")
 )
 
 func TestWiFiGetNamesOneNoError(t *testing.T) {
@@ -22,11 +34,11 @@ func TestWiFiGetNamesOneNoError(t *testing.T) {
 
 	wifiHandler := NewWiFiHandle(t)
 	service := wifi.New(wifiHandler)
-	expectedResult := []string{"nevergivup"}
+	expectedResult := []string{interfaceName1}
 
 	wifiHandler.On("Interfaces").Return([]*wifipkg.Interface{
 		{
-			Name: "nevergivup",
+			Name: interfaceName1,
 		},
 	}, nil)
 
@@ -43,17 +55,17 @@ func TestWiFiGetNamesMultipleNoError(t *testing.T) {
 
 	wifiHandler := NewWiFiHandle(t)
 	service := wifi.New(wifiHandler)
-	expectedResult := []string{"Naf-Naf", "Nuf-Nuf", "Nif-Nif"}
+	expectedResult := []string{interfaceName2, interfaceName3, interfaceName4}
 
 	wifiHandler.On("Interfaces").Return([]*wifipkg.Interface{
 		{
-			Name: "Naf-Naf",
+			Name: interfaceName2,
 		},
 		{
-			Name: "Nuf-Nuf",
+			Name: interfaceName3,
 		},
 		{
-			Name: "Nif-Nif",
+			Name: interfaceName4,
 		},
 	}, nil)
 
@@ -70,14 +82,13 @@ func TestWiFIGetNamesWithError(t *testing.T) {
 
 	wifiHandler := NewWiFiHandle(t)
 	service := wifi.New(wifiHandler)
-	expectedErr := errNoExit
 
-	wifiHandler.On("Interfaces").Return(nil, expectedErr)
+	wifiHandler.On("Interfaces").Return(nil, errTest)
 
 	_, err := service.GetNames()
 
 	require.ErrorContains(t, err, "getting interfaces")
-	require.ErrorIs(t, err, expectedErr)
+	require.ErrorIs(t, err, errTest)
 
 	wifiHandler.AssertExpectations(t)
 }
@@ -88,12 +99,11 @@ func TestWiFiGetAddressesOneNoError(t *testing.T) {
 	mockHandler := NewWiFiHandle(t)
 	service := wifi.New(mockHandler)
 
-	mac, _ := net.ParseMAC("00:11:22:33:44:55")
-	expectedResult := []net.HardwareAddr{mac}
+	expectedResult := []net.HardwareAddr{mac1}
 
 	mockHandler.On("Interfaces").Return([]*wifipkg.Interface{
 		{
-			HardwareAddr: mac,
+			HardwareAddr: mac1,
 		},
 	}, nil)
 
@@ -112,23 +122,19 @@ func TestWiFiGetAddressesMultipleNoError(t *testing.T) {
 	mockHandler := NewWiFiHandle(t)
 	service := wifi.New(mockHandler)
 
-	mac1, _ := net.ParseMAC("00:11:22:33:44:55")
-	mac2, _ := net.ParseMAC("AA:BB:CC:DD:EE:FF")
-	mac3, _ := net.ParseMAC("11:22:33:44:55:66")
-
 	expectedResult := []net.HardwareAddr{mac1, mac2, mac3}
 
 	mockHandler.On("Interfaces").Return([]*wifipkg.Interface{
 		{
-			Name:         "Naf-Naf",
+			Name:         interfaceName2,
 			HardwareAddr: mac1,
 		},
 		{
-			Name:         "Nuf-Nuf",
+			Name:         interfaceName3,
 			HardwareAddr: mac2,
 		},
 		{
-			Name:         "Nif-Nif",
+			Name:         interfaceName4,
 			HardwareAddr: mac3,
 		},
 	}, nil)
@@ -148,13 +154,12 @@ func TestWiFiGetAddressesWithError(t *testing.T) {
 	mockHandler := NewWiFiHandle(t)
 	service := wifi.New(mockHandler)
 
-	expectedErr := errWiFiDisabled
-	mockHandler.On("Interfaces").Return(nil, expectedErr)
+	mockHandler.On("Interfaces").Return(nil, errTest)
 
 	_, err := service.GetAddresses()
 
 	require.ErrorContains(t, err, "getting interfaces")
-	require.ErrorIs(t, err, expectedErr)
+	require.ErrorIs(t, err, errTest)
 
 	mockHandler.AssertExpectations(t)
 }

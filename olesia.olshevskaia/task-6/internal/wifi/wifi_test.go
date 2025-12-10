@@ -12,21 +12,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	errTest = errors.New("test error")
-)
+var errTest = errors.New("test error")
 
 const (
 	interfaceName1 = "nevergivup"
 	interfaceName2 = "Naf-Naf"
 	interfaceName3 = "Nuf-Nuf"
 	interfaceName4 = "Nif-Nif"
-)
-
-var (
-	mac1, _ = net.ParseMAC("00:11:22:33:44:55")
-	mac2, _ = net.ParseMAC("AA:BB:CC:DD:EE:FF")
-	mac3, _ = net.ParseMAC("11:22:33:44:55:66")
 )
 
 func TestWiFiGetNamesOneNoError(t *testing.T) {
@@ -99,6 +91,7 @@ func TestWiFiGetAddressesOneNoError(t *testing.T) {
 	mockHandler := NewWiFiHandle(t)
 	service := wifi.New(mockHandler)
 
+	mac1, _ := net.ParseMAC("00:11:22:33:44:55")
 	expectedResult := []net.HardwareAddr{mac1}
 
 	mockHandler.On("Interfaces").Return([]*wifipkg.Interface{
@@ -121,6 +114,10 @@ func TestWiFiGetAddressesMultipleNoError(t *testing.T) {
 
 	mockHandler := NewWiFiHandle(t)
 	service := wifi.New(mockHandler)
+
+	mac1, _ := net.ParseMAC("00:11:22:33:44:55")
+	mac2, _ := net.ParseMAC("AA:BB:CC:DD:EE:FF")
+	mac3, _ := net.ParseMAC("11:22:33:44:55:66")
 
 	expectedResult := []net.HardwareAddr{mac1, mac2, mac3}
 

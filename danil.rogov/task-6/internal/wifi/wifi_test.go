@@ -25,12 +25,9 @@ func (m *MockWiFiHandle) Interfaces() ([]*wifi.Interface, error) {
 	return m.interfaces, m.err
 }
 
-func createTestWiFiHandle(
-	t *testing.T,
-	interfaces []*wifi.Interface,
-	err error,
-) myWifi.WiFiHandle {
+func createTestWiFiHandle(t *testing.T, interfaces []*wifi.Interface, err error) *MockWiFiHandle {
 	t.Helper()
+
 	return &MockWiFiHandle{
 		interfaces: interfaces,
 		err:        err,

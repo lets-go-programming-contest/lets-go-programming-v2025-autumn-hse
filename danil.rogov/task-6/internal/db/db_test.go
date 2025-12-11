@@ -108,6 +108,7 @@ func TestGetNamesRowCloseError(t *testing.T) {
 
 	require.NoError(t, mock.ExpectationsWereMet())
 }
+
 func TestCorrectGetUniqueNames(t *testing.T) {
 	t.Parallel()
 

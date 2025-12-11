@@ -4,18 +4,19 @@ import (
 	"net"
 	"testing"
 
+	"github.com/VlasfimosY/task-6/internal/wifi"
 	wifilib "github.com/mdlayher/wifi"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/VlasfimosY/task-6/internal/wifi"
 )
 
 func TestWiFiService_GetAddresses_Success(t *testing.T) {
 	t.Parallel()
+
 	addr1, _ := net.ParseMAC("00:11:22:33:44:55")
 	addr2, _ := net.ParseMAC("aa:bb:cc:dd:ee:ff")
 
-	mockHandle := &mockWiFiHandle{
+	mockHandle := &mockWiFiWiFiHandle{
 		interfaces: []*wifilib.Interface{
 			{HardwareAddr: addr1, Name: "wlan0"},
 			{HardwareAddr: addr2, Name: "wlan1"},
@@ -31,7 +32,8 @@ func TestWiFiService_GetAddresses_Success(t *testing.T) {
 
 func TestWiFiService_GetAddresses_Error(t *testing.T) {
 	t.Parallel()
-	mockHandle := &mockWiFiHandle{
+
+	mockHandle := &mockWiFiWiFiHandle{
 		err: assert.AnError,
 	}
 
@@ -44,9 +46,10 @@ func TestWiFiService_GetAddresses_Error(t *testing.T) {
 
 func TestWiFiService_GetNames_Success(t *testing.T) {
 	t.Parallel()
+
 	addr1, _ := net.ParseMAC("00:11:22:33:44:55")
 
-	mockHandle := &mockWiFiHandle{
+	mockHandle := &mockWiFiWiFiHandle{
 		interfaces: []*wifilib.Interface{
 			{HardwareAddr: addr1, Name: "wlan0"},
 			{HardwareAddr: nil, Name: "lo"},
@@ -62,7 +65,8 @@ func TestWiFiService_GetNames_Success(t *testing.T) {
 
 func TestWiFiService_GetNames_Error(t *testing.T) {
 	t.Parallel()
-	mockHandle := &mockWiFiHandle{
+
+	mockHandle := &mockWiFiWiFiHandle{
 		err: assert.AnError,
 	}
 

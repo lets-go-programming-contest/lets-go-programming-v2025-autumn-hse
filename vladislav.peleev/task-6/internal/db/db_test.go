@@ -6,18 +6,18 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/stretchr/testify/require"
 	"github.com/VlasfimosY/task-6/internal/db"
+	"github.com/stretchr/testify/require"
 )
 
-var (
-	errClose = errors.New("close error")
-)
+var errClose = errors.New("close error")
 
 func TestGetNames(t *testing.T) {
 	t.Parallel()
+
 	dbConn, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	defer dbConn.Close()
 
 	mock.ExpectQuery("SELECT name FROM users").
@@ -32,8 +32,10 @@ func TestGetNames(t *testing.T) {
 
 func TestGetNames_Empty(t *testing.T) {
 	t.Parallel()
+
 	dbConn, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	defer dbConn.Close()
 
 	mock.ExpectQuery("SELECT name FROM users").
@@ -48,8 +50,10 @@ func TestGetNames_Empty(t *testing.T) {
 
 func TestGetNames_QueryError(t *testing.T) {
 	t.Parallel()
+
 	dbConn, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	defer dbConn.Close()
 
 	mock.ExpectQuery("SELECT name FROM users").WillReturnError(sql.ErrNoRows)
@@ -62,8 +66,10 @@ func TestGetNames_QueryError(t *testing.T) {
 
 func TestGetNames_ScanError(t *testing.T) {
 	t.Parallel()
+
 	dbConn, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	defer dbConn.Close()
 
 	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
@@ -78,8 +84,10 @@ func TestGetNames_ScanError(t *testing.T) {
 
 func TestGetUniqueNames(t *testing.T) {
 	t.Parallel()
+
 	dbConn, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	defer dbConn.Close()
 
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").
@@ -94,8 +102,10 @@ func TestGetUniqueNames(t *testing.T) {
 
 func TestGetUniqueNames_Empty(t *testing.T) {
 	t.Parallel()
+
 	dbConn, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	defer dbConn.Close()
 
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").
@@ -110,8 +120,10 @@ func TestGetUniqueNames_Empty(t *testing.T) {
 
 func TestGetUniqueNames_QueryError(t *testing.T) {
 	t.Parallel()
+
 	dbConn, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	defer dbConn.Close()
 
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnError(sql.ErrNoRows)
@@ -124,8 +136,10 @@ func TestGetUniqueNames_QueryError(t *testing.T) {
 
 func TestGetUniqueNames_ScanError(t *testing.T) {
 	t.Parallel()
+
 	dbConn, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	defer dbConn.Close()
 
 	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
@@ -140,8 +154,10 @@ func TestGetUniqueNames_ScanError(t *testing.T) {
 
 func TestGetNames_RowsErr(t *testing.T) {
 	t.Parallel()
+
 	dbConn, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	defer dbConn.Close()
 
 	rows := sqlmock.NewRows([]string{"name"}).AddRow("Alice").CloseError(errClose)
@@ -156,8 +172,10 @@ func TestGetNames_RowsErr(t *testing.T) {
 
 func TestGetUniqueNames_RowsErr(t *testing.T) {
 	t.Parallel()
+
 	dbConn, mock, err := sqlmock.New()
 	require.NoError(t, err)
+
 	defer dbConn.Close()
 
 	rows := sqlmock.NewRows([]string{"name"}).AddRow("Bob").CloseError(errClose)

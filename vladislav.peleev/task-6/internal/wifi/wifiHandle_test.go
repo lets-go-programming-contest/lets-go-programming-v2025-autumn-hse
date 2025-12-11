@@ -1,8 +1,6 @@
 package wifi_test
 
-import (
-	"github.com/mdlayher/wifi"
-)
+import "github.com/mdlayher/wifi"
 
 type mockWiFiHandle struct {
 	interfaces []*wifi.Interface

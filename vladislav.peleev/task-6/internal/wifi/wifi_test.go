@@ -10,15 +10,6 @@ import (
 	"github.com/VlasfimosY/task-6/internal/wifi"
 )
 
-type mockWiFiHandle struct {
-	interfaces []*wifi.Interface
-	err        error
-}
-
-func (m *mockWiFiHandle) Interfaces() ([]*wifi.Interface, error) {
-	return m.interfaces, m.err
-}
-
 func TestWiFiService_GetAddresses_Success(t *testing.T) {
 	t.Parallel()
 	addr1, _ := net.ParseMAC("00:11:22:33:44:55")
@@ -31,7 +22,7 @@ func TestWiFiService_GetAddresses_Success(t *testing.T) {
 		},
 	}
 
-	service := wifi.New(mockHandle) // ← полный путь
+	service := wifi.New(mockHandle)
 
 	addrs, err := service.GetAddresses()
 	require.NoError(t, err)

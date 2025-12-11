@@ -162,11 +162,9 @@ func TestGetUniqueNames_RowsError(t *testing.T) {
 	require.Nil(t, names)
 }
 
-func TestNew(t *testing.T) {
+func TestNewDBService(t *testing.T) {
 	mockDB, _, _ := sqlmock.New()
-
 	service := db.New(mockDB)
-
 	require.NotNil(t, service)
 	require.Equal(t, mockDB, service.DB)
 }

@@ -24,7 +24,11 @@ var (
 	errQuery   = errors.New("error during query")
 )
 
-func createTestDB(t *testing.T) (db *sql.DB, mock sqlmock.Sqlmock) {
+// Возвращение интерфейса sqlmock.Sqlmock необходимо, так как библиотека go-sqlmock
+// предоставляет только интерфейс, а не конкретную реализацию.
+//
+//nolint:ireturn
+func createTestDB(t *testing.T) (*sql.DB, sqlmock.Sqlmock) {
 	t.Helper()
 
 	db, mock, err := sqlmock.New()

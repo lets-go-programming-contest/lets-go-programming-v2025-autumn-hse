@@ -70,7 +70,7 @@ func TestGetNames_ScanError(t *testing.T) {
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestGetUniqueNames(t *testing *testing.T) {
+func TestGetUniqueNames(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
 	defer db.Close()

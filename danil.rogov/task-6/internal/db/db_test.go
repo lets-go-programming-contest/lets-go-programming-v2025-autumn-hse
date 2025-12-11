@@ -24,7 +24,7 @@ var (
 	errQuery   = errors.New("error during query")
 )
 
-func createTestDB(t *testing.T) (*sql.DB, sqlmock.Sqlmock) {
+func createTestDB(t *testing.T) (db *sql.DB, mock sqlmock.Sqlmock) {
 	t.Helper()
 
 	db, mock, err := sqlmock.New()

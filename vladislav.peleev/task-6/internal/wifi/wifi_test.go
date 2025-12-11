@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestWiFiService_GetAddresses(t *testing.T) {
+func TestWiFiService_GetAddresses_Success(t *testing.T) {
 	addr1, _ := net.ParseMAC("00:11:22:33:44:55")
 	addr2, _ := net.ParseMAC("aa:bb:cc:dd:ee:ff")
 
@@ -39,13 +39,13 @@ func TestWiFiService_GetAddresses_Error(t *testing.T) {
 	assert.Contains(t, err.Error(), "getting interfaces:")
 }
 
-func TestWiFiService_GetNames(t *testing.T) {
+func TestWiFiService_GetNames_Success(t *testing.T) {
 	addr1, _ := net.ParseMAC("00:11:22:33:44:55")
 
 	mockHandle := &mockWiFiHandle{
 		interfaces: []*wifi.Interface{
 			{HardwareAddr: addr1, Name: "wlan0"},
-			{HardwareAddr: nil, Name: "lo"}, // пример
+			{HardwareAddr: nil, Name: "lo"},
 		},
 	}
 

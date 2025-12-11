@@ -9,21 +9,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDBService_GetNames(t *testing.T) {
+func TestDBService_GetNames_Success(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
 	defer db.Close()
 
 	mock.ExpectQuery("SELECT name FROM users").
 		WillReturnRows(sqlmock.NewRows([]string{"name"}).
-			AddRow("Alice").AddRow("Bob").AddRow("Charlie"))
+			AddRow("Alice").AddRow("Bob"))
 
 	service := New(db)
 
 	names, err := service.GetNames()
 	require.NoError(t, err)
-	assert.Equal(t, []string{"Alice", "Bob", "Charlie"}, names)
-
+	assert.Equal(t, []string{"Alice", "Bob"}, names)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -40,7 +39,6 @@ func TestDBService_GetNames_Empty(t *testing.T) {
 	names, err := service.GetNames()
 	require.NoError(t, err)
 	assert.Empty(t, names)
-
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -57,7 +55,6 @@ func TestDBService_GetNames_QueryError(t *testing.T) {
 	_, err = service.GetNames()
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "db query:")
-
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -66,7 +63,7 @@ func TestDBService_GetNames_ScanError(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"name"}).AddRow(123) // wrong type
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(123)
 	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
 
 	service := New(db)
@@ -74,11 +71,10 @@ func TestDBService_GetNames_ScanError(t *testing.T) {
 	_, err = service.GetNames()
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "rows scanning:")
-
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestDBService_GetUniqueNames(t *testing.T) {
+func TestDBService_GetUniqueNames_Success(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
 	defer db.Close()
@@ -92,11 +88,26 @@ func TestDBService_GetUniqueNames(t *testing.T) {
 	names, err := service.GetUniqueNames()
 	require.NoError(t, err)
 	assert.Equal(t, []string{"Alice", "Bob"}, names)
-
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestDBService_GetUniqueNames_Error(t *testing.T) {
+func TestDBService_GetUniqueNames_Empty(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+	defer db.Close()
+
+	mock.ExpectQuery("SELECT DISTINCT name FROM users").
+		WillReturnRows(sqlmock.NewRows([]string{"name"}))
+
+	service := New(db)
+
+	names, err := service.GetUniqueNames()
+	require.NoError(t, err)
+	assert.Empty(t, names)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestDBService_GetUniqueNames_QueryError(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	require.NoError(t, err)
 	defer db.Close()
@@ -109,6 +120,21 @@ func TestDBService_GetUniqueNames_Error(t *testing.T) {
 	_, err = service.GetUniqueNames()
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "db query:")
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
 
+func TestDBService_GetUniqueNames_ScanError(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+	defer db.Close()
+
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(123)
+	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
+
+	service := New(db)
+
+	_, err = service.GetUniqueNames()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "rows scanning:")
 	assert.NoError(t, mock.ExpectationsWereMet())
 }

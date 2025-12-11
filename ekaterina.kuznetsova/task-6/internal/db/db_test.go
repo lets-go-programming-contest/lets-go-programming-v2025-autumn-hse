@@ -24,6 +24,7 @@ var testTable = []rowTestDb{
 	},
 }
 
+
 func TestGetNames_ScanError(t *testing.T) {
 	mockDB, mock, _ := sqlmock.New()
 	dbService := db.DBService{DB: mockDB}

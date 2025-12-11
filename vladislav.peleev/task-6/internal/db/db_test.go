@@ -10,7 +10,9 @@ import (
 	"github.com/VlasfimosY/task-6/internal/db"
 )
 
-var errClose = errors.New("close error")
+var (
+	errClose = errors.New("close error")
+)
 
 func TestGetNames(t *testing.T) {
 	t.Parallel()

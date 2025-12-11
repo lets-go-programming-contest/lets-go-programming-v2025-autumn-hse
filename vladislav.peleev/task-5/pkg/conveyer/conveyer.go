@@ -59,16 +59,6 @@ func New(size int) *conveyerImpl {
 }
 
 func (c *conveyerImpl) ensureChannel(name string) chan string {
-	c.mu.RLock()
-	if channel, exists := c.channels[name]; exists {
-		c.mu.RUnlock()
-		return channel
-	}
-	c.mu.RUnlock()
-
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
 	if channel, exists := c.channels[name]; exists {
 		return channel
 	}

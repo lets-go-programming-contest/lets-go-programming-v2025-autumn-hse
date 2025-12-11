@@ -57,10 +57,7 @@ func TestGetNames_ScanError(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"name"}).
-		AddRow("dummy").
-		RowError(0, errors.New("scan error"))
-
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
 	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
 
 	s := New(db)
@@ -118,10 +115,7 @@ func TestGetUniqueNames_ScanError(t *testing.T) {
 	require.NoError(t, err)
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"name"}).
-		AddRow("dummy").
-		RowError(0, errors.New("scan error"))
-
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
 
 	s := New(db)

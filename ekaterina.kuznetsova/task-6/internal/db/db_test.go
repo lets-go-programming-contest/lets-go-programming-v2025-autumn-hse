@@ -170,3 +170,12 @@ func mockUniqueRows(names []string) *sqlmock.Rows {
 	}
 	return rows
 }
+
+func TestNewDBService(t *testing.T) {
+	mockDB, _, _ := sqlmock.New()
+
+	service := db.New(mockDB)
+
+	require.NotNil(t, service)
+	require.Equal(t, mockDB, service.DB)
+}

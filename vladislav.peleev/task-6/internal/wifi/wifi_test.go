@@ -1,4 +1,4 @@
-package wifi
+package wifi_test
 
 import (
 	"net"
@@ -10,6 +10,7 @@ import (
 )
 
 func TestWiFiService_GetAddresses_Success(t *testing.T) {
+	t.Parallel()
 	addr1, _ := net.ParseMAC("00:11:22:33:44:55")
 	addr2, _ := net.ParseMAC("aa:bb:cc:dd:ee:ff")
 
@@ -28,6 +29,7 @@ func TestWiFiService_GetAddresses_Success(t *testing.T) {
 }
 
 func TestWiFiService_GetAddresses_Error(t *testing.T) {
+	t.Parallel()
 	mockHandle := &mockWiFiHandle{
 		err: assert.AnError,
 	}
@@ -40,6 +42,7 @@ func TestWiFiService_GetAddresses_Error(t *testing.T) {
 }
 
 func TestWiFiService_GetNames_Success(t *testing.T) {
+	t.Parallel()
 	addr1, _ := net.ParseMAC("00:11:22:33:44:55")
 
 	mockHandle := &mockWiFiHandle{
@@ -57,6 +60,7 @@ func TestWiFiService_GetNames_Success(t *testing.T) {
 }
 
 func TestWiFiService_GetNames_Error(t *testing.T) {
+	t.Parallel()
 	mockHandle := &mockWiFiHandle{
 		err: assert.AnError,
 	}

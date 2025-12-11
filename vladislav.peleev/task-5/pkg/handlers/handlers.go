@@ -9,6 +9,12 @@ import (
 
 var ErrCantBeDecorated = errors.New("can't be decorated")
 
+const (
+	decoratedPrefix   = "decorated: "
+	noDecoratorSubstr = "no decorator"
+	noMultiplexSubstr = "no multiplexer"
+)
+
 func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan string) error {
 	for {
 		select {
@@ -22,12 +28,12 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 				return nil
 			}
 
-			if strings.Contains(data, "no decorator") {
+			if strings.Contains(data, noDecoratorSubstr) {
 				return ErrCantBeDecorated
 			}
 
-			if !strings.HasPrefix(data, "decorated: ") {
-				data = "decorated: " + data
+			if !strings.HasPrefix(data, decoratedPrefix) {
+				data = decoratedPrefix + data
 			}
 
 			select {
@@ -88,7 +94,7 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 						return
 					}
 
-					if strings.Contains(data, "no multiplexer") {
+					if strings.Contains(data, noMultiplexSubstr) {
 						continue
 					}
 

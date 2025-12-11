@@ -9,12 +9,12 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-const Undefined = "undefined"
+const RecvValueOnClosedChannel = "undefined"
 
 var (
-	ErrCannotRegisterAfterRun = errors.New("cannot register after Run")
-	ErrAlreadyStarted         = errors.New("already started")
-	ErrChanNotFound           = errors.New("chan not found")
+	errCannotRegisterAfterRun = errors.New("cannot register after Run")
+	errAlreadyStarted         = errors.New("already started")
+	errChanNotFound           = errors.New("chan not found")
 )
 
 type Conveyer interface {
@@ -59,6 +59,16 @@ func New(size int) *conveyerImpl {
 }
 
 func (c *conveyerImpl) ensureChannel(name string) chan string {
+	c.mu.RLock()
+	if channel, exists := c.channels[name]; exists {
+		c.mu.RUnlock()
+		return channel
+	}
+	c.mu.RUnlock()
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if channel, exists := c.channels[name]; exists {
 		return channel
 	}
@@ -77,7 +87,7 @@ func (c *conveyerImpl) RegisterDecorator(
 	defer c.mu.Unlock()
 
 	if c.started {
-		return ErrCannotRegisterAfterRun
+		return errCannotRegisterAfterRun
 	}
 
 	inChannel := c.ensureChannel(input)
@@ -98,7 +108,7 @@ func (c *conveyerImpl) RegisterSeparator(
 	defer c.mu.Unlock()
 
 	if c.started {
-		return ErrCannotRegisterAfterRun
+		return errCannotRegisterAfterRun
 	}
 
 	inChannel := c.ensureChannel(input)
@@ -123,7 +133,7 @@ func (c *conveyerImpl) RegisterMultiplexer(
 	defer c.mu.Unlock()
 
 	if c.started {
-		return ErrCannotRegisterAfterRun
+		return errCannotRegisterAfterRun
 	}
 
 	inChannels := make([]chan string, len(inputs))
@@ -145,7 +155,7 @@ func (c *conveyerImpl) Run(ctx context.Context) error {
 	if c.started {
 		c.mu.Unlock()
 
-		return ErrAlreadyStarted
+		return errAlreadyStarted
 	}
 
 	c.started = true
@@ -190,7 +200,7 @@ func (c *conveyerImpl) Send(input, data string) error {
 	c.mu.RUnlock()
 
 	if !exists {
-		return ErrChanNotFound
+		return errChanNotFound
 	}
 
 	channel <- data
@@ -204,12 +214,12 @@ func (c *conveyerImpl) Recv(output string) (string, error) {
 	c.mu.RUnlock()
 
 	if !exists {
-		return "", ErrChanNotFound
+		return "", errChanNotFound
 	}
 
 	data, ok := <-channel
 	if !ok {
-		return Undefined, nil
+		return RecvValueOnClosedChannel, nil
 	}
 
 	return data, nil

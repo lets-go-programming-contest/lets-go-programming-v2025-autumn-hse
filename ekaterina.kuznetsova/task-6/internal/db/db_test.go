@@ -189,3 +189,4 @@ func TestNewDBService(t *testing.T) {
 	require.NotNil(t, service)
 	require.Equal(t, mockDB, service.DB)
 }
+

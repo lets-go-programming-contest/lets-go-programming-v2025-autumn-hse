@@ -2,6 +2,7 @@ package db_test
 
 import (
 	"database/sql"
+	"errors"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -16,6 +17,7 @@ const (
 	rowsError         = "rows error: "
 	rowsScanningError = "rows scanning: "
 	uniqueNamesQuery  = "SELECT DISTINCT name FROM users"
+	closingError      = "Error during close"
 )
 
 func createTestDB(t *testing.T) (*sql.DB, sqlmock.Sqlmock) {
@@ -82,6 +84,24 @@ func TestGetNamesScanError(t *testing.T) {
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
+func TestGetNamesRowCloseError(t *testing.T) {
+	t.Parallel()
+
+	mockDatabase, mock := createTestDB(t)
+
+	rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.New(closingError))
+
+	mock.ExpectQuery(namesQuery).WillReturnRows(rows)
+
+	database := db.New(mockDatabase)
+	expected, err := database.GetNames()
+
+	require.Error(t, err)
+	assert.Nil(t, expected)
+	assert.Contains(t, err.Error(), rowsError)
+
+	require.NoError(t, mock.ExpectationsWereMet())
+}
 func TestCorrectGetUniqueNames(t *testing.T) {
 	t.Parallel()
 
@@ -131,6 +151,25 @@ func TestGetUniqueNamesScanError(t *testing.T) {
 	require.Error(t, err)
 	assert.Nil(t, got)
 	assert.Contains(t, err.Error(), rowsScanningError)
+
+	require.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetUniqueNamesRowCloseError(t *testing.T) {
+	t.Parallel()
+
+	mockDatabase, mock := createTestDB(t)
+
+	rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.New(closingError))
+
+	mock.ExpectQuery(namesQuery).WillReturnRows(rows)
+
+	database := db.New(mockDatabase)
+	expected, err := database.GetUniqueNames()
+
+	require.Error(t, err)
+	assert.Nil(t, expected)
+	assert.Contains(t, err.Error(), rowsError)
 
 	require.NoError(t, mock.ExpectationsWereMet())
 }

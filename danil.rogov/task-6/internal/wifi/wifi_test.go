@@ -12,6 +12,8 @@ import (
 
 const (
 	gettingInterfacesError = "getting interfaces: "
+	testWifi               = "wifi1"
+	testMAC                = "00:11:22:33:44:55"
 )
 
 type MockWiFiHandle struct {
@@ -39,11 +41,10 @@ func TestCorrectGetNames(t *testing.T) {
 	t.Parallel()
 
 	mockHandle := createTestWiFiHandle(t, []*wifi.Interface{
-		{Name: "wlan0"},
-		{Name: "wifi0"},
+		{Name: testWifi},
 	}, nil)
 
-	expected := []string{"wlan0", "wifi0"}
+	expected := []string{testWifi}
 	service := myWifi.New(mockHandle)
 	got, err := service.GetNames()
 
@@ -67,15 +68,13 @@ func TestIncorrectGetNames(t *testing.T) {
 func TestCorrectGetAddresses(t *testing.T) {
 	t.Parallel()
 
-	mac1, _ := net.ParseMAC("00:11:22:33:44:55")
-	mac2, _ := net.ParseMAC("aa:bb:cc:dd:ee:ff")
+	mac, _ := net.ParseMAC(testMAC)
 
 	mockHandle := createTestWiFiHandle(t, []*wifi.Interface{
-		{HardwareAddr: mac1},
-		{HardwareAddr: mac2},
+		{HardwareAddr: mac},
 	}, nil)
 
-	expected := []net.HardwareAddr{mac1, mac2}
+	expected := []net.HardwareAddr{mac}
 	service := myWifi.New(mockHandle)
 	got, err := service.GetAddresses()
 

@@ -7,7 +7,17 @@ import (
 	"github.com/mdlayher/wifi"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/VlasfimosY/task-6/internal/wifi"
 )
+
+type mockWiFiHandle struct {
+	interfaces []*wifi.Interface
+	err        error
+}
+
+func (m *mockWiFiHandle) Interfaces() ([]*wifi.Interface, error) {
+	return m.interfaces, m.err
+}
 
 func TestWiFiService_GetAddresses_Success(t *testing.T) {
 	t.Parallel()
@@ -21,7 +31,7 @@ func TestWiFiService_GetAddresses_Success(t *testing.T) {
 		},
 	}
 
-	service := New(mockHandle)
+	service := wifi.New(mockHandle) // ← полный путь
 
 	addrs, err := service.GetAddresses()
 	require.NoError(t, err)
@@ -34,7 +44,7 @@ func TestWiFiService_GetAddresses_Error(t *testing.T) {
 		err: assert.AnError,
 	}
 
-	service := New(mockHandle)
+	service := wifi.New(mockHandle)
 
 	_, err := service.GetAddresses()
 	require.Error(t, err)
@@ -52,7 +62,7 @@ func TestWiFiService_GetNames_Success(t *testing.T) {
 		},
 	}
 
-	service := New(mockHandle)
+	service := wifi.New(mockHandle)
 
 	names, err := service.GetNames()
 	require.NoError(t, err)
@@ -65,7 +75,7 @@ func TestWiFiService_GetNames_Error(t *testing.T) {
 		err: assert.AnError,
 	}
 
-	service := New(mockHandle)
+	service := wifi.New(mockHandle)
 
 	_, err := service.GetNames()
 	require.Error(t, err)

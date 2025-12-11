@@ -17,7 +17,11 @@ const (
 	rowsError         = "rows error: "
 	rowsScanningError = "rows scanning: "
 	uniqueNamesQuery  = "SELECT DISTINCT name FROM users"
-	closingError      = "Error during close"
+)
+
+var (
+	errClosing = errors.New("error during close")
+	errQuery   = errors.New("error during query")
 )
 
 func createTestDB(t *testing.T) (*sql.DB, sqlmock.Sqlmock) {
@@ -55,6 +59,8 @@ func TestIncorrectGetNames(t *testing.T) {
 
 	mockDatabase, mock := createTestDB(t)
 
+	mock.ExpectQuery(namesQuery).WillReturnError(errQuery)
+
 	database := db.New(mockDatabase)
 	got, err := database.GetNames()
 
@@ -89,7 +95,7 @@ func TestGetNamesRowCloseError(t *testing.T) {
 
 	mockDatabase, mock := createTestDB(t)
 
-	rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.New(closingError))
+	rows := sqlmock.NewRows([]string{"name"}).CloseError(errClosing)
 
 	mock.ExpectQuery(namesQuery).WillReturnRows(rows)
 
@@ -126,6 +132,8 @@ func TestIncorrectGetUniqueNames(t *testing.T) {
 
 	mockDatabase, mock := createTestDB(t)
 
+	mock.ExpectQuery(namesQuery).WillReturnError(errQuery)
+
 	database := db.New(mockDatabase)
 	got, err := database.GetUniqueNames()
 
@@ -160,7 +168,7 @@ func TestGetUniqueNamesRowCloseError(t *testing.T) {
 
 	mockDatabase, mock := createTestDB(t)
 
-	rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.New(closingError))
+	rows := sqlmock.NewRows([]string{"name"}).CloseError(errClosing)
 
 	mock.ExpectQuery(namesQuery).WillReturnRows(rows)
 

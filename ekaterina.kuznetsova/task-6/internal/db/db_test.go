@@ -24,6 +24,21 @@ var testTable = []rowTestDb{
 	},
 }
 
+func TestGetNames_Success(t *testing.T) {
+	mockDB, mock, _ := sqlmock.New()
+	dbService := db.DBService{DB: mockDB}
+
+	rows := sqlmock.NewRows([]string{"name"}).
+		AddRow("Ivan").
+		AddRow("Gena228")
+
+	mock.ExpectQuery("SELECT name FROM users").
+		WillReturnRows(rows)
+
+	names, err := dbService.GetNames()
+	require.NoError(t, err)
+	require.Equal(t, []string{"Ivan", "Gena228"}, names)
+}
 
 func TestGetNames_ScanError(t *testing.T) {
 	mockDB, mock, _ := sqlmock.New()
@@ -73,6 +88,8 @@ var uniqueNamesTestTable = []uniqueNamesTestCase{
 		errExpected: errors.New("ExpectedError"),
 	},
 }
+
+
 
 func TestGetUniqueNames_Success(t *testing.T) {
 	mockDB, mock, _ := sqlmock.New()

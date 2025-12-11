@@ -40,6 +40,18 @@ func TestGetNames_Success(t *testing.T) {
 	require.Equal(t, []string{"Ivan", "Gena228"}, names)
 }
 
+func TestGetNames_QueryError(t *testing.T) {
+	mockDB, mock, _ := sqlmock.New()
+	dbService := db.DBService{DB: mockDB}
+
+	mock.ExpectQuery("SELECT name FROM users").
+		WillReturnError(errors.New("query error"))
+
+	names, err := dbService.GetNames()
+	require.Error(t, err)
+	require.Nil(t, names)
+}
+
 func TestGetNames_ScanError(t *testing.T) {
 	mockDB, mock, _ := sqlmock.New()
 	dbService := db.DBService{DB: mockDB}

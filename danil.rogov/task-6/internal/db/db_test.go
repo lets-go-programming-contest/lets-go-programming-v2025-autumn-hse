@@ -170,7 +170,7 @@ func TestGetUniqueNamesRowCloseError(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"name"}).CloseError(errClosing)
 
-	mock.ExpectQuery(namesQuery).WillReturnRows(rows)
+	mock.ExpectQuery(uniqueNamesQuery).WillReturnRows(rows)
 
 	database := db.New(mockDatabase)
 	expected, err := database.GetUniqueNames()

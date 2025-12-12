@@ -146,7 +146,6 @@ func parseMACs(macStr []string) []net.HardwareAddr {
 
 func parseMAC(macStr string) net.HardwareAddr {
 	hwAddr, err := net.ParseMAC(macStr)
-
 	if err != nil {
 		return nil
 	}

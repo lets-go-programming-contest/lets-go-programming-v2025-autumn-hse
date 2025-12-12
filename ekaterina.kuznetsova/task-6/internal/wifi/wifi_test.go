@@ -12,6 +12,7 @@ import (
 )
 
 //go:generate mockery --name=WiFiHandle --testonly --quiet --outpkg wifi_test --output .
+var ErrExpected = errors.New("expected error")
 
 type rowTestSysInfo struct {
 	addrs       []string
@@ -19,19 +20,21 @@ type rowTestSysInfo struct {
 	errExpected error
 }
 
-var testTable = []rowTestSysInfo{
-	{
-		addrs: []string{"00:11:22:33:44:55", "aa:bb:cc:dd:ee:ff"},
-		names: []string{"eth1", "eth2"},
-	},
-	{
-		errExpected: errors.New("ExpectedError"),
-	},
-}
-
 func TestGetAddresses(t *testing.T) {
+	t.Parallel()
+
 	mockWifi := NewWiFiHandle(t)
 	wifiService := myWifi.New(mockWifi)
+
+	var testTable = []rowTestSysInfo{
+		{
+			addrs: []string{"00:11:22:33:44:55", "aa:bb:cc:dd:ee:ff"},
+			names: []string{"eth1", "eth2"},
+		},
+		{
+			errExpected: ErrExpected,
+		},
+	}
 
 	for i, row := range testTable {
 		mockWifi.On("Interfaces").Unset()
@@ -41,8 +44,10 @@ func TestGetAddresses(t *testing.T) {
 
 		if row.errExpected != nil {
 			expectedErr := fmt.Errorf("getting interfaces: %w", row.errExpected)
+
 			require.Error(t, err, "row: %d", i)
 			require.EqualError(t, err, expectedErr.Error(), "row: %d", i)
+
 			continue
 		}
 
@@ -52,8 +57,20 @@ func TestGetAddresses(t *testing.T) {
 }
 
 func TestGetNames(t *testing.T) {
+	t.Parallel()
+
 	mockWifi := NewWiFiHandle(t)
 	wifiService := myWifi.New(mockWifi)
+
+	var testTable = []rowTestSysInfo{
+		{
+			addrs: []string{"00:11:22:33:44:55", "aa:bb:cc:dd:ee:ff"},
+			names: []string{"eth1", "eth2"},
+		},
+		{
+			errExpected: ErrExpected,
+		},
+	}
 
 	for i, row := range testTable {
 		mockWifi.On("Interfaces").Unset()
@@ -63,8 +80,10 @@ func TestGetNames(t *testing.T) {
 
 		if row.errExpected != nil {
 			expectedErr := fmt.Errorf("getting interfaces: %w", row.errExpected)
+
 			require.Error(t, err, "row: %d", i)
 			require.EqualError(t, err, expectedErr.Error(), "row: %d", i)
+
 			continue
 		}
 
@@ -81,12 +100,13 @@ func mockIfaces(addrs, names []string) []*wifi.Interface {
 		n = len(names)
 	}
 
-	for i := 0; i < n; i++ {
+	for i := range n {
 		var hwAddr net.HardwareAddr
 
 		if i < len(addrs) {
 			hwAddr = parseMAC(addrs[i])
 			if hwAddr == nil {
+
 				continue
 			}
 		} else {
@@ -109,21 +129,26 @@ func mockIfaces(addrs, names []string) []*wifi.Interface {
 		}
 		interfaces = append(interfaces, iface)
 	}
+
 	return interfaces
 }
 
 func parseMACs(macStr []string) []net.HardwareAddr {
-	var addrs []net.HardwareAddr
+	addrs := make([]net.HardwareAddr, 0, len(macStr))
+
 	for _, addr := range macStr {
 		addrs = append(addrs, parseMAC(addr))
 	}
+
 	return addrs
 }
 
 func parseMAC(macStr string) net.HardwareAddr {
 	hwAddr, err := net.ParseMAC(macStr)
 	if err != nil {
+
 		return nil
 	}
+
 	return hwAddr
 }

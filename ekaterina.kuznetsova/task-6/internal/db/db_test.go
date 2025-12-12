@@ -45,7 +45,7 @@ func TestGetNames_RowsErrAfterIteration(t *testing.T) {
 }
 
 func TestGetUniqueNames_RowsErrAfterIteration(t *testing.T) {
-	mockDB, _, err := sqlmock.New()
+	mockDB, mock, err := sqlmock.New()
 	require.NoError(t, err)
 	defer mockDB.Close()
 

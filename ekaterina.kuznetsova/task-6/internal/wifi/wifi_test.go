@@ -21,21 +21,21 @@ type rowTestSysInfo struct {
 	errExpected error
 }
 
-var testTable = []rowTestSysInfo{
-	{
-		addrs: []string{"00:11:22:33:44:55", "aa:bb:cc:dd:ee:ff"},
-		names: []string{"eth1", "eth2"},
-	},
-	{
-		errExpected: ErrExpected,
-	},
-}
-
 func TestGetAddresses(t *testing.T) {
 	t.Parallel()
 
 	mockWifi := NewWiFiHandle(t)
 	wifiService := myWifi.New(mockWifi)
+
+	testTable := []rowTestSysInfo{
+		{
+			addrs: []string{"00:11:22:33:44:55", "aa:bb:cc:dd:ee:ff"},
+			names: []string{"eth1", "eth2"},
+		},
+		{
+			errExpected: ErrExpected,
+		},
+	}
 
 	for i, row := range testTable {
 		mockWifi.On("Interfaces").Unset()
@@ -62,6 +62,16 @@ func TestGetNames(t *testing.T) {
 
 	mockWifi := NewWiFiHandle(t)
 	wifiService := myWifi.New(mockWifi)
+
+	testTable := []rowTestSysInfo{
+		{
+			addrs: []string{"00:11:22:33:44:55", "aa:bb:cc:dd:ee:ff"},
+			names: []string{"eth1", "eth2"},
+		},
+		{
+			errExpected: ErrExpected,
+		},
+	}
 
 	for i, row := range testTable {
 		mockWifi.On("Interfaces").Unset()
@@ -143,3 +153,4 @@ func parseMAC(macStr string) net.HardwareAddr {
 
 	return hwAddr
 }
+

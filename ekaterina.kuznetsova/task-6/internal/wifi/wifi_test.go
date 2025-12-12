@@ -74,11 +74,8 @@ func TestGetNames(t *testing.T) {
 }
 
 func mockIfaces(addrs, names []string) []*wifi.Interface {
-	if len(addrs) != len(names) && len(addrs) > 0 && len(names) > 0 {
-		panic("mockIfaces: mismatched addrs and names length")
-	}
-
 	var interfaces []*wifi.Interface
+
 	n := len(addrs)
 	if len(names) > n {
 		n = len(names)
@@ -86,6 +83,7 @@ func mockIfaces(addrs, names []string) []*wifi.Interface {
 
 	for i := 0; i < n; i++ {
 		var hwAddr net.HardwareAddr
+
 		if i < len(addrs) {
 			hwAddr = parseMAC(addrs[i])
 			if hwAddr == nil {

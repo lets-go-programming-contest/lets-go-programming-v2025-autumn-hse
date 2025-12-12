@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Ekaterina-101/task-6/internal/db"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/Ekaterina-101/task-6/internal/db"
 	"github.com/stretchr/testify/require"
 )
 

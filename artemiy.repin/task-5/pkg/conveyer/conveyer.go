@@ -68,8 +68,6 @@ func (c *Conveyer) closeAllChannels() {
 	}
 }
 
-}
-
 func (c *Conveyer) Run(ctx context.Context) error {
 	defer c.closeAllChannels()
 

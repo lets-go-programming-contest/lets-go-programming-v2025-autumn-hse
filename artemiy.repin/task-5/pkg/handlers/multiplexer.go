@@ -16,7 +16,6 @@ func MultiplexerFunc(
 	outputChannel chan string,
 ) error {
 	if len(inputChannels) == 0 {
-		close(outputChannel)
 
 		return nil
 	}
@@ -68,7 +67,6 @@ func multiplexerHelper(
 	}
 
 	waitGroup.Wait()
-	close(outputChannel)
 
 	return nil
 }

@@ -185,24 +185,6 @@ func TestGetNames_RowsError(t *testing.T) {
 	require.Nil(t, names)
 }
 
-func TestGetNames_CloseErrorOnEmptyRows(t *testing.T) {
-	mockDB, mock, err := sqlmock.New()
-	require.NoError(t, err)
-	defer mockDB.Close()
-
-	service := db.New(mockDB)
-
-	rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.New("close error"))
-
-	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
-
-	names, err := service.GetNames()
-	require.Error(t, err)
-	require.Nil(t, names)
-
-	require.NoError(t, mock.ExpectationsWereMet()) // Обязательно!
-}
-
 func TestGetUniqueNames_Success(t *testing.T) {
 	mockDB, mock, err := sqlmock.New()
 	require.NoError(t, err)

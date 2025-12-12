@@ -1,155 +1,93 @@
 package wifi_test
 
 import (
-	"errors"
-	myWifi "github.com/Ekaterina-101/task-6/internal/wifi"
-	"fmt"
-	"github.com/mdlayher/wifi"
-	wifiMocks "github.com/Ekaterina-101/task-6/internal/wifi/mocks"
-	"github.com/stretchr/testify/require"
 	"net"
 	"testing"
+
+	myWifi "github.com/Ekaterina-101/task-6/internal/wifi"
+	"github.com/mdlayher/wifi"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
+const (
+	gettingInterfacesError = "getting interfaces: "
+	testWifi               = "wifi1"
+	testMAC                = "00:11:22:33:44:55"
+)
 
-//go:generate mockery --name=WiFi --dir=../../../../../../.. --output=. --outpkg=wifi_test --filename=mock_wifi.go --structname=MockWiFi
-
-type rowTestSysInfo struct {
-	addrs       []string
-	errExpected error
+type MockWiFiHandle struct {
+	interfaces []*wifi.Interface
+	err        error
 }
 
-var testTable = []rowTestSysInfo{
-	{
-		addrs: []string{"00:11:22:33:44:55", "aa:bb:cc:dd:ee:ff"},
-	},
-	{
-		errExpected: errors.New("ExpectedError"),
-	},
+func (m *MockWiFiHandle) Interfaces() ([]*wifi.Interface, error) {
+	return m.interfaces, m.err
 }
 
-func TestGetAddresses(t *testing.T) {
-	mockWifi := &wifiMocks.MockWiFi{}
-	wifiService := myWifi.WiFiService{WiFi: mockWifi}
+func createTestWiFiHandle(t *testing.T, interfaces []*wifi.Interface, err error) *MockWiFiHandle {
+	t.Helper()
 
-	for i, row := range testTable {
-
-		mockWifi.On("Interfaces").Unset()
-		mockWifi.On("Interfaces").Return(mockIfaces(row.addrs), row.errExpected)
-
-		actualAddrs, err := wifiService.GetAddresses()
-
-		if row.errExpected != nil {
-			require.ErrorIs(t, err, row.errExpected,
-				"row: %d, expected error: %v, actual error: %v",
-				i, row.errExpected, err)
-			continue
-		}
-
-		require.NoError(t, err, "row: %d, error must be nil", i)
-		require.Equal(t, parseMACs(row.addrs), actualAddrs,
-			"row: %d, expected addrs: %v, actual addrs: %v",
-			i, parseMACs(row.addrs), actualAddrs)
+	return &MockWiFiHandle{
+		interfaces: interfaces,
+		err:        err,
 	}
 }
 
-func mockIfaces(addrs []string) []*wifi.Interface {
-	var interfaces []*wifi.Interface
+func TestCorrectGetNames(t *testing.T) {
+	t.Parallel()
 
-	for i, addrStr := range addrs {
-		hwAddr := parseMAC(addrStr)
-		if hwAddr == nil {
-			continue
-		}
+	mockHandle := createTestWiFiHandle(t, []*wifi.Interface{
+		{Name: testWifi},
+	}, nil)
 
-		iface := &wifi.Interface{
-			Index:        i + 1,
-			Name:         fmt.Sprintf("eth%d", i+1),
-			HardwareAddr: hwAddr,
-			PHY:          1,
-			Device:       1,
-			Type:         wifi.InterfaceTypeAPVLAN,
-			Frequency:    0,
-		}
+	expected := []string{testWifi}
+	service := myWifi.New(mockHandle)
+	got, err := service.GetNames()
 
-		interfaces = append(interfaces, iface)
-	}
-
-	return interfaces
+	require.NoError(t, err)
+	assert.Equal(t, expected, got)
 }
 
-func parseMACs(macStr []string) []net.HardwareAddr {
-	var addrs []net.HardwareAddr
-	for _, addr := range macStr {
-		addrs = append(addrs, parseMAC(addr))
-	}
-	return addrs
+func TestIncorrectGetNames(t *testing.T) {
+	t.Parallel()
+
+	mockHandle := createTestWiFiHandle(t, nil, assert.AnError)
+
+	service := myWifi.New(mockHandle)
+	got, err := service.GetNames()
+
+	require.Error(t, err)
+	assert.Nil(t, got)
+	assert.Contains(t, err.Error(), gettingInterfacesError)
 }
 
-func parseMAC(macStr string) net.HardwareAddr {
-	hwAddr, err := net.ParseMAC(macStr)
-	if err != nil {
-		return nil
-	}
-	return hwAddr
+func TestCorrectGetAddresses(t *testing.T) {
+	t.Parallel()
+
+	mac, _ := net.ParseMAC(testMAC)
+
+	mockHandle := createTestWiFiHandle(t, []*wifi.Interface{
+		{HardwareAddr: mac},
+	}, nil)
+
+	expected := []net.HardwareAddr{mac}
+	service := myWifi.New(mockHandle)
+	got, err := service.GetAddresses()
+
+	require.NoError(t, err)
+	assert.Equal(t, expected, got)
 }
 
-type rowTestGetNames struct {
-	names       []string
-	errExpected error
-}
+func TestIncorrectGetAddresses(t *testing.T) {
+	t.Parallel()
 
-var testTableGetNames = []rowTestGetNames{
-	{
-		names: []string{"1111", "WifiIvan"},
-	},
-	{
-		errExpected: errors.New("ExpectedError"),
-	},
-}
+	mockHandle := createTestWiFiHandle(t, nil, assert.AnError)
 
-func TestGetNames(t *testing.T) {
-	mockWifi := &wifiMocks.MockWiFi{}
-	wifiService := myWifi.WiFiService{WiFi: mockWifi}
+	service := myWifi.New(mockHandle)
+	got, err := service.GetAddresses()
 
-	for i, row := range testTableGetNames {
-
-		mockWifi.On("Interfaces").Unset()
-
-		mockWifi.
-			On("Interfaces").
-			Return(mockInterfacesByNames(row.names), row.errExpected)
-
-		actualNames, err := wifiService.GetNames()
-
-		if row.errExpected != nil {
-			require.ErrorIs(t, err, row.errExpected,
-				"row %d: expected error %v, got %v",
-				i, row.errExpected, err)
-			continue
-		}
-
-		require.NoError(t, err, "row %d: unexpected error", i)
-		require.Equal(t, row.names, actualNames,
-			"row %d: expected names %v, got %v",
-			i, row.names, actualNames)
-	}
-}
-
-func mockInterfacesByNames(names []string) []*wifi.Interface {
-	var interfaces []*wifi.Interface
-
-	for i, name := range names {
-		iface := &wifi.Interface{
-			Index: i + 1,
-			Name:  name,
-			PHY:   1,
-			Device: 1,
-			Type: wifi.InterfaceTypeAPVLAN,
-			Frequency: 0,
-		}
-		interfaces = append(interfaces, iface)
-	}
-
-	return interfaces
+	require.Error(t, err)
+	assert.Nil(t, got)
+	assert.Contains(t, err.Error(), gettingInterfacesError)
 }

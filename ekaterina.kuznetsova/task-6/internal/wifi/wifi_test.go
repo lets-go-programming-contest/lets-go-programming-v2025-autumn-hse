@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	myWifi "github.com/Ekaterina-101/task-6/internal/wifi"
-	wifiMocks "github.com/Ekaterina-101/task-6/internal/wifi/mocks"
+	
 	"github.com/mdlayher/wifi"
 	"github.com/stretchr/testify/require"
 )

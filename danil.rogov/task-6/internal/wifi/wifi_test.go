@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+//go:generate mockery --name=WiFiHandle --testonly --quiet --outpkg wifi_test --output .
 const (
 	gettingInterfacesError = "getting interfaces: "
 	testWifi               = "wifi1"
@@ -59,7 +60,7 @@ func TestIncorrectGetNames(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Nil(t, got)
-	assert.Contains(t, err.Error(), gettingInterfacesError)
+	assert.ErrorContains(t, err, gettingInterfacesError)
 }
 
 func TestCorrectGetAddresses(t *testing.T) {
@@ -89,5 +90,5 @@ func TestIncorrectGetAddresses(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Nil(t, got)
-	assert.Contains(t, err.Error(), gettingInterfacesError)
+	assert.ErrorContains(t, err, gettingInterfacesError)
 }

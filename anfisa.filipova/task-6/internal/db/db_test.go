@@ -14,7 +14,13 @@ const (
 	queryUnique  = "SELECT DISTINCT name FROM users"
 )
 
+var (
+	errDataBase = errors.New("database error")
+	errRow      = errors.New("row error")
+)
+
 func TestGetNames(t *testing.T) {
+	t.Parallel()
 	mockDB, mock, err := sqlmock.New()
 
 	require.NoError(t, err)
@@ -24,6 +30,7 @@ func TestGetNames(t *testing.T) {
 
 	// Тест 1: Успешный запрос с несколькими строками
 	t.Run("success with multiple rows", func(t *testing.T) {
+		t.Parallel()
 		rows := sqlmock.NewRows([]string{"name"}).
 			AddRow("Alice").
 			AddRow("Bob")
@@ -37,6 +44,7 @@ func TestGetNames(t *testing.T) {
 
 	// Тест 2: Успешный запрос с пустым результатом
 	t.Run("success with empty result", func(t *testing.T) {
+		t.Parallel()
 		rows := sqlmock.NewRows([]string{"name"})
 		mock.ExpectQuery(queryDefault).WillReturnRows(rows)
 
@@ -48,8 +56,9 @@ func TestGetNames(t *testing.T) {
 
 	// Тест 3: Ошибка запроса
 	t.Run("query error", func(t *testing.T) {
+		t.Parallel()
 		mock.ExpectQuery(queryDefault).
-			WillReturnError(errors.New("db error"))
+			WillReturnError(errDataBase)
 
 		names, err := service.GetNames()
 
@@ -60,7 +69,9 @@ func TestGetNames(t *testing.T) {
 
 	// Тест 4: Ошибка сканирования (NULL значение)
 	t.Run("scan error", func(t *testing.T) {
+		t.Parallel()
 		rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
+
 		mock.ExpectQuery(queryDefault).WillReturnRows(rows)
 
 		names, err := service.GetNames()
@@ -72,9 +83,10 @@ func TestGetNames(t *testing.T) {
 
 	// Тест 5: Ошибка rows.Err()
 	t.Run("rows error", func(t *testing.T) {
+		t.Parallel()
 		rows := sqlmock.NewRows([]string{"name"}).
 			AddRow("Alice").
-			RowError(0, errors.New("row error"))
+			RowError(0, errRow)
 		mock.ExpectQuery(queryDefault).WillReturnRows(rows)
 
 		names, err := service.GetNames()
@@ -88,7 +100,9 @@ func TestGetNames(t *testing.T) {
 }
 
 func TestGetUniqueNames(t *testing.T) {
+	t.Parallel()
 	mockDB, mock, err := sqlmock.New()
+
 	require.NoError(t, err)
 	defer mockDB.Close()
 
@@ -96,10 +110,12 @@ func TestGetUniqueNames(t *testing.T) {
 
 	// Тест 1: Уникальные имена с дубликатами
 	t.Run("distinct with duplicates", func(t *testing.T) {
+		t.Parallel()
 		rows := sqlmock.NewRows([]string{"name"}).
 			AddRow("Alice").
 			AddRow("Alice").
 			AddRow("Bob")
+
 		mock.ExpectQuery(queryUnique).WillReturnRows(rows)
 
 		names, err := service.GetUniqueNames()
@@ -110,7 +126,9 @@ func TestGetUniqueNames(t *testing.T) {
 
 	// Тест 2: Пустой результат
 	t.Run("empty result", func(t *testing.T) {
+		t.Parallel()
 		rows := sqlmock.NewRows([]string{"name"})
+
 		mock.ExpectQuery(queryUnique).WillReturnRows(rows)
 
 		names, err := service.GetUniqueNames()
@@ -121,8 +139,9 @@ func TestGetUniqueNames(t *testing.T) {
 
 	// Тест 3: Ошибка запроса
 	t.Run("query error", func(t *testing.T) {
+		t.Parallel()
 		mock.ExpectQuery(queryUnique).
-			WillReturnError(errors.New("db error"))
+			WillReturnError(errDataBase)
 
 		names, err := service.GetUniqueNames()
 
@@ -133,7 +152,9 @@ func TestGetUniqueNames(t *testing.T) {
 
 	// Тест 4: Ошибка сканирования
 	t.Run("scan error", func(t *testing.T) {
+		t.Parallel()
 		rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
+
 		mock.ExpectQuery(queryUnique).WillReturnRows(rows)
 
 		names, err := service.GetUniqueNames()
@@ -144,9 +165,11 @@ func TestGetUniqueNames(t *testing.T) {
 	})
 	// Тест 5: Ошибка rows.Err()
 	t.Run("rows error", func(t *testing.T) {
+		t.Parallel()
 		rows := sqlmock.NewRows([]string{"name"}).
 			AddRow("Alice").
-			RowError(0, errors.New("row error"))
+			RowError(0, errRow)
+
 		mock.ExpectQuery(queryUnique).WillReturnRows(rows)
 
 		names, err := service.GetUniqueNames()
@@ -160,18 +183,24 @@ func TestGetUniqueNames(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
+	t.Parallel()
 	mockDB, mock, err := sqlmock.New()
+
 	require.NoError(t, err)
 
 	defer mockDB.Close()
 
 	service := db.New(mockDB)
+
 	require.NotNil(t, service)
 	require.NotNil(t, service.DB)
 
 	rows := sqlmock.NewRows([]string{"name"}).AddRow("Test")
+
 	mock.ExpectQuery(queryDefault).WillReturnRows(rows)
+
 	names, err := service.GetNames()
+
 	require.NoError(t, err)
 	require.Equal(t, []string{"Test"}, names)
 }

@@ -48,7 +48,6 @@ func separatorHelper(
 
 		case data, receivedOk := <-inputChannel:
 			if !receivedOk {
-
 				return nil
 			}
 

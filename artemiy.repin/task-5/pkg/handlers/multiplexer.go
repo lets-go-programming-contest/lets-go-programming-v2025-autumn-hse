@@ -16,7 +16,6 @@ func MultiplexerFunc(
 	outputChannel chan string,
 ) error {
 	if len(inputChannels) == 0 {
-
 		return nil
 	}
 

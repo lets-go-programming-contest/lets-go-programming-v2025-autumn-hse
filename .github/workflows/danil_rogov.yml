@@ -1,0 +1,32 @@
+name: Run local tests
+
+on:
+  push:
+    branches: [ "danil.rogov/task-7" ]
+  pull_request:
+    branches: [ "danil.rogov/task-7" ]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: "1.22.7"
+    
+    - name: Run DB tests
+      run: |
+        echo "Запуск тестов для internal/db"
+        cd internal/db
+        go test -v
+    
+    - name: Run WiFi tests
+      run: |
+        echo "Запуск тестов для internal/wifi"
+        cd internal/wifi
+        go test -v

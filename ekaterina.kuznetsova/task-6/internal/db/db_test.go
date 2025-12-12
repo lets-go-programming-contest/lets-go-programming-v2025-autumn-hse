@@ -39,8 +39,8 @@ func TestGetNames_QueryError(t *testing.T) {
 		WillReturnError(errors.New("query error"))
 
 	names, err := service.GetNames()
-	require.Error(t, err)
 	require.Nil(t, names)
+	require.ErrorContains(t, err, "db query: query error")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -52,7 +52,6 @@ func TestGetNames_EmptyResult(t *testing.T) {
 	service := db.New(mockDB)
 
 	rows := sqlmock.NewRows([]string{"name"})
-
 	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
 
 	names, err := service.GetNames()
@@ -68,14 +67,12 @@ func TestGetNames_ScanError(t *testing.T) {
 
 	service := db.New(mockDB)
 
-	rows := sqlmock.NewRows([]string{"name"}).AddRow("Ivan")
-	rows.RowError(0, errors.New("scan error"))
-
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
 	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
 
 	names, err := service.GetNames()
-	require.Error(t, err)
 	require.Nil(t, names)
+	require.ErrorContains(t, err, "rows scanning")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -94,8 +91,8 @@ func TestGetNames_RowsErrAfterIteration(t *testing.T) {
 	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
 
 	names, err := service.GetNames()
-	require.Error(t, err)
 	require.Nil(t, names)
+	require.ErrorContains(t, err, "rows error: row iteration error")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -129,8 +126,8 @@ func TestGetUniqueNames_QueryError(t *testing.T) {
 		WillReturnError(errors.New("query error"))
 
 	names, err := service.GetUniqueNames()
-	require.Error(t, err)
 	require.Nil(t, names)
+	require.ErrorContains(t, err, "db query: query error")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -142,7 +139,6 @@ func TestGetUniqueNames_EmptyResult(t *testing.T) {
 	service := db.New(mockDB)
 
 	rows := sqlmock.NewRows([]string{"name"})
-
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
 
 	names, err := service.GetUniqueNames()
@@ -158,18 +154,14 @@ func TestGetUniqueNames_ScanError(t *testing.T) {
 
 	service := db.New(mockDB)
 
-	rows := sqlmock.NewRows([]string{"name"}).AddRow("Ivan")
-	rows.RowError(0, errors.New("scan error"))
-
+	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
 
 	names, err := service.GetUniqueNames()
-	require.Error(t, err)
 	require.Nil(t, names)
+	require.ErrorContains(t, err, "rows scanning")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
-
-
 
 func TestGetUniqueNames_RowsErrAfterIteration(t *testing.T) {
 	mockDB, mock, err := sqlmock.New()
@@ -186,9 +178,7 @@ func TestGetUniqueNames_RowsErrAfterIteration(t *testing.T) {
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
 
 	names, err := service.GetUniqueNames()
-	require.Error(t, err)
 	require.Nil(t, names)
+	require.ErrorContains(t, err, "rows error: row iteration error")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
-
-

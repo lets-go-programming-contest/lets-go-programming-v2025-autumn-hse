@@ -60,6 +60,22 @@ func TestGetNames_EmptyResult(t *testing.T) {
     require.Equal(t, []string{}, names)
 }
 
+func TestGetNames_CloseErrorOnEmptyRows(t *testing.T) {
+    mockDB, mock, err := sqlmock.New()
+    require.NoError(t, err)
+    defer mockDB.Close()
+
+    service := db.New(mockDB)
+
+    rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.New("close error"))
+
+    mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
+
+    names, err := service.GetNames()
+    require.Error(t, err)
+    require.Nil(t, names)
+}
+
 func TestGetNames_QueryError(t *testing.T) {
 	mockDB, mock, err := sqlmock.New()
 	require.NoError(t, err)
@@ -160,6 +176,22 @@ func TestGetUniqueNames_EmptyResult(t *testing.T) {
     names, err := service.GetUniqueNames()
     require.NoError(t, err)
     require.Equal(t, []string{}, names)
+}
+
+func TestGetUniqueNames_CloseErrorOnEmptyRows(t *testing.T) {
+    mockDB, mock, err := sqlmock.New()
+    require.NoError(t, err)
+    defer mockDB.Close()
+
+    service := db.New(mockDB)
+
+    rows := sqlmock.NewRows([]string{"name"}).CloseError(errors.New("close error"))
+
+    mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
+
+    names, err := service.GetUniqueNames()
+    require.Error(t, err)
+    require.Nil(t, names)
 }
 
 func TestGetUniqueNames_QueryError(t *testing.T) {

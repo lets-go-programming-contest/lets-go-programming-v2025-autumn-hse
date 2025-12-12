@@ -9,7 +9,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-const RecvValueOnClosedChannel = "undefined"
+const recvValueOnClosedChannel = "undefined"
 
 var (
 	errCannotRegisterAfterRun = errors.New("cannot register after Run")

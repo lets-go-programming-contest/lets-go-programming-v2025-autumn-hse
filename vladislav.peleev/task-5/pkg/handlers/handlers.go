@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-var ErrCantBeDecorated = errors.New("can't be decorated")
+var errCantBeDecorated = errors.New("can't be decorated")
 
 const (
 	decoratedPrefix   = "decorated: "
@@ -20,11 +20,8 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 		select {
 		case <-ctx.Done():
 			return nil
-
 		case data, ok := <-input:
 			if !ok {
-				close(output)
-
 				return nil
 			}
 
@@ -52,13 +49,8 @@ func SeparatorFunc(ctx context.Context, input chan string, outputs []chan string
 		select {
 		case <-ctx.Done():
 			return nil
-
 		case data, ok := <-input:
 			if !ok {
-				for _, out := range outputs {
-					close(out)
-				}
-
 				return nil
 			}
 
@@ -79,7 +71,6 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 
 	for _, ch := range inputs {
 		inCh := ch
-
 		waitGroup.Add(1)
 
 		go func(inputChan chan string) {
@@ -109,7 +100,6 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 	}
 
 	waitGroup.Wait()
-	close(output)
 
 	return nil
 }

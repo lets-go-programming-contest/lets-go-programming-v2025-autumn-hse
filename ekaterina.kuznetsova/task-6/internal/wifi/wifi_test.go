@@ -93,7 +93,7 @@ func TestGetNames(t *testing.T) {
 }
 
 func mockIfaces(addrs, names []string) []*wifi.Interface {
-	var interfaces []*wifi.Interface
+	interfaces := make([]*wifi.Interface, 0, len(addrs))
 
 	n := len(addrs)
 	if len(names) > n {
@@ -105,6 +105,7 @@ func mockIfaces(addrs, names []string) []*wifi.Interface {
 
 		if i < len(addrs) {
 			hwAddr = parseMAC(addrs[i])
+
 			if hwAddr == nil {
 
 				continue
@@ -145,6 +146,7 @@ func parseMACs(macStr []string) []net.HardwareAddr {
 
 func parseMAC(macStr string) net.HardwareAddr {
 	hwAddr, err := net.ParseMAC(macStr)
+
 	if err != nil {
 
 		return nil

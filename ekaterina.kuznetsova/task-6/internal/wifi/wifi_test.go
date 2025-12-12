@@ -3,9 +3,10 @@ package wifi_test
 import (
 	"errors"
 	"fmt"
-	myWifi "github.com/Ekaterina-101/task-6/internal/wifi"
 	"net"
 	"testing"
+
+	myWifi "github.com/Ekaterina-101/task-6/internal/wifi"
 
 	"github.com/mdlayher/wifi"
 	"github.com/stretchr/testify/require"

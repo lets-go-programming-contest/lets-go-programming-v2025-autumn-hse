@@ -63,18 +63,11 @@ func (c *Conveyer) closeAllChannels() {
 
 	for _, channel := range c.channels {
 		if channel != nil {
-			safeCloseChannel(channel)
+			close(channel)
 		}
 	}
 }
 
-// Небольшой костыль 😊.
-func safeCloseChannel(channel chan string) {
-	defer func() {
-		_ = recover()
-	}()
-
-	close(channel)
 }
 
 func (c *Conveyer) Run(ctx context.Context) error {

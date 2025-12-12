@@ -67,7 +67,7 @@ func TestIncorrectGetNames(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Nil(t, got)
-	assert.ErrorContains(t, err, rowsError)
+	require.ErrorContains(t, err, rowsError)
 
 	require.NoError(t, mock.ExpectationsWereMet())
 }
@@ -86,7 +86,7 @@ func TestGetNamesScanError(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Nil(t, got)
-	assert.ErrorContains(t, err, rowsScanningError)
+	require.ErrorContains(t, err, rowsScanningError)
 
 	require.NoError(t, mock.ExpectationsWereMet())
 }
@@ -105,7 +105,7 @@ func TestGetNamesRowCloseError(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Nil(t, expected)
-	assert.ErrorContains(t, err, rowsError)
+	require.ErrorContains(t, err, rowsError)
 
 	require.NoError(t, mock.ExpectationsWereMet())
 }
@@ -141,7 +141,7 @@ func TestIncorrectGetUniqueNames(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Nil(t, got)
-	assert.ErrorContains(t, err, rowsError)
+	require.ErrorContains(t, err, rowsError)
 
 	require.NoError(t, mock.ExpectationsWereMet())
 }
@@ -160,7 +160,7 @@ func TestGetUniqueNamesScanError(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Nil(t, got)
-	assert.ErrorContains(t, err, rowsScanningError)
+	require.ErrorContains(t, err, rowsScanningError)
 
 	require.NoError(t, mock.ExpectationsWereMet())
 }
@@ -179,7 +179,7 @@ func TestGetUniqueNamesRowCloseError(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Nil(t, expected)
-	assert.ErrorContains(t, err, rowsError)
+	require.ErrorContains(t, err, rowsError)
 
 	require.NoError(t, mock.ExpectationsWereMet())
 }

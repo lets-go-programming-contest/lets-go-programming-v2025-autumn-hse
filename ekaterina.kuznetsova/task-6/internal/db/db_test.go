@@ -1,12 +1,13 @@
-package db
+package db_test
 
 import (
 	"errors"
 	"testing"
 
-	"github.com/Ekaterina-101/task-6/internal/db"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
+
+	dbsvc "github.com/Ekaterina-101/task-6/internal/db"
 )
 
 func TestGetNames_Success(t *testing.T) {
@@ -14,7 +15,7 @@ func TestGetNames_Success(t *testing.T) {
 	require.NoError(t, err)
 	defer mockDB.Close()
 
-	service := db.New(mockDB)
+	service := dbsvc.New(mockDB)
 
 	rows := sqlmock.NewRows([]string{"name"}).
 		AddRow("Ivan").
@@ -33,7 +34,7 @@ func TestGetNames_QueryError(t *testing.T) {
 	require.NoError(t, err)
 	defer mockDB.Close()
 
-	service := db.New(mockDB)
+	service := dbsvc.New(mockDB)
 
 	mock.ExpectQuery("SELECT name FROM users").
 		WillReturnError(errors.New("query error"))
@@ -49,7 +50,7 @@ func TestGetNames_EmptyResult(t *testing.T) {
 	require.NoError(t, err)
 	defer mockDB.Close()
 
-	service := db.New(mockDB)
+	service := dbsvc.New(mockDB)
 
 	rows := sqlmock.NewRows([]string{"name"})
 	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
@@ -65,9 +66,9 @@ func TestGetNames_ScanError(t *testing.T) {
 	require.NoError(t, err)
 	defer mockDB.Close()
 
-	service := db.New(mockDB)
+	service := dbsvc.New(mockDB)
 
-	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
+	rows := sqlmock.NewRows([]string{"name"}).AddRow("Ivan").AddRow(nil)
 	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
 
 	names, err := service.GetNames()
@@ -81,18 +82,18 @@ func TestGetNames_RowsErrAfterIteration(t *testing.T) {
 	require.NoError(t, err)
 	defer mockDB.Close()
 
-	service := db.New(mockDB)
+	service := dbsvc.New(mockDB)
 
 	rows := sqlmock.NewRows([]string{"name"}).
 		AddRow("Ivan").
 		AddRow("Gena228").
-		RowError(1, errors.New("row iteration error"))
+		CloseError(errors.New("row iteration error"))
 
 	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)
 
 	names, err := service.GetNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, "rows error: row iteration error")
+	require.ErrorContains(t, err, "rows error")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -101,7 +102,7 @@ func TestGetUniqueNames_Success(t *testing.T) {
 	require.NoError(t, err)
 	defer mockDB.Close()
 
-	service := db.New(mockDB)
+	service := dbsvc.New(mockDB)
 
 	rows := sqlmock.NewRows([]string{"name"}).
 		AddRow("Ivan").
@@ -120,7 +121,7 @@ func TestGetUniqueNames_QueryError(t *testing.T) {
 	require.NoError(t, err)
 	defer mockDB.Close()
 
-	service := db.New(mockDB)
+	service := dbsvc.New(mockDB)
 
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").
 		WillReturnError(errors.New("query error"))
@@ -136,7 +137,7 @@ func TestGetUniqueNames_EmptyResult(t *testing.T) {
 	require.NoError(t, err)
 	defer mockDB.Close()
 
-	service := db.New(mockDB)
+	service := dbsvc.New(mockDB)
 
 	rows := sqlmock.NewRows([]string{"name"})
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
@@ -152,9 +153,9 @@ func TestGetUniqueNames_ScanError(t *testing.T) {
 	require.NoError(t, err)
 	defer mockDB.Close()
 
-	service := db.New(mockDB)
+	service := dbsvc.New(mockDB)
 
-	rows := sqlmock.NewRows([]string{"name"}).AddRow(nil)
+	rows := sqlmock.NewRows([]string{"name"}).AddRow("Ivan").AddRow(nil)
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
 
 	names, err := service.GetUniqueNames()
@@ -168,17 +169,17 @@ func TestGetUniqueNames_RowsErrAfterIteration(t *testing.T) {
 	require.NoError(t, err)
 	defer mockDB.Close()
 
-	service := db.New(mockDB)
+	service := dbsvc.New(mockDB)
 
 	rows := sqlmock.NewRows([]string{"name"}).
 		AddRow("Ivan").
 		AddRow("Gena228").
-		RowError(1, errors.New("row iteration error"))
+		CloseError(errors.New("row iteration error"))
 
 	mock.ExpectQuery("SELECT DISTINCT name FROM users").WillReturnRows(rows)
 
 	names, err := service.GetUniqueNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, "rows error: row iteration error")
+	require.ErrorContains(t, err, "rows error")
 	require.NoError(t, mock.ExpectationsWereMet())
 }

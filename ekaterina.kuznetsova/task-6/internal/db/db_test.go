@@ -57,13 +57,6 @@ func TestGetNamesQueryError(t *testing.T) {
 	require.Error(t, err)
 	assert.Nil(t, have)
 	assert.Contains(t, err.Error(), "db query: query error")
-@RomashovVs
-RomashovVs
-3 days ago
-Можно использовать ErrorContains.
-
-@Ekaterina-101	Reply...
-
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 

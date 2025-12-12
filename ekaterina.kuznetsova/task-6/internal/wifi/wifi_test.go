@@ -153,4 +153,3 @@ func parseMAC(macStr string) net.HardwareAddr {
 
 	return hwAddr
 }
-

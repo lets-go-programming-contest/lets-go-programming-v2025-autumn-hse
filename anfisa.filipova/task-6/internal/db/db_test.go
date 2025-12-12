@@ -25,9 +25,11 @@ func TestGetNames(t *testing.T) {
 	// Тест 1: Успешный запрос с несколькими строками
 	t.Run("success with multiple rows", func(t *testing.T) {
 		t.Parallel()
+
 		mockDB, mock, err := sqlmock.New()
 
 		require.NoError(t, err)
+
 		defer mockDB.Close()
 
 		service := db.New(mockDB)
@@ -45,9 +47,11 @@ func TestGetNames(t *testing.T) {
 	// Тест 2: Успешный запрос с пустым результатом
 	t.Run("success with empty result", func(t *testing.T) {
 		t.Parallel()
+
 		mockDB, mock, err := sqlmock.New()
 
 		require.NoError(t, err)
+
 		defer mockDB.Close()
 
 		service := db.New(mockDB)
@@ -63,9 +67,11 @@ func TestGetNames(t *testing.T) {
 	// Тест 3: Ошибка запроса
 	t.Run("query error", func(t *testing.T) {
 		t.Parallel()
+
 		mockDB, mock, err := sqlmock.New()
 
 		require.NoError(t, err)
+
 		defer mockDB.Close()
 
 		service := db.New(mockDB)
@@ -82,9 +88,11 @@ func TestGetNames(t *testing.T) {
 	// Тест 4: Ошибка сканирования (NULL значение)
 	t.Run("scan error", func(t *testing.T) {
 		t.Parallel()
+
 		mockDB, mock, err := sqlmock.New()
 
 		require.NoError(t, err)
+
 		defer mockDB.Close()
 
 		service := db.New(mockDB)
@@ -102,15 +110,18 @@ func TestGetNames(t *testing.T) {
 	// Тест 5: Ошибка rows.Err()
 	t.Run("rows error", func(t *testing.T) {
 		t.Parallel()
+
 		mockDB, mock, err := sqlmock.New()
 
 		require.NoError(t, err)
+
 		defer mockDB.Close()
 
 		service := db.New(mockDB)
 		rows := sqlmock.NewRows([]string{"name"}).
 			AddRow("Alice").
 			RowError(0, errRow)
+
 		mock.ExpectQuery(queryDefault).WillReturnRows(rows)
 
 		names, err := service.GetNames()
@@ -119,8 +130,6 @@ func TestGetNames(t *testing.T) {
 		require.ErrorContains(t, err, "rows error:")
 		require.Nil(t, names)
 	})
-
-	//require.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestGetUniqueNames(t *testing.T) {
@@ -129,9 +138,11 @@ func TestGetUniqueNames(t *testing.T) {
 	// Тест 1: Уникальные имена с дубликатами
 	t.Run("distinct with duplicates", func(t *testing.T) {
 		t.Parallel()
+
 		mockDB, mock, err := sqlmock.New()
 
 		require.NoError(t, err)
+
 		defer mockDB.Close()
 
 		service := db.New(mockDB)
@@ -151,6 +162,7 @@ func TestGetUniqueNames(t *testing.T) {
 	// Тест 2: Пустой результат
 	t.Run("empty result", func(t *testing.T) {
 		t.Parallel()
+
 		mockDB, mock, err := sqlmock.New()
 
 		require.NoError(t, err)
@@ -170,12 +182,15 @@ func TestGetUniqueNames(t *testing.T) {
 	// Тест 3: Ошибка запроса
 	t.Run("query error", func(t *testing.T) {
 		t.Parallel()
+
 		mockDB, mock, err := sqlmock.New()
 
 		require.NoError(t, err)
+
 		defer mockDB.Close()
 
 		service := db.New(mockDB)
+
 		mock.ExpectQuery(queryUnique).
 			WillReturnError(errDataBase)
 
@@ -189,9 +204,11 @@ func TestGetUniqueNames(t *testing.T) {
 	// Тест 4: Ошибка сканирования
 	t.Run("scan error", func(t *testing.T) {
 		t.Parallel()
+
 		mockDB, mock, err := sqlmock.New()
 
 		require.NoError(t, err)
+
 		defer mockDB.Close()
 
 		service := db.New(mockDB)
@@ -208,9 +225,11 @@ func TestGetUniqueNames(t *testing.T) {
 	// Тест 5: Ошибка rows.Err()
 	t.Run("rows error", func(t *testing.T) {
 		t.Parallel()
+
 		mockDB, mock, err := sqlmock.New()
 
 		require.NoError(t, err)
+
 		defer mockDB.Close()
 
 		service := db.New(mockDB)
@@ -226,12 +245,11 @@ func TestGetUniqueNames(t *testing.T) {
 		require.ErrorContains(t, err, "rows error:")
 		require.Nil(t, names)
 	})
-
-	//require.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestNew(t *testing.T) {
 	t.Parallel()
+
 	mockDB, mock, err := sqlmock.New()
 
 	require.NoError(t, err)

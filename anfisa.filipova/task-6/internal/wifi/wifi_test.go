@@ -97,6 +97,7 @@ func TestGetAddresses(t *testing.T) {
 	// Тест 5: Ошибка при получении интерфейсов
 	t.Run("error getting interfaces", func(t *testing.T) {
 		t.Parallel()
+
 		mockWifi := NewWiFiHandle(t)
 		service := wifi.New(mockWifi)
 
@@ -113,6 +114,7 @@ func TestGetAddresses(t *testing.T) {
 	// Тест 6: Невалидный MAC-адрес
 	t.Run("invalid MAC address", func(t *testing.T) {
 		t.Parallel()
+
 		mockWifi := NewWiFiHandle(t)
 		service := wifi.New(mockWifi)
 
@@ -135,6 +137,7 @@ func TestGetNames(t *testing.T) {
 	// Тест 1: Успешное получение имен
 	t.Run("success with multiple names", func(t *testing.T) {
 		t.Parallel()
+
 		mockWifi := NewWiFiHandle(t)
 		service := wifi.New(mockWifi)
 
@@ -155,6 +158,7 @@ func TestGetNames(t *testing.T) {
 	// Тест 2: Одно имя
 	t.Run("success with single name", func(t *testing.T) {
 		t.Parallel()
+
 		mockWifi := NewWiFiHandle(t)
 		service := wifi.New(mockWifi)
 
@@ -173,6 +177,7 @@ func TestGetNames(t *testing.T) {
 	// Тест 3: Пустой результат
 	t.Run("success with empty interfaces", func(t *testing.T) {
 		t.Parallel()
+
 		mockWifi := NewWiFiHandle(t)
 		service := wifi.New(mockWifi)
 
@@ -188,6 +193,7 @@ func TestGetNames(t *testing.T) {
 	// Тест 4: Дубликаты имен
 	t.Run("interfaces with duplicate names", func(t *testing.T) {
 		t.Parallel()
+
 		mockWifi := NewWiFiHandle(t)
 		service := wifi.New(mockWifi)
 
@@ -208,6 +214,7 @@ func TestGetNames(t *testing.T) {
 	// Тест 5: Пустое имя
 	t.Run("interface with empty name", func(t *testing.T) {
 		t.Parallel()
+
 		mockWifi := NewWiFiHandle(t)
 		service := wifi.New(mockWifi)
 
@@ -227,6 +234,7 @@ func TestGetNames(t *testing.T) {
 	// Тест 6: Ошибка при получении интерфейсов
 	t.Run("error getting interfaces", func(t *testing.T) {
 		t.Parallel()
+
 		mockWifi := NewWiFiHandle(t)
 		service := wifi.New(mockWifi)
 
@@ -243,6 +251,7 @@ func TestGetNames(t *testing.T) {
 
 func TestNew(t *testing.T) {
 	t.Parallel()
+
 	mockWifi := NewWiFiHandle(t)
 	service := wifi.New(mockWifi)
 

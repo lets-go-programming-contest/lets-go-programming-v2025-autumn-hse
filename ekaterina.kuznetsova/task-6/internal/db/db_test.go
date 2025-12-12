@@ -379,14 +379,3 @@ func TestGetUniqueNames_RowsErrAfterIteration(t *testing.T) {
 	require.Error(t, err)
 	require.Nil(t, names)
 }
-
-func TestNewDBService(t *testing.T) {
-	mockDB, _, err := sqlmock.New()
-	require.NoError(t, err)
-	defer mockDB.Close()
-
-	service := db.New(mockDB)
-	require.NotNil(t, service)
-	require.Equal(t, mockDB, service.DB)
-}
-

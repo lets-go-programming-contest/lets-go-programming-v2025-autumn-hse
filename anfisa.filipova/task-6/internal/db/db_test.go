@@ -75,6 +75,7 @@ func TestGetNames(t *testing.T) {
 		defer mockDB.Close()
 
 		service := db.New(mockDB)
+
 		mock.ExpectQuery(queryDefault).
 			WillReturnError(errDataBase)
 
@@ -166,6 +167,7 @@ func TestGetUniqueNames(t *testing.T) {
 		mockDB, mock, err := sqlmock.New()
 
 		require.NoError(t, err)
+
 		defer mockDB.Close()
 
 		service := db.New(mockDB)

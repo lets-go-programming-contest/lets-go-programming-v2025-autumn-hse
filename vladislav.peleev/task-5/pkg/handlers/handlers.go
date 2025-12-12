@@ -71,6 +71,7 @@ func MultiplexerFunc(ctx context.Context, inputs []chan string, output chan stri
 
 	for _, ch := range inputs {
 		inCh := ch
+
 		waitGroup.Add(1)
 
 		go func(inputChan chan string) {

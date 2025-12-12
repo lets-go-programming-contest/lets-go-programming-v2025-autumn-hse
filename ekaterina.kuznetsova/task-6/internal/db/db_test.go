@@ -28,14 +28,13 @@ func TestGetNames_Success(t *testing.T) {
 }
 
 func TestGetNames_RowsErrAfterIteration(t *testing.T) {
-	mockDB, _, err := sqlmock.New()
+	mockDB, mock, err := sqlmock.New()
 	require.NoError(t, err)
 	defer mockDB.Close()
 
 	service := db.New(mockDB)
 
 	rows := sqlmock.NewRows([]string{"name"}).AddRow("Ivan")
-	rows.Err()
 	rows.RowError(1, errors.New("rows.Err() error"))
 
 	mock.ExpectQuery("SELECT name FROM users").WillReturnRows(rows)

@@ -12,11 +12,10 @@ import (
 	w "github.com/Ekaterina-101/task-6/internal/wifi"
 )
 
-//go:generate mockery --name=WiFi --dir=../../../../../../.. --output=. --outpkg=wifi_test --filename=mock_wifi.go --structname=MockWiFi
+//go:generate mockery --name=WiFiHandle --output=. --outpkg=wifi_test --filename=mock_wifi.go --structname=MockWiFi
 
 var (
-	errInterfacesError = errors.New("interfaces error")
-	errNamesError      = errors.New("names error")
+	errInterfaces = errors.New("interfaces error")
 )
 
 func TestGetAddresses_Success(t *testing.T) {
@@ -27,19 +26,15 @@ func TestGetAddresses_Success(t *testing.T) {
 	hwAddr, err := net.ParseMAC("38:d5:7a:eb:43:8f")
 	require.NoError(t, err)
 
-	interfaces := []*wifi.Interface{
+	mock.On("Interfaces").Return([]*wifi.Interface{
 		{HardwareAddr: hwAddr},
-	}
-
-	want := []net.HardwareAddr{hwAddr}
-
-	mock.On("Interfaces").Return(interfaces, nil)
+	}, nil)
 
 	service := w.New(mock)
 	got, err := service.GetAddresses()
 
 	require.NoError(t, err)
-	assert.Equal(t, want, got)
+	assert.Equal(t, []net.HardwareAddr{hwAddr}, got)
 
 	mock.AssertExpectations(t)
 }
@@ -48,8 +43,7 @@ func TestGetAddresses_Error(t *testing.T) {
 	t.Parallel()
 
 	mock := new(MockWiFi)
-
-	mock.On("Interfaces").Return(nil, errInterfacesError)
+	mock.On("Interfaces").Return(nil, errInterfaces)
 
 	service := w.New(mock)
 	got, err := service.GetAddresses()
@@ -65,7 +59,6 @@ func TestGetAddresses_Empty(t *testing.T) {
 	t.Parallel()
 
 	mock := new(MockWiFi)
-
 	mock.On("Interfaces").Return([]*wifi.Interface{}, nil)
 
 	service := w.New(mock)
@@ -82,18 +75,15 @@ func TestGetNames_Success(t *testing.T) {
 
 	mock := new(MockWiFi)
 
-	ifaceName := "wlp2s0"
-	interfaces := []*wifi.Interface{
-		{Name: ifaceName},
-	}
-
-	mock.On("Interfaces").Return(interfaces, nil)
+	mock.On("Interfaces").Return([]*wifi.Interface{
+		{Name: "wlp2s0"},
+	}, nil)
 
 	service := w.New(mock)
 	got, err := service.GetNames()
 
 	require.NoError(t, err)
-	assert.Equal(t, []string{ifaceName}, got)
+	assert.Equal(t, []string{"wlp2s0"}, got)
 
 	mock.AssertExpectations(t)
 }
@@ -102,15 +92,14 @@ func TestGetNames_Error(t *testing.T) {
 	t.Parallel()
 
 	mock := new(MockWiFi)
-
-	mock.On("Interfaces").Return(nil, errNamesError)
+	mock.On("Interfaces").Return(nil, errInterfaces)
 
 	service := w.New(mock)
 	got, err := service.GetNames()
 
 	require.Error(t, err)
 	assert.Nil(t, got)
-	assert.Contains(t, err.Error(), "getting interfaces: names error")
+	assert.Contains(t, err.Error(), "getting interfaces: interfaces error")
 
 	mock.AssertExpectations(t)
 }
@@ -119,7 +108,6 @@ func TestGetNames_Empty(t *testing.T) {
 	t.Parallel()
 
 	mock := new(MockWiFi)
-
 	mock.On("Interfaces").Return([]*wifi.Interface{}, nil)
 
 	service := w.New(mock)

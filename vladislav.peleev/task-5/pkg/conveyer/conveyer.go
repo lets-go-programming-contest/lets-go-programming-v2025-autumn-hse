@@ -209,7 +209,7 @@ func (c *conveyerImpl) Recv(output string) (string, error) {
 
 	data, ok := <-channel
 	if !ok {
-		return RecvValueOnClosedChannel, nil
+		return recvValueOnClosedChannel, nil
 	}
 
 	return data, nil

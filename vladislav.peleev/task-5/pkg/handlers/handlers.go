@@ -26,7 +26,7 @@ func PrefixDecoratorFunc(ctx context.Context, input chan string, output chan str
 			}
 
 			if strings.Contains(data, noDecoratorSubstr) {
-				return ErrCantBeDecorated
+				return errCantBeDecorated
 			}
 
 			if !strings.HasPrefix(data, decoratedPrefix) {

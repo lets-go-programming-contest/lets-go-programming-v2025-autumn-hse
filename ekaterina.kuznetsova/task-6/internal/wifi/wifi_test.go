@@ -107,7 +107,6 @@ func mockIfaces(addrs, names []string) []*wifi.Interface {
 			hwAddr = parseMAC(addrs[i])
 
 			if hwAddr == nil {
-
 				continue
 			}
 		} else {
@@ -148,7 +147,6 @@ func parseMAC(macStr string) net.HardwareAddr {
 	hwAddr, err := net.ParseMAC(macStr)
 
 	if err != nil {
-
 		return nil
 	}
 

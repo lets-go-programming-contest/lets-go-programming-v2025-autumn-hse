@@ -17,7 +17,7 @@ import (
 func TestNew(t *testing.T) {
 	t.Parallel()
 
-	mockWifi := &wifiMocks.MockWiFi{}
+	mockWifi := &MockWiFi{}
 	wifiService := myWifi.New(mockWifi)
 
 	require.NotNil(t, wifiService, "WiFiService should not be nil")
@@ -39,7 +39,9 @@ var testTable = []rowTestSysInfo{
 }
 
 func TestGetAddresses(t *testing.T) {
-	mockWifi := &wifiMocks.MockWiFi{}
+	t.Parallel()
+
+	mockWifi := &MockWiFi{}
 	wifiService := myWifi.WiFiService{WiFi: mockWifi}
 
 	for i, row := range testTable {
@@ -118,7 +120,9 @@ var testTableGetNames = []rowTestGetNames{
 }
 
 func TestGetNames(t *testing.T) {
-	mockWifi := &wifiMocks.MockWiFi{}
+	t.Parallel()
+
+	mockWifi := &MockWiFi{}
 	wifiService := myWifi.WiFiService{WiFi: mockWifi}
 
 	for i, row := range testTableGetNames {

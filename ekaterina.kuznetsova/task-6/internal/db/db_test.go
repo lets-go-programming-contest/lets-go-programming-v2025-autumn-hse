@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	errQuery   = errors.New("query error")
-	errRowIter = errors.New("row iteration error")
+	errQuery      = errors.New("query error")
+	errRowIter    = errors.New("row iteration error")
+	errRowScaning = errors.New("rows scanning")
 )
 
 func TestGetNames_Success(t *testing.T) {
@@ -49,7 +50,7 @@ func TestGetNames_QueryError(t *testing.T) {
 
 	names, err := service.GetNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, "db query: query error")
+	require.ErrorContains(t, err, errQuery)
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -85,7 +86,7 @@ func TestGetNames_ScanError(t *testing.T) {
 
 	names, err := service.GetNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, "rows scanning")
+	require.ErrorContains(t, err, errRowScaning)
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -107,7 +108,7 @@ func TestGetNames_RowsErrAfterIteration(t *testing.T) {
 
 	names, err := service.GetNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, "rows error: row iteration error")
+	require.ErrorContains(t, err, errRowIter)
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -146,7 +147,7 @@ func TestGetUniqueNames_QueryError(t *testing.T) {
 
 	names, err := service.GetUniqueNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, "db query: query error")
+	require.ErrorContains(t, err, errQuery)
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -182,7 +183,7 @@ func TestGetUniqueNames_ScanError(t *testing.T) {
 
 	names, err := service.GetUniqueNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, "rows scanning")
+	require.ErrorContains(t, err, errRowScaning)
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -204,6 +205,6 @@ func TestGetUniqueNames_RowsErrAfterIteration(t *testing.T) {
 
 	names, err := service.GetUniqueNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, "rows error: row iteration error")
+	require.ErrorContains(t, err, errRowIter)
 	require.NoError(t, mock.ExpectationsWereMet())
 }

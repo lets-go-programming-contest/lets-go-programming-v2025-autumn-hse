@@ -13,7 +13,7 @@ import (
 )
 
 //go:generate mockery --name=WiFiHandle --testonly --quiet --outpkg wifi_test --output .
-var ErrExpected = errors.New("expected error")
+var ErrMockInterfacesCallFailed = errors.New("mock interfaces call failed")
 
 type rowTestSysInfo struct {
 	addrs       []string
@@ -33,7 +33,7 @@ func TestGetAddresses(t *testing.T) {
 			names: []string{"eth1", "eth2"},
 		},
 		{
-			errExpected: ErrExpected,
+			errExpected: ErrMockInterfacesCallFailed,
 		},
 	}
 
@@ -69,7 +69,7 @@ func TestGetNames(t *testing.T) {
 			names: []string{"eth1", "eth2"},
 		},
 		{
-			errExpected: ErrExpected,
+			errExpected: ErrMockInterfacesCallFailed,
 		},
 	}
 

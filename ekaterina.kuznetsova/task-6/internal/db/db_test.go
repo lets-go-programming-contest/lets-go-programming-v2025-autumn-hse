@@ -50,7 +50,7 @@ func TestGetNames_QueryError(t *testing.T) {
 
 	names, err := service.GetNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, errQuery)
+	require.ErrorContains(t, err, errQuery.Error())
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 

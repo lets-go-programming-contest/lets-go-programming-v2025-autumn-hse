@@ -22,7 +22,6 @@ var (
 func TestGetNames(t *testing.T) {
 	t.Parallel()
 
-	// Тест 1: Успешный запрос с несколькими строками
 	t.Run("success with multiple rows", func(t *testing.T) {
 		t.Parallel()
 
@@ -44,7 +43,6 @@ func TestGetNames(t *testing.T) {
 		require.Equal(t, []string{"Alice", "Bob"}, names)
 	})
 
-	// Тест 2: Успешный запрос с пустым результатом
 	t.Run("success with empty result", func(t *testing.T) {
 		t.Parallel()
 
@@ -64,7 +62,6 @@ func TestGetNames(t *testing.T) {
 		require.ElementsMatch(t, []string{}, names)
 	})
 
-	// Тест 3: Ошибка запроса
 	t.Run("query error", func(t *testing.T) {
 		t.Parallel()
 
@@ -81,12 +78,10 @@ func TestGetNames(t *testing.T) {
 
 		names, err := service.GetNames()
 
-		require.Error(t, err)
 		require.ErrorContains(t, err, "db query:")
 		require.Nil(t, names)
 	})
 
-	// Тест 4: Ошибка сканирования (NULL значение)
 	t.Run("scan error", func(t *testing.T) {
 		t.Parallel()
 
@@ -103,12 +98,10 @@ func TestGetNames(t *testing.T) {
 
 		names, err := service.GetNames()
 
-		require.Error(t, err)
 		require.ErrorContains(t, err, "rows scanning:")
 		require.Nil(t, names)
 	})
 
-	// Тест 5: Ошибка rows.Err()
 	t.Run("rows error", func(t *testing.T) {
 		t.Parallel()
 
@@ -127,7 +120,6 @@ func TestGetNames(t *testing.T) {
 
 		names, err := service.GetNames()
 
-		require.Error(t, err)
 		require.ErrorContains(t, err, "rows error:")
 		require.Nil(t, names)
 	})
@@ -136,7 +128,6 @@ func TestGetNames(t *testing.T) {
 func TestGetUniqueNames(t *testing.T) {
 	t.Parallel()
 
-	// Тест 1: Уникальные имена с дубликатами
 	t.Run("distinct with duplicates", func(t *testing.T) {
 		t.Parallel()
 
@@ -160,7 +151,6 @@ func TestGetUniqueNames(t *testing.T) {
 		require.Equal(t, []string{"Alice", "Alice", "Bob"}, names)
 	})
 
-	// Тест 2: Пустой результат
 	t.Run("empty result", func(t *testing.T) {
 		t.Parallel()
 
@@ -181,7 +171,6 @@ func TestGetUniqueNames(t *testing.T) {
 		require.ElementsMatch(t, []string{}, names)
 	})
 
-	// Тест 3: Ошибка запроса
 	t.Run("query error", func(t *testing.T) {
 		t.Parallel()
 
@@ -198,12 +187,10 @@ func TestGetUniqueNames(t *testing.T) {
 
 		names, err := service.GetUniqueNames()
 
-		require.Error(t, err)
 		require.ErrorContains(t, err, "db query:")
 		require.Nil(t, names)
 	})
 
-	// Тест 4: Ошибка сканирования
 	t.Run("scan error", func(t *testing.T) {
 		t.Parallel()
 
@@ -220,11 +207,10 @@ func TestGetUniqueNames(t *testing.T) {
 
 		names, err := service.GetUniqueNames()
 
-		require.Error(t, err)
 		require.ErrorContains(t, err, "rows scanning:")
 		require.Nil(t, names)
 	})
-	// Тест 5: Ошибка rows.Err()
+
 	t.Run("rows error", func(t *testing.T) {
 		t.Parallel()
 
@@ -243,7 +229,6 @@ func TestGetUniqueNames(t *testing.T) {
 
 		names, err := service.GetUniqueNames()
 
-		require.Error(t, err)
 		require.ErrorContains(t, err, "rows error:")
 		require.Nil(t, names)
 	})

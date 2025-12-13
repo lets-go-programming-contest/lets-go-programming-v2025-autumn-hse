@@ -86,7 +86,7 @@ func TestGetNames_ScanError(t *testing.T) {
 
 	names, err := service.GetNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, errRowScaning)
+	require.ErrorContains(t, err, errRowScaning.Error())
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -108,7 +108,7 @@ func TestGetNames_RowsErrAfterIteration(t *testing.T) {
 
 	names, err := service.GetNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, errRowIter)
+	require.ErrorContains(t, err, errRowIter.Error())
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -147,7 +147,7 @@ func TestGetUniqueNames_QueryError(t *testing.T) {
 
 	names, err := service.GetUniqueNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, errQuery)
+	require.ErrorContains(t, err, errQuery.Error())
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -183,7 +183,7 @@ func TestGetUniqueNames_ScanError(t *testing.T) {
 
 	names, err := service.GetUniqueNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, errRowScaning)
+	require.ErrorContains(t, err, errRowScaning.Error())
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -205,6 +205,6 @@ func TestGetUniqueNames_RowsErrAfterIteration(t *testing.T) {
 
 	names, err := service.GetUniqueNames()
 	require.Nil(t, names)
-	require.ErrorContains(t, err, errRowIter)
+	require.ErrorContains(t, err, errRowIter.Error())
 	require.NoError(t, mock.ExpectationsWereMet())
 }
